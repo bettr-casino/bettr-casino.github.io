@@ -1,3 +1,4 @@
-% bettr.casino
+bettr.casino
+============
 
 # Open Bounties
