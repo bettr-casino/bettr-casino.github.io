@@ -2,7 +2,7 @@
 
 | Bounty ID | Bounty Details | 
 |-----------|----------------| 
-| BOUNTY1 | [Create Lobby Card Prefab](./bountys/bounty1.md) | 
+| BOUNTY1 | [Create Lobby Card Prefab](bountys/bounty1.md) | 
 
 
 # Assigned Bounties
