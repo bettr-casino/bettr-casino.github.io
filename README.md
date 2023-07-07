@@ -1,1 +1,3 @@
-# bettr-casino.github.io
+% bettr.casino
+
+# Open Bounties
