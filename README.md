@@ -1,10 +1,16 @@
 # Open Bounties
 
-| [Create Lobby Card Prefab](https://github.com/orgs/bettr-casino/projects/1) | 
+| Bounty |
+| -------|
+| Create Lobby Card Prefab | 
 
 
 # Assigned Bounties
 
+| Bounty |
+| -------|
 
 # Completed Bounties
 
+| Bounty |
+| -------|
