@@ -1,4 +1,1 @@
-bettr.casino
-============
-
 # Open Bounties
