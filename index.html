@@ -34,18 +34,9 @@
             margin: 20px 0; /* Added more vertical spacing */
         }
 
-        ul {
-            list-style-type: disc;
-            margin-left: 20px;
-        }
-
-        li {
-            font-size: 16px;
-        }
-
         /* Style for the colored box */
         .profession-box {
-            background-color: #f2f2f2; /* Choose your desired background color */
+            background-color: #ECECEC; /* Lighter color than the header */
             padding: 10px;
             border-radius: 5px;
         }
@@ -54,6 +45,23 @@
             background-color: #f5f5f5;
             padding: 20px 0; /* Added more vertical spacing */
             text-align: center;
+        }
+
+        /* Style for the list boxes */
+        .list-box {
+            background-color: #f2f2f2; /* Choose your desired background color */
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0; /* Added vertical spacing between lists */
+        }
+
+        /* Remove list bullet points */
+        ul {
+            list-style-type: none;
+        }
+
+        li {
+            font-size: 16px;
         }
     </style>
 
@@ -81,37 +89,45 @@
         </div>
 
         <h2>Our Approach:</h2>
-        <ul>
-            <li>Task-Based Participation:
-                <ul>
-                    <li>Select and complete tasks that align with your expertise.</li>
-                    <li>Work independently, contributing to various facets of game development.</li>
-                </ul>
-            </li>
-            <li>Flexible Involvement:
-                <ul>
-                    <li>Engage on your own terms, with no traditional employment relationship.</li>
-                </ul>
-            </li>
-            <li>Token Appreciation:
-                <ul>
-                    <li>Currently, contributors receive tokens as a token of appreciation for completed tasks.</li>
-                    <li><strong>Future Aspirations:</strong> We aim to offer these tokens as a stake in the project's success, pending legal clearance. Your contributions today could become part of our future profit-sharing plan.</li>
-                </ul>
-            </li>
-            <li>Portfolio Enhancement:
-                <ul>
-                    <li>Add real-world gaming projects to your professional portfolio.</li>
-                    <li>Showcase your diverse and impactful contributions.</li>
-                </ul>
-            </li>
-            <li>Community Collaboration:
-                <ul>
-                    <li>Connect and grow with a network of industry professionals.</li>
-                    <li>Exchange knowledge and learn from peers in the field.</li>
-                </ul>
-            </li>
-        </ul>
+        <!-- Enclosed lists in colored boxes -->
+        <div class="list-box">
+            <ul>
+                <li>Task-Based Participation:</li>
+                <li>Select and complete tasks that align with your expertise.</li>
+                <li>Work independently, contributing to various facets of game development.</li>
+            </ul>
+        </div>
+        
+        <div class="list-box">
+            <ul>
+                <li>Flexible Involvement:</li>
+                <li>Engage on your own terms, with no traditional employment relationship.</li>
+            </ul>
+        </div>
+        
+        <div class="list-box">
+            <ul>
+                <li>Token Appreciation:</li>
+                <li>Currently, contributors receive tokens as a token of appreciation for completed tasks.</li>
+                <li><strong>Future Aspirations:</strong> We aim to offer these tokens as a stake in the project's success, pending legal clearance. Your contributions today could become part of our future profit-sharing plan.</li>
+            </ul>
+        </div>
+        
+        <div class="list-box">
+            <ul>
+                <li>Portfolio Enhancement:</li>
+                <li>Add real-world gaming projects to your professional portfolio.</li>
+                <li>Showcase your diverse and impactful contributions.</li>
+            </ul>
+        </div>
+        
+        <div class="list-box">
+            <ul>
+                <li>Community Collaboration:</li>
+                <li>Connect and grow with a network of industry professionals.</li>
+                <li>Exchange knowledge and learn from peers in the field.</li>
+            </ul>
+        </div>
 
         <h2>Bettr Casino: Shape Tomorrow's Gaming Landscape</h2>
         <p>Join us in this journey where your skills have the potential to earn a future stake in our shared success.</p>
