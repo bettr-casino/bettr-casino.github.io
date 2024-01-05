@@ -1,87 +1,137 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bettr Casino: Collaborative Game Development</title>
-    <script src="https://consent-manager.api.osano.com/osano.js?id=eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJPc2FubywgSW5jLiIsInN1YiI6IkF6eXEybVUwU2I4Z2Q3RzZFIiwiaWF0IjoxNzA0NDMwOTg1LCJleHAiOjE4NjIxMTA5ODUsInNjb3BlcyI6WyJhbGwiXSwianRpIjoiZjJkMzRhMTAtN2ZkNy00ZTc3LWFhZDAtNTk3N2RkMmYzZGQzIn0.LwL21-g0mSOJkTkyAZKpgm-xRYckYV-_h0iMuu8EBOHN5i7_14wHrpBzCSNHUhETWvfucLD8kOssiw_N488hcIBwidT3VwcIon_NwMuVxUdoGb5bDI2yIKVigAKVYgL68CV6qWcgeeQxCI5OZdcGeVHzNIi_ZJGGPvyjGhwO-5sNP5015x1urkgpz0-5i1CuYymvjcRLGC1RfxhgETkiNiR23rXSh_S__fpREPnh_InKoiYg93Wu1OcJoPxLCmVxnxgwOrNkPBaezRryX1Q7TXayg6J55WGOIJ9UbZbrwgJBOeHCbQQrmgk0COSw7Jsf4XKOPRxL_Sd68Hph48562R7K0VkSmfRBwrjqT7XySM0vn1-bmPpiTk6U3iWzGagfASH8Se_85sN3t9ID33l_VDdzgUCZHB1VtX14SE3N_LQmwOjXEMhonPkGLe6u3OL5LpvnIc-PEcuYV_i3_0Kz8CVWlYo27iLNu6ykyCrXbZ5lfvfax2vXWv9MSYikJNJ4"></script>
+    
+    <!-- Osano Cookie Consent Script -->
+    <script src="https://consent-manager.api.osano.com/osano.js?id=your-api-key"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #007BFF;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin: 0;
+        }
+
+        p {
+            font-size: 16px;
+            margin: 20px 0;
+        }
+
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+
+        li {
+            font-size: 16px;
+        }
+
+        h2 em {
+            font-style: italic;
+        }
+
+        footer {
+            background-color: #f5f5f5;
+            padding: 10px 0;
+            text-align: center;
+        }
+    </style>
+
 </head>
 
 <body>
-
-  <script>
-    // Initialize Osano Cookie Consent
-    Osano.init({
-        apiKey: 'eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJPc2FubywgSW5jLiIsInN1YiI6IkF6eXEybVUwU2I4Z2Q3RzZFIiwiaWF0IjoxNzA0NDMwOTg1LCJleHAiOjE4NjIxMTA5ODUsInNjb3BlcyI6WyJhbGwiXSwianRpIjoiZjJkMzRhMTAtN2ZkNy00ZTc3LWFhZDAtNTk3N2RkMmYzZGQzIn0.LwL21-g0mSOJkTkyAZKpgm-xRYckYV-_h0iMuu8EBOHN5i7_14wHrpBzCSNHUhETWvfucLD8kOssiw_N488hcIBwidT3VwcIon_NwMuVxUdoGb5bDI2yIKVigAKVYgL68CV6qWcgeeQxCI5OZdcGeVHzNIi_ZJGGPvyjGhwO-5sNP5015x1urkgpz0-5i1CuYymvjcRLGC1RfxhgETkiNiR23rXSh_S__fpREPnh_InKoiYg93Wu1OcJoPxLCmVxnxgwOrNkPBaezRryX1Q7TXayg6J55WGOIJ9UbZbrwgJBOeHCbQQrmgk0COSw7Jsf4XKOPRxL_Sd68Hph48562R7K0VkSmfRBwrjqT7XySM0vn1-bmPpiTk6U3iWzGagfASH8Se_85sN3t9ID33l_VDdzgUCZHB1VtX14SE3N_LQmwOjXEMhonPkGLe6u3OL5LpvnIc-PEcuYV_i3_0Kz8CVWlYo27iLNu6ykyCrXbZ5lfvfax2vXWv9MSYikJNJ4', // Replace with your actual Osano API key
-        appUrl: window.location.hostname,
-        groups: {
-            necessary: {
-                title: 'Necessary',
-                description: 'These cookies are necessary for the website to function properly.',
+    <!-- Osano Cookie Consent Banner -->
+    <script>
+        Osano.init({
+            apiKey: 'your-api-key', // Replace with your actual Osano API key
+            appUrl: window.location.hostname,
+            groups: {
+                necessary: {
+                    title: 'Necessary',
+                    description: 'These cookies are necessary for the website to function properly.',
+                },
+                analytics: {
+                    title: 'Analytics',
+                    description: 'These cookies allow us to analyze website traffic and improve your experience.',
+                },
             },
-            analytics: {
-                title: 'Analytics',
-                description: 'These cookies allow us to analyze website traffic and improve your experience.',
-            },
-        },
-        languages: ['en'], // Add more languages if needed
-        defaultGroup: 'necessary', // Specify the default group
-    });
-  </script>
+            languages: ['en'], // Add more languages if needed
+            defaultGroup: 'necessary', // Specify the default group
+        });
+    </script>
 
-    <h1>Bettr Casino: Collaborative Game Development</h1>
+    <header>
+        <h1>Bettr Casino: Collaborative Game Development</h1>
+    </header>
 
-    <p>Bettr Casino invites skilled professionals to contribute to our innovative game development projects through a task-based approach.</p>
+    <main>
+        <p>Bettr Casino invites skilled professionals to contribute to our innovative game development projects through a task-based approach.</p>
 
-    <h3><strong>Seeking Contributions From:</strong></h3>
-    <ul>
-        <li><strong>3D Artists & Animators</strong></li>
-        <li><strong>Developers</strong></li>
-        <li><strong>Audio Engineers</strong></li>
-        <li><strong>Product Managers</strong></li>
-        <li><strong>Mathematicians</strong></li>
-    </ul>
+        <h2><strong>Seeking Contributions From:</strong></h2>
+        <ul>
+            <li><strong>3D Artists & Animators</strong></li>
+            <li><strong>Developers</strong></li>
+            <li><strong>Audio Engineers</strong></li>
+            <li><strong>Product Managers</strong></li>
+            <li><strong>Mathematicians</strong></li>
+        </ul>
 
-    <h3><strong>Our Approach:</strong></h3>
+        <h2><strong>Our Approach:</strong></h2>
+        <ul>
+            <li><strong>Task-Based Participation:</strong>
+                <ul>
+                    <li>Select and complete tasks that align with your expertise.</li>
+                    <li>Work independently, contributing to various facets of game development.</li>
+                </ul>
+            </li>
+            <li><strong>Flexible Involvement:</strong>
+                <ul>
+                    <li>Engage on your own terms, with no traditional employment relationship.</li>
+                </ul>
+            </li>
+            <li><strong>Token Appreciation:</strong>
+                <ul>
+                    <li>Currently, contributors receive tokens as a token of appreciation for completed tasks.</li>
+                    <li><strong>Future Aspirations:</strong> We aim to offer these tokens as a stake in the project's success, pending legal clearance. Your contributions today could become part of our future profit-sharing plan.</li>
+                </ul>
+            </li>
+            <li><strong>Portfolio Enhancement:</strong>
+                <ul>
+                    <li>Add real-world gaming projects to your professional portfolio.</li>
+                    <li>Showcase your diverse and impactful contributions.</li>
+                </ul>
+            </li>
+            <li><strong>Community Collaboration:</strong>
+                <ul>
+                    <li>Connect and grow with a network of industry professionals.</li>
+                    <li>Exchange knowledge and learn from peers in the field.</li>
+                </ul>
+            </li>
+        </ul>
 
-    <ul>
-        <li><strong>Task-Based Participation:</strong>
-            <ul>
-                <li>Select and complete tasks that align with your expertise.</li>
-                <li>Work independently, contributing to various facets of game development.</li>
-            </ul>
-        </li>
+        <h2><em>Shape Tomorrow's Gaming Landscape with Bettr Casino</em></h2>
+        <p>Join us in this journey where your skills have the potential to earn a future stake in our shared success.</p>
+    </main>
 
-        <li><strong>Flexible Involvement:</strong>
-            <ul>
-                <li>Engage on your own terms, with no traditional employment relationship.</li>
-            </ul>
-        </li>
-
-        <li><strong>Token Appreciation:</strong>
-            <ul>
-                <li>Currently, contributors receive tokens as a token of appreciation for completed tasks.</li>
-                <li><strong>Future Aspirations:</strong> We aim to offer these tokens as a stake in the project's success, pending legal clearance. Your contributions today could become part of our future profit-sharing plan.</li>
-            </ul>
-        </li>
-
-        <li><strong>Portfolio Enhancement:</strong>
-            <ul>
-                <li>Add real-world gaming projects to your professional portfolio.</li>
-                <li>Showcase your diverse and impactful contributions.</li>
-            </ul>
-        </li>
-
-        <li><strong>Community Collaboration:</strong>
-            <ul>
-                <li>Connect and grow with a network of industry professionals.</li>
-                <li>Exchange knowledge and learn from peers in the field.</li>
-            </ul>
-        </li>
-    </ul>
-
-    <h2><em>Shape Tomorrow's Gaming Landscape with Bettr Casino</em></h2>
-
-    <p>Join us in this journey where your skills have the potential to earn a future stake in our shared success.</p>
+    <footer>
+        <p>&copy; 2024 Bettr Casino</p>
+    </footer>
 
 </body>
 
