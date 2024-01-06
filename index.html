@@ -30,7 +30,7 @@
     </table>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        $(document).ready(function() {
             const dataUrl = 'https://bettr-casino-tasks.s3.us-west-2.amazonaws.com/gsheets-task-list/allopentasks.json';
 
             fetch(dataUrl)
@@ -40,12 +40,13 @@
                 });
 
             function setupTable(data) {
-                const table = $('#tasks-table').DataTable({
+                $('#tasks-table').DataTable({
                     data: data.rows,
-                    columns: data.headers.map(header => ({ title: header }))
+                    columns: data.headers.map(header => ({ title: header })),
+                    pageLength: 5  // Default number of rows per page
                 });
             }
         });
     </script>
 </body>
-</
+</html>
