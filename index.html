@@ -84,7 +84,8 @@
                 $('#tasks-table').DataTable({
                     data: data.rows,
                     columns: data.headers.map(header => ({ title: header })),
-                    pageLength: 5  // Default number of rows per page
+                    pageLength: 10,  // Default number of rows per page
+                    lengthMenu: [10, 20, 50]
                 });
             }
         });
