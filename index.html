@@ -117,7 +117,8 @@
                     const table = $('#summary-table').DataTable();
                     const rowIndex = table.row(this).index(); // Gets the index of the clicked row
                     const detailsRowData = data.rows.map(row => row.slice(detailsStartIndex + 1, internalStartIndex)); // Extract Details columns
-                    populateDetailsForm(detailsColumns, detailsRowData, rowIndex);
+                    const detailsRow = detailsRowData[rowIndex];
+                    populateDetailsForm(detailsColumns, detailsRow, rowIndex);
                 });
             }
     
