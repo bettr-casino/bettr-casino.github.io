@@ -49,6 +49,10 @@
             border: 1px solid #aaa; /* Change border color on hover for differentiation */
         }
 
+        .highlighted {
+            background-color: #f0f0f0; /* Choose a color for highlighting */
+        }
+
         /* ... other styles for DataTables elements ... */
     </style>
 </head>
@@ -114,6 +118,13 @@
     
                 // Event listener for row click in Summary table
                 $('#summary-table tbody').on('click', 'tr', function() {
+
+                    // Remove highlighting from all rows
+                    $('#summary-table tbody tr').removeClass('highlighted');
+                
+                    // Highlight the clicked row
+                    $(this).addClass('highlighted');
+
                     const table = $('#summary-table').DataTable();
                     const rowIndex = table.row(this).index(); // Gets the index of the clicked row
                     const detailsRowData = data.rows.map(row => row.slice(detailsStartIndex + 1, internalStartIndex)); // Extract Details columns
