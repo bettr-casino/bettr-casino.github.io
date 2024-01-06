@@ -9,22 +9,52 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
     <style>
+        body {
+            font-family: Arial, sans-serif; /* Update font if needed */
+            background-color: #fff; /* Set background color if needed */
+            color: #333; /* Set text color if needed */
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
         }
+
         th, td {
             border: 1px solid #ddd;
             padding: 8px;
         }
+
         th {
-            background-color: #f2f2f2;
+            background-color: #002246; /* Updated header background color */
+            color: #fff; /* Set header text color to white for better contrast */
         }
+
+        h1 {
+            background-color: #002246; /* Updated to match the provided styling */
+            color: #fff; /* Set text color to white for better contrast */
+            padding: 10px; /* Adjust padding as needed */
+            text-align: center; /* Center the title if needed */
+        }
+
+        /* Additional styling for DataTables elements as needed */
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            background-color: #002246; /* Match button color to the theme */
+            color: #fff;
+            border: 1px solid #fff; /* Add white border for visibility */
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background-color: #002246; /* Maintain the same color on hover */
+            border: 1px solid #aaa; /* Change border color on hover for differentiation */
+        }
+
+        /* ... other styles for DataTables elements ... */
     </style>
 </head>
 <body>
     <h1>All Tasks</h1>
-    <table id="tasks-table">
+    <table id="tasks-table" class="display" width="100%">
         <thead></thead>
         <tbody></tbody>
     </table>
