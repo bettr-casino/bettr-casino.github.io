@@ -113,24 +113,30 @@
                 });
     
                 // Event listener for row click in Summary table
-                // $('#summary-table tbody').on('click', 'tr', function() {
-                //     const rowData = $('#summary-table').DataTable().row(this).data();
-                //     populateDetailsForm(rowData);
-                // });
+                $('#summary-table tbody').on('click', 'tr', function() {
+                    const table = $('#summary-table').DataTable();
+                    const rowIndex = table.row(this).index(); // Gets the index of the clicked row
+                    const detailsRowData = data.rows.map(row => row.slice(detailsStartIndex + 1, internalStartIndex)); // Extract Details columns
+                    populateDetailsForm(detailsColumns, detailsRowData, rowIndex);
+                });
             }
     
-            // function populateDetailsForm(dataRow) {
-            //     const detailsForm = $('#details-form');
-            //     // Clear existing content
-            //     detailsForm.empty();
+            function populateDetailsForm(columns, dataRow, rowIndex) {
+                const detailsForm = $('#details-form');
+                // Clear existing content
+                detailsForm.empty();
     
-            //     // Populate form fields based on dataRow
-            //     // Example: $('<p>').text(`Title: ${dataRow[3]}`).appendTo(detailsForm);
-            //     // ... add other fields ...
+                // Iterate over columns and create a <p> tag for each column with its corresponding row value
+                columns.forEach((column, index) => {
+                    const columnName = column.title;  // Assuming column object has a 'title' property
+                    const columnValue = dataRow[index];
+
+                    $('<p>').html(`<strong>${columnName}:</strong> ${columnValue}`).appendTo(detailsForm);
+                });
     
-            //     // Show the form
-            //     detailsForm.show();
-            // }
+                // Show the form
+                detailsForm.show();
+            }
         });
     </script>
     
