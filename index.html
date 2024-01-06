@@ -106,6 +106,7 @@
     
                 // // Initialize the Summary DataTable
                 $('#summary-table').DataTable({
+                    data: [data.rows[0]],  // Only show the first row initially
                     columns: data.headers.map(header => ({ title: header })),
                     pageLength: 10,  // Default number of rows per page
                     lengthMenu: [10, 20, 50]
