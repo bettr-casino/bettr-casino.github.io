@@ -108,8 +108,8 @@
                 $('#summary-table').DataTable({
                     data: data.rows.map(row => row.slice(summaryStartIndex + 1, detailsStartIndex)), // Extract Summary columns
                     columns: summaryColumns,
-                    pageLength: 10,  // Default number of rows per page
-                    lengthMenu: [5, 20, 50]
+                    pageLength: 5,  // Default number of rows per page
+                    lengthMenu: [5, 10, 20, 50]
                 });
     
                 // Event listener for row click in Summary table
