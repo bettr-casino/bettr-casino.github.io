@@ -66,31 +66,80 @@
 
     </div>        
 
-    <table id="tasks-table" class="display" width="100%">
-        <thead></thead>
-        <tbody></tbody>
+    <!-- Summary Table -->
+    <table id="summary-table" class="display" width="100%">
+        <thead>
+            <!-- Headers will be dynamically populated -->
+        </thead>
+        <tbody>
+            <!-- Rows will be dynamically populated -->
+        </tbody>
     </table>
+
+    <!-- Details Form -->
+    <div id="details-form" style="display: none;">
+        <!-- Dynamic form fields will be populated here -->
+    </div>
 
     <script>
         $(document).ready(function() {
             const dataUrl = 'https://bettr-casino-tasks.s3.us-west-2.amazonaws.com/gsheets-task-list/allopentasks.json';
-
+    
+            // Fetch and process data
             fetch(dataUrl)
                 .then(response => response.json())
                 .then(data => {
-                    setupTable(data);
+                    setupTables(data);
                 });
-
-            function setupTable(data) {
-                $('#tasks-table').DataTable({
-                    data: data.rows,
-                    columns: data.headers.map(header => ({ title: header })),
-                    pageLength: 10,  // Default number of rows per page
-                    lengthMenu: [10, 20, 50]
+    
+            function setupTables(data) {
+                // Find indices for the 'Summary', 'Details', and 'Internal' columns
+                const summaryStartIndex = data.headers.indexOf("Summary") + 1;
+                const detailsStartIndex = data.headers.indexOf("Details");
+                const internalStartIndex = data.headers.indexOf("Internal");
+    
+                // Create column definitions for Summary and Internal tables
+                const summaryColumns = data.headers.slice(summaryStartIndex, detailsStartIndex)
+                    .map(header => ({ title: header, data: header }));
+                const internalColumns = data.headers.slice(detailsStartIndex, internalStartIndex)
+                    .map(header => ({ title: header, data: header }));
+    
+                // Initialize the Summary DataTable
+                $('#summary-table').DataTable({
+                    data: data.rows.map(row => row.slice(summaryStartIndex, detailsStartIndex)),
+                    columns: summaryColumns,
+                    pageLength: 10
                 });
+    
+                // Initialize the Internal DataTable (if necessary)
+                // $('#internal-table').DataTable({
+                //     data: data.rows.map(row => row.slice(detailsStartIndex, internalStartIndex)),
+                //     columns: internalColumns,
+                //     pageLength: 10
+                // });
+    
+                // Event listener for row click in Summary table
+                $('#summary-table tbody').on('click', 'tr', function() {
+                    const rowData = $('#summary-table').DataTable().row(this).data();
+                    populateDetailsForm(rowData);
+                });
+            }
+    
+            function populateDetailsForm(dataRow) {
+                const detailsForm = $('#details-form');
+                // Clear existing content
+                detailsForm.empty();
+    
+                // Populate form fields based on dataRow
+                // Example: $('<p>').text(`Title: ${dataRow[3]}`).appendTo(detailsForm);
+                // ... add other fields ...
+    
+                // Show the form
+                detailsForm.show();
             }
         });
     </script>
+    
 
     <footer>
         <p>&copy; 2024 Bettr Casino</p>
