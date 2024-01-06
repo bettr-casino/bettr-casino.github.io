@@ -94,14 +94,14 @@
     
             function setupTables(data) {
                 // Find indices for the 'Summary', 'Details', and 'Internal' columns
-                const summaryStartIndex = data.headers.indexOf("Summary") + 1;
+                const summaryStartIndex = data.headers.indexOf("Summary");
                 const detailsStartIndex = data.headers.indexOf("Details");
                 const internalStartIndex = data.headers.indexOf("Internal");
     
                 // Create column definitions for Summary and Internal tables
-                const summaryColumns = data.headers.slice(summaryStartIndex, detailsStartIndex)
+                const summaryColumns = data.headers.slice(summaryStartIndex + 1, detailsStartIndex)
                     .map(header => ({ title: header, data: header }));
-                const internalColumns = data.headers.slice(detailsStartIndex, internalStartIndex)
+                const detailsColumns = data.headers.slice(detailsStartIndex + 1, internalStartIndex)
                     .map(header => ({ title: header, data: header }));
     
                 // Initialize the Summary DataTable
@@ -119,24 +119,24 @@
                 // });
     
                 // Event listener for row click in Summary table
-                $('#summary-table tbody').on('click', 'tr', function() {
-                    const rowData = $('#summary-table').DataTable().row(this).data();
-                    populateDetailsForm(rowData);
-                });
+                // $('#summary-table tbody').on('click', 'tr', function() {
+                //     const rowData = $('#summary-table').DataTable().row(this).data();
+                //     populateDetailsForm(rowData);
+                // });
             }
     
-            function populateDetailsForm(dataRow) {
-                const detailsForm = $('#details-form');
-                // Clear existing content
-                detailsForm.empty();
+            // function populateDetailsForm(dataRow) {
+            //     const detailsForm = $('#details-form');
+            //     // Clear existing content
+            //     detailsForm.empty();
     
-                // Populate form fields based on dataRow
-                // Example: $('<p>').text(`Title: ${dataRow[3]}`).appendTo(detailsForm);
-                // ... add other fields ...
+            //     // Populate form fields based on dataRow
+            //     // Example: $('<p>').text(`Title: ${dataRow[3]}`).appendTo(detailsForm);
+            //     // ... add other fields ...
     
-                // Show the form
-                detailsForm.show();
-            }
+            //     // Show the form
+            //     detailsForm.show();
+            // }
         });
     </script>
     
