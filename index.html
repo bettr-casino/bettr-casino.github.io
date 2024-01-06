@@ -100,9 +100,9 @@
     
                 // Create column definitions for Summary and Internal tables
                 const summaryColumns = data.headers.slice(summaryStartIndex + 1, detailsStartIndex)
-                    .map(header => ({ title: header, data: header }));
+                    .map(header => ({ title: header }));
                 const detailsColumns = data.headers.slice(detailsStartIndex + 1, internalStartIndex)
-                    .map(header => ({ title: header, data: header }));
+                    .map(header => ({ title: header }));
     
                 // // Initialize the Summary DataTable
                 $('#summary-table').DataTable({
