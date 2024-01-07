@@ -156,15 +156,22 @@
                 const detailsForm = $('#details-form');
                 // Clear existing content
                 detailsForm.empty();
+
+                // Start the table
+                const detailsTable = $('<table>').addClass('details-table');
     
-                // Iterate over columns and create a <p> tag for each column with its corresponding row value
+                // Iterate over columns and add rows to the table
                 columns.forEach((column, index) => {
                     const columnName = column.title;  // Assuming column object has a 'title' property
                     const columnValue = dataRow[index];
-
-                    $('<p>').html(`<strong>${columnName}:</strong> ${columnValue}`).appendTo(detailsForm);
+                    const row = $('<tr>')
+                        .append($('<td>').html(`<strong>${columnName}</strong>`))
+                        .append($('<td>').text(columnValue));
+                    detailsTable.append(row);
                 });
     
+                // Append the table to the form
+                detailsTable.appendTo(detailsForm);
                 // Show the form
                 detailsForm.show();
             }
