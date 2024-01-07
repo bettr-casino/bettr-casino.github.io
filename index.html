@@ -160,7 +160,7 @@
                     .map(header => ({ title: header }));
     
                 // // Initialize the Summary DataTable
-                $('#summary-table').DataTable({
+                const summaryTable = $('#summary-table').DataTable({
                     data: data.rows.map(row => row.slice(summaryStartIndex + 1, detailsStartIndex)), // Extract Summary columns
                     columns: summaryColumns,
                     pageLength: 5,  // Default number of rows per page
