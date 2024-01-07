@@ -71,6 +71,25 @@
             line-height: 1.5; /* Line height for better readability */
         }
 
+        .details-table {
+            width: 100%; /* Full width of the container */
+            border-collapse: collapse; /* Collapsed borders */
+        }
+
+        .details-table td {
+            padding: 5px; /* Padding in table cells */
+            border: 1px solid #ddd; /* Border for each cell */
+        }
+
+        .details-table td:first-child {
+            font-weight: bold; /* Bold font for keys */
+            width: 30%; /* Fixed width for keys column */
+        }
+
+        .details-table td:last-child {
+            width: 70%; /* Remaining width for values column */
+        }
+
         /* ... other styles for DataTables elements ... */
     </style>
 </head>
@@ -165,7 +184,7 @@
                     const columnName = column.title;  // Assuming column object has a 'title' property
                     const columnValue = dataRow[index];
                     const row = $('<tr>')
-                        .append($('<td>').html(`<strong>${columnName}</strong>`))
+                        .append($('<td>').html(columnName))
                         .append($('<td>').text(columnValue));
                     detailsTable.append(row);
                 });
