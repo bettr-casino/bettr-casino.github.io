@@ -219,7 +219,7 @@
                     const columnValue = dataRow[index];
 
                     // Check if the column is 'Tags' and process accordingly
-                    if (columnName === 'Tags') {
+                    if (columnName === 'Tags' || columnName === 'Skill Sets') {
                         const tags = columnValue.split(',').map(tag => tag.trim());
                         const tagsContainer = $('<td>');
                         tags.forEach(tag => {
@@ -231,7 +231,7 @@
                         const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').text(columnValue));
                         detailsTable.append(row);
                     }
-                    
+
                 });
     
                 const button = $('<button>')
