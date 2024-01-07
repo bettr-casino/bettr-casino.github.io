@@ -213,19 +213,26 @@
                 // Start the table
                 const detailsTable = $('<table>').addClass('details-table');
 
-                // Check if the column is 'Tags' and process accordingly
-                if (columnName === 'Tags') {
-                    const tags = columnValue.split(',').map(tag => tag.trim());
-                    const tagsContainer = $('<td>');
-                    tags.forEach(tag => {
-                        $('<span>').addClass('tag').text(tag).appendTo(tagsContainer);
-                    });
-                    const row = $('<tr>').append($('<td>').text(columnName)).append(tagsContainer);
-                    detailsTable.append(row);
-                } else {
-                    const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').text(columnValue));
-                    detailsTable.append(row);
-                }
+                // Iterate over columns and add rows to the table
+                columns.forEach((column, index) => {
+                    const columnName = column.title;  // Assuming column object has a 'title' property
+                    const columnValue = dataRow[index];
+
+                    // Check if the column is 'Tags' and process accordingly
+                    if (columnName === 'Tags') {
+                        const tags = columnValue.split(',').map(tag => tag.trim());
+                        const tagsContainer = $('<td>');
+                        tags.forEach(tag => {
+                            $('<span>').addClass('tag').text(tag).appendTo(tagsContainer);
+                        });
+                        const row = $('<tr>').append($('<td>').text(columnName)).append(tagsContainer);
+                        detailsTable.append(row);
+                    } else {
+                        const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').text(columnValue));
+                        detailsTable.append(row);
+                    }
+                    
+                });
     
                 const button = $('<button>')
                     .text('Download Challenge')
