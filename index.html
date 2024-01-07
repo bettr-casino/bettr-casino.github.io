@@ -135,9 +135,9 @@
     
             function setupTables(data) {
                 // Find indices for the 'Summary', 'Details', and 'Internal' columns
-                const summaryStartIndex = data.headers.indexOf("Summary");
-                const detailsStartIndex = data.headers.indexOf("Details");
-                const internalStartIndex = data.headers.indexOf("Internal");
+                const summaryStartIndex = data.headers.indexOf("Section");
+                const detailsStartIndex = data.headers.indexOf("Section", summaryStartIndex + 1);
+                const internalStartIndex = data.headers.indexOf("Section", detailsStartIndex + 1);
     
                 // Create column definitions for Summary and Internal tables
                 const summaryColumns = data.headers.slice(summaryStartIndex + 1, detailsStartIndex)
@@ -181,7 +181,7 @@
 
                 // Start the table
                 const detailsTable = $('<table>').addClass('details-table');
-    
+
                 // Iterate over columns and add rows to the table
                 columns.forEach((column, index) => {
                     const columnName = column.title;  // Assuming column object has a 'title' property
@@ -191,6 +191,8 @@
                         .append($('<td>').text(columnValue));
                     detailsTable.append(row);
                 });
+    
+                const button = $('<button>').text('Complete Challenge').addClass('get-started-btn');
     
                 // Append the table to the form
                 detailsTable.appendTo(detailsForm);
