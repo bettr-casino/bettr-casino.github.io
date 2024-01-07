@@ -103,6 +103,16 @@
             text-align: center; /* Center text */
         }
 
+        .tag {
+            display: inline-block;
+            background-color: #002246;
+            color: white;
+            padding: 5px 10px;
+            margin: 2px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
 
         /* ... other styles for DataTables elements ... */
     </style>
@@ -203,15 +213,19 @@
                 // Start the table
                 const detailsTable = $('<table>').addClass('details-table');
 
-                // Iterate over columns and add rows to the table
-                columns.forEach((column, index) => {
-                    const columnName = column.title;  // Assuming column object has a 'title' property
-                    const columnValue = dataRow[index];
-                    const row = $('<tr>')
-                        .append($('<td>').html(columnName))
-                        .append($('<td>').text(columnValue));
+                // Check if the column is 'Tags' and process accordingly
+                if (columnName === 'Tags') {
+                    const tags = columnValue.split(',').map(tag => tag.trim());
+                    const tagsContainer = $('<td>');
+                    tags.forEach(tag => {
+                        $('<span>').addClass('tag').text(tag).appendTo(tagsContainer);
+                    });
+                    const row = $('<tr>').append($('<td>').text(columnName)).append(tagsContainer);
                     detailsTable.append(row);
-                });
+                } else {
+                    const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').text(columnValue));
+                    detailsTable.append(row);
+                }
     
                 const button = $('<button>')
                     .text('Download Challenge')
