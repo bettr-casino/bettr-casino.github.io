@@ -114,8 +114,8 @@
             
         <h2>Open Source Game Development Platform</h2>
         <p>Bettr Casino is an open source game development platform. ur mission is to build and deploy online games through a collaborative open-source project model.</p>
-        <p>Join us by completing one of the challenges listed below.</p>
-        <p>Each challenge has been designed to be completed in a few hours. Once your complete is accepted, you will receive tokens which represent a stake in the game's success.</p>
+        <p>Join us by downloading one of the challenge package listed below. Follow the instructions in the downloaded package to get started.</p>
+        <p>Each challenge has been designed to be completed in a few hours. Completed challenges will receive tokens which represent a stake in the game's success.</p>
 
         <!-- Additional Content Sections Here -->
 
@@ -166,6 +166,12 @@
                     pageLength: 5,  // Default number of rows per page
                     lengthMenu: [5, 10, 20, 50]
                 });
+
+                // Check if there are rows in the table
+                if (summaryTable.data().any()) {
+                    // Trigger click on the first row
+                    $('#summary-table tbody tr:eq(0)').click();
+                }
     
                 // Event listener for row click in Summary table
                 $('#summary-table tbody').on('click', 'tr', function() {
@@ -206,7 +212,10 @@
                     detailsTable.append(row);
                 });
     
-                const button = $('<button>').text('Complete Challenge').addClass('get-started-btn');
+                const button = $('<button>')
+                    .text('Download Challenge')
+                    .addClass('get-started-btn')
+                    .on('click', downloadChallenge); // Bind the click event;
                 detailsForm.append(button);
     
                 // Append the table to the form
@@ -214,6 +223,12 @@
                 // Show the form
                 detailsForm.show();
             }
+
+            function downloadChallenge() {
+                // Your code here
+                alert('TODO: Download Challenge'); // Example action
+            }
+            
         });
     </script>
     
