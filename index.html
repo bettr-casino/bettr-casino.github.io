@@ -705,6 +705,42 @@
                 var email = $("#register-modal input[name='email']").val();
                 // Show spinner
                 $('#register-spinner').show();
+
+                // Define a timeout duration
+                var timeoutDuration = 10000;
+
+                // Set up a timer for the timeout
+                var timeout = setTimeout(function() {
+                    // Hide spinner
+                    $('#register-spinner').hide();
+                    // Show timeout error message
+                    $('#register-error').text('Verification code request timed out. If this persists, please email support@bettr.casino.').show();
+                }, timeoutDuration);
+
+                // // Make the HTTP POST request
+                // $.ajax({
+                //     url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/otp',
+                //     type: 'POST',
+                //     contentType: 'application/json',
+                //     data: JSON.stringify({ "email": email }),
+                //     success: function(response) {
+                //         // Clear the timeout
+                //         clearTimeout(timeout);
+                //         // Hide spinner and error message
+                //         $('#login-spinner').hide();
+                //         $('#login-error').hide();
+                //         // Call showVerificationModal on success
+                //         showVerificationModal(email, "login");
+                //     },
+                //     error: function(xhr, status, error) {
+                //         // Clear the timeout
+                //         clearTimeout(timeout);
+                //         // Hide spinner and show error message
+                //         $('#login-spinner').hide();
+                //         $('#login-error').text('Failed to send verification code. Please try again.').show();
+                //     }
+                // });
+
                 //showVerificationModal(email, "register");
             });
 
