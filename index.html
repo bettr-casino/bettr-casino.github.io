@@ -500,13 +500,13 @@
                 var modalContent = document.querySelector('.register-modal-content');
 
                 // Calculate the modal position
-                var topPosition = rect.top + window.scrollY; // 10px above the button
-                var leftPosition = rect.left - modalContent.offsetWidth + window.scrollX; // Centered above the button
+                var topPosition = rect.top + window.scrollY;
+                var rightPosition = 20;
 
                 // Adjust modal position and display it
                 modal.style.display = 'block';
                 modal.style.top = `${topPosition}px`;
-                modal.style.left = `${leftPosition}px`;
+                modal.style.right = `${rightPosition}px`;
             }
 
             // When the user clicks on <span> (x), close the register modal
@@ -532,13 +532,13 @@
                 var modalContent = document.querySelector('.login-modal-content');
 
                 // Calculate the modal position
-                var topPosition = rect.top + window.scrollY; // 10px above the button
-                var leftPosition = rect.left - modalContent.offsetWidth + window.scrollX; // Centered above the button
+                var topPosition = rect.top + window.scrollY;
+                var rightPosition = 20;
 
                 // Adjust modal position and display it
                 modal.style.display = 'block';
                 modal.style.top = `${topPosition}px`;
-                modal.style.left = `${leftPosition}px`;
+                modal.style.right = `${rightPosition}px`;
             }
 
             // When the user clicks on <span> (x), close the register modal
