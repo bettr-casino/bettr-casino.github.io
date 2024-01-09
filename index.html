@@ -288,7 +288,7 @@
         <div class="register-modal-content">
             <span id="register_close" class="close">&times;</span>
             <h2>Register</h2>
-            <p>We’ll email you a one time password.</p>
+            <p>We’ll email you a verification code.</p>
             <form id="register-form">
                 <input type="email" placeholder="Email" name="email" required>
                 <label>
@@ -305,7 +305,7 @@
         <div class="login-modal-content">
             <span id="login_close" class="close">&times;</span>
             <h2>Login</h2>
-            <p>We’ll email you a one time password.</p>
+            <p>We’ll email you a verification code.</p>
             <form id="login-form">
                 <input type="email" placeholder="Email" name="email" required>
                 <label>
@@ -323,8 +323,9 @@
             <span id="verification_close" class="close">&times;</span>
             <span id="verification_back" class="verification-modal-back-btn">Back</span>
             <h2>Verification</h2>
+            <p>We emailed you a verification code.</p>
             <form id="verification-form">
-                <input type="text" placeholder="Verification Code" name="verification_code" required>
+                <input type="text" placeholder="Enter Verification Code" name="verification_code" required>
                 <button id="verification_button" type="button">Verify</button>
             </form>
         </div>
@@ -535,7 +536,6 @@
                 var registerButton = document.getElementById('register-btn');
                 var rect = registerButton.getBoundingClientRect();
                 var modal = document.getElementById('register-modal');
-                var modalContent = document.querySelector('.register-modal-content');
 
                 // Calculate the modal position
                 var topPosition = rect.top + window.scrollY;
@@ -553,7 +553,6 @@
                 var loginButton = document.getElementById('login-btn');
                 var rect = loginButton.getBoundingClientRect();
                 var modal = document.getElementById('login-modal');
-                var modalContent = document.querySelector('.login-modal-content');
 
                 // Calculate the modal position
                 var topPosition = rect.top + window.scrollY;
@@ -640,17 +639,16 @@
                 var parentModal = $(`#${modalType}-modal`);
                 parentModal.hide();
 
-                var modal = $("#verification-modal");
+                $('#verification-modal').show();
+
+                var modal = document.getElementById('verification-modal');
                 var modalHeader = $("#verification-modal .verification-modal-content h2");
                 var modalBackButton = $("#verification_back");
-
-                // Show the verification modal
                 modalHeader.text(modalType === "register" ? "Register" : "Login");
-                modal.show();
 
                 // Set the event handler for the back button
                 modalBackButton.on("click", function() {
-                    modal.hide();
+                    $('#verification-modal').hide();
                     $("#" + modalType + "-modal").show();
                 });
 
