@@ -700,11 +700,10 @@
                 modal.style.right = `${rightPosition}px`;
             }
 
-            // Bind the showVerificationModal to the click event of the button
-            $('#register_button').click(function() {
-                var email = $("#register-modal input[name='email']").val();
+            function handleVerification(modalType) {
+                var email = $(`#${modalType}-modal input[name='email']`).val();
                 // Show spinner
-                $('#register-spinner').show();
+                $(`#${modalType}-spinner`).show();
 
                 // Define a timeout duration
                 var timeoutDuration = 10000;
@@ -712,64 +711,44 @@
                 // Set up a timer for the timeout
                 var timeout = setTimeout(function() {
                     // Hide spinner
-                    $('#register-spinner').hide();
+                    $(`#${modalType}-spinner`).hide();
                     // Show timeout error message
-                    $('#register-error').text('Verification code request timed out. If this persists, please email support@bettr.casino.').show();
+                    $(`#${modalType}-error`).text('Verification code request timed out. If this persists, please email support@bettr.casino.').show();
                 }, timeoutDuration);
 
-                // // Make the HTTP POST request
-                // $.ajax({
-                //     url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/otp',
-                //     type: 'POST',
-                //     contentType: 'application/json',
-                //     data: JSON.stringify({ "email": email }),
-                //     success: function(response) {
-                //         // Clear the timeout
-                //         clearTimeout(timeout);
-                //         // Hide spinner and error message
-                //         $('#login-spinner').hide();
-                //         $('#login-error').hide();
-                //         // Call showVerificationModal on success
-                //         showVerificationModal(email, "login");
-                //     },
-                //     error: function(xhr, status, error) {
-                //         // Clear the timeout
-                //         clearTimeout(timeout);
-                //         // Hide spinner and show error message
-                //         $('#login-spinner').hide();
-                //         $('#login-error').text('Failed to send verification code. Please try again.').show();
-                //     }
-                // });
+                // Make the HTTP POST request
+                $.ajax({
+                    url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/otp',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ "email": email }),
+                    success: function(response) {
+                        // Clear the timeout
+                        clearTimeout(timeout);
+                        // Hide spinner and error message
+                        $(`#${modalType}-spinner`).hide();
+                        $(`#${modalType}-error`).hide();
+                        // Call showVerificationModal on success
+                        showVerificationModal(email, modalType);
+                    },
+                    error: function(xhr, status, error) {
+                        // Clear the timeout
+                        clearTimeout(timeout);
+                        // Hide spinner and show error message
+                        $(`#${modalType}-spinner`).hide();
+                        $(`#${modalType}-error').text('Verification code request error. If this persists, please email support@bettr.casino.`).show();
+                    }
+                });
+            }
 
-                //showVerificationModal(email, "register");
+            // Bind the showVerificationModal to the click event of the button
+            $('#register_button').click(function() {
+                handleVerification("register");
+
             });
 
             $('#login_button').click(function() {
-                var email = $("#login-modal input[name='email']").val();
-                // Show spinner
-                $('#login-spinner').show();
-
-                // Make the HTTP POST request
-                // $.ajax({
-                //     url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/otp',
-                //     type: 'POST',
-                //     contentType: 'application/json',
-                //     data: JSON.stringify({ "email": email }),
-                //     success: function(response) {
-                //         // Hide spinner and error message
-                //         $('#register-spinner').hide();
-                //         $('#register-error').hide();
-                //         // Call showVerificationModal on success
-                //         showVerificationModal(email, "register");
-                //     },
-                //     error: function(xhr, status, error) {
-                //         // Hide spinner and show error message
-                //         $('#register-spinner').hide();
-                //         $('#register-error').text('Failed to send verification code. Please try again.').show();
-                //     }
-                // });
-
-                //showVerificationModal(email, "login");
+                handleVerification("login");
             });
 
             // Event handlers for closing the modals
