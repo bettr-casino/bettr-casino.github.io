@@ -173,7 +173,9 @@
             text-align: center; /* Center the text */
         }
 
-        .register-modal-content {
+        .register-modal-content,
+        .login-modal-content,
+        .verification-modal-content {
             background-color: #f9f9f9;
             padding: 10px;
             border: 1px solid #002246;
@@ -185,7 +187,9 @@
         }
 
         /* The Submit Button */
-        #register_button {
+        #register_button,
+        #login_button,
+        #verification_button {
             background-color: #9a9af7; /* Same as highlighted row color */
             color: white; /* Text color */
             padding: 14px 20px;
@@ -196,13 +200,16 @@
             border-radius: 5px; /* Rounded corners */
         }
 
-        #register_button:hover {
+        #register_button:hover,
+        #login_button:hover {
             background-color: #8484f8; /* Slightly lighter color on hover */
             opacity: 0.9;
         }
 
         /* The Close Button */
-        #register_close {
+        #register_close,
+        #login_close,
+        #verification_close {
             color: #002246; /* Color to match the header */
             float: right;
             font-size: 28px;
@@ -210,76 +217,20 @@
         }
 
         #register_close:hover,
-        #register_close:focus {
-            color: #9a9af7; /* Color on hover to match the button */
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .login-modal-content {
-            background-color: #f9f9f9;
-            padding: 10px;
-            border: 1px solid #002246;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            width: auto; /* Auto width based on content */
-            min-width: 200px; /* Minimum width */
-            max-width: 300px; /* Maximum width */
-        }
-
-        /* The Submit Button */
-        #login_button {
-            background-color: #9a9af7; /* Same as highlighted row color */
-            color: white; /* Text color */
-            padding: 14px 20px;
-            margin: 8px 0;
-            border: none;
-            cursor: pointer;
-            width: 100%; /* Full width */
-            border-radius: 5px; /* Rounded corners */
-        }
-
-        #login_button:hover {
-            background-color: #8484f8; /* Slightly lighter color on hover */
-            opacity: 0.9;
-        }
-
-        /* The Close Button */
-        #login_close {
-            color: #002246; /* Color to match the header */
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
+        #register_close:focus,
         #login_close:hover,
-        #login_close:focus {
+        #login_close:focus, 
+        #verification_close:hover,
+        #verification_close:focus{
             color: #9a9af7; /* Color on hover to match the button */
             text-decoration: none;
             cursor: pointer;
-        }
-
-        /* Shared styles for both register and login modals */
-        .modal-verify-btn {
-            background-color: #9a9af7; /* Same as highlighted row color */
-            color: white; /* Text color */
-            padding: 14px 20px;
-            margin: 8px 0;
-            border: none;
-            cursor: pointer;
-            width: 100%; /* Full width */
-            border-radius: 5px; /* Rounded corners */
-            font-size: 16px;
-        }
-
-        .modal-verify-btn:hover {
-            background-color: #8484f8; /* Slightly lighter color on hover */
-            opacity: 0.9;
-        }
+        }        
 
         /* Style for the verification code input */
         #register-modal input[type="text"],
-        #login-modal input[type="text"] {
+        #login-modal input[type="text"],
+        #verification-modal input[type="text"] {
             width: calc(100% - 20px);
             padding: 10px;
             margin: 10px 0;
@@ -290,7 +241,8 @@
 
         /* Disabled state of the button */
         #register_button:disabled,
-        #login_button:disabled {
+        #login_button:disabled,
+        #verification_button:disabled {
             background-color: #cccccc; /* Light gray background to indicate it's disabled */
             color: #666666; /* Darker gray text */
             cursor: not-allowed; /* Cursor to indicate the button is not clickable */
@@ -299,22 +251,24 @@
 
         /* Hover state of the disabled button to ensure there's no change */
         #register_button:disabled:hover,
-        #login_button:disabled:hover {
+        #login_button:disabled:hover,
+        #verification_button:disabled:hover {
             background-color: #cccccc; /* Same as the normal disabled state */
             opacity: 1; /* No change in opacity */
         }
-
-        .modal-back-btn {
+                
+        /* Add the back button styles as well */
+        .verification-modal-back-btn {
             display: inline-block;
             margin-top: 10px;
-            color: #9a9af7; /* Choose a color that fits your design */
+            color: #9a9af7;
             cursor: pointer;
             text-decoration: underline;
         }
 
-        .modal-back-btn:hover {
-            color: #8484f8; /* Slightly lighter color on hover */
-        }
+        .verification-modal-back-btn:hover {
+            color: #8484f8;
+        }        
 
     </style>
 </head>
@@ -335,7 +289,7 @@
             <span id="register_close" class="close">&times;</span>
             <h2>Register</h2>
             <p>We’ll email you a one time password.</p>
-            <form>
+            <form id="register-form">
                 <input type="email" placeholder="Email" name="email" required>
                 <label>
                     <input type="checkbox" checked="checked" name="remember"> Remember me
@@ -352,7 +306,7 @@
             <span id="login_close" class="close">&times;</span>
             <h2>Login</h2>
             <p>We’ll email you a one time password.</p>
-            <form>
+            <form id="login-form">
                 <input type="email" placeholder="Email" name="email" required>
                 <label>
                 <input type="checkbox" checked="checked" name="remember"> Remember me
@@ -362,9 +316,23 @@
         </div>
     </div>
 
+    <!-- The Verification Modal -->
+    <div id="verification-modal" class="modal" style="display: none;">
+        <!-- Modal content -->
+        <div class="verification-modal-content">
+            <span id="verification_close" class="close">&times;</span>
+            <span id="verification_back" class="verification-modal-back-btn">Back</span>
+            <h2>Verification</h2>
+            <form id="verification-form">
+                <input type="text" placeholder="Verification Code" name="verification_code" required>
+                <button id="verification_button" type="button">Verify</button>
+            </form>
+        </div>
+    </div>
+
     <div class="header-buttons">
         <h1>Bettr Casino: Open Source Game Development Platform</h1>
-        <button id="register-account-btn" class="header-btn">Register</button>
+        <button id="register-btn" class="header-btn">Register</button>
         <button id="login-btn" class="header-btn">Login</button>
     </div>
 
@@ -564,7 +532,7 @@
             function showRegisterButton(){
                 $('#register-modal').show();
                 // Get the button that opens the register modal
-                var registerButton = document.getElementById('register-account-btn');
+                var registerButton = document.getElementById('register-btn');
                 var rect = registerButton.getBoundingClientRect();
                 var modal = document.getElementById('register-modal');
                 var modalContent = document.querySelector('.register-modal-content');
@@ -606,7 +574,7 @@
             var registerModal = document.getElementById('register-modal');
 
             // Get the button that opens the register modal
-            var registerButton = document.getElementById('register-account-btn');
+            var registerButton = document.getElementById('register-btn');
 
             // Get the <span> element that closes the register modal
             var registerClose = document.getElementById('register_close');
@@ -653,41 +621,62 @@
                 }
             }
 
-            function getVerificationCode(email, modalType, buttonText) {
-                // Placeholder for server call
-                console.log("Server call to send verification code to: " + email);
+            // Get the login modal
+            var verificationModal = document.getElementById('verification-modal');
 
-                // Update the modal content based on the provided image
-                var modalContentHtml = `
-                    <div class="` + modalType + `-modal-content">
-                        <span class="close-btn">&times;</span>
-                        <form>
-                            <input type="text" placeholder="Verification Code" name="verificationCode" required>
-                            <button id="` + modalType + `-verify-button" type="button" class="modal-verify-btn">` + buttonText + `</button>
-                        </form>
-                    </div>`;
+            // Get the <span> element that closes the login modal
+            var verificationClose = document.getElementById('verification_close');
 
-                // Set the new HTML inside the modal content
-                $("#" + modalType + "-modal").html(modalContentHtml);
-
-                // Add event handler for the close button inside the modal
-                $("#" + modalType + "-modal .close-btn").click(function() {
-                    $("#" + modalType + "-modal").hide();
-                });                
-
-                // Show the updated modal
-                $("#" + modalType + "-modal").show();
+            // When the user clicks on <span> (x), close the register modal
+            verificationClose.onclick = function() {
+                verificationModal.style.display = 'none';
             }
 
-            // Bind the getVerificationCode function to the click event of the button
+
+            // Function to show the verification modal
+            function showVerificationModal(email, modalType) {
+
+                // Get the register modal
+                var parentModal = $(`#${modalType}-modal`);
+                parentModal.hide();
+
+                var modal = $("#verification-modal");
+                var modalHeader = $("#verification-modal .verification-modal-content h2");
+                var modalBackButton = $("#verification_back");
+
+                // Show the verification modal
+                modalHeader.text(modalType === "register" ? "Register" : "Login");
+                modal.show();
+
+                // Set the event handler for the back button
+                modalBackButton.on("click", function() {
+                    modal.hide();
+                    $("#" + modalType + "-modal").show();
+                });
+
+                // Get the button that opens the login or register modal
+                var btn = document.getElementById(`${modalType}-btn`);
+                var rect = btn.getBoundingClientRect();
+
+                // Calculate the modal position
+                var topPosition = rect.top + window.scrollY;
+                var rightPosition = 20;
+
+                // Adjust modal position and display it
+                modal.style.display = 'block';
+                modal.style.top = `${topPosition}px`;
+                modal.style.right = `${rightPosition}px`;
+            }
+
+            // Bind the showVerificationModal to the click event of the button
             $('#register_button').click(function() {
                 var email = $("#register-modal input[name='email']").val();
-                getVerificationCode(email, "register", "Register");
+                showVerificationModal(email, "register");
             });
 
             $('#login_button').click(function() {
                 var email = $("#login-modal input[name='email']").val();
-                getVerificationCode(email, "login", "Login");
+                showVerificationModal(email, "login");
             });
 
             // Event handlers for closing the modals
