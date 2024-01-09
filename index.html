@@ -259,6 +259,50 @@
             cursor: pointer;
         }
 
+        /* Shared styles for both register and login modals */
+        .modal-verify-btn {
+            background-color: #9a9af7; /* Same as highlighted row color */
+            color: white; /* Text color */
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%; /* Full width */
+            border-radius: 5px; /* Rounded corners */
+            font-size: 16px;
+        }
+
+        .modal-verify-btn:hover {
+            background-color: #8484f8; /* Slightly lighter color on hover */
+            opacity: 0.9;
+        }
+
+        /* Style for the verification code input */
+        #register-modal input[type="text"],
+        #login-modal input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd; /* Light grey border */
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        /* Disabled state of the button */
+        #register_button:disabled,
+        #login_button:disabled {
+            background-color: #cccccc; /* Light gray background to indicate it's disabled */
+            color: #666666; /* Darker gray text */
+            cursor: not-allowed; /* Cursor to indicate the button is not clickable */
+            border: 1px solid #bbbbbb; /* Border color for disabled state */
+        }
+
+        /* Hover state of the disabled button to ensure there's no change */
+        #register_button:disabled:hover,
+        #login_button:disabled:hover {
+            background-color: #cccccc; /* Same as the normal disabled state */
+            opacity: 1; /* No change in opacity */
+        }
 
     </style>
 </head>
@@ -348,6 +392,36 @@
                 .then(data => {
                     setupTables(data);
                 });
+
+            // Function to validate email using simple regex
+            function isValidEmail(email) {
+                var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return regex.test(email);
+            }
+
+            // Function to enable/disable verification button based on email validity
+            function toggleVerificationButton(inputSelector, buttonSelector) {
+                var email = $(inputSelector).val();
+                if (isValidEmail(email)) {
+                    $(buttonSelector).prop('disabled', false);
+                } else {
+                    $(buttonSelector).prop('disabled', true);
+                }
+            }
+
+            // Event listener for email input on register modal
+            $("#register-modal input[name='email']").on('input', function() {
+                toggleVerificationButton("#register-modal input[name='email']", "#register_button");
+            });
+
+            // Event listener for email input on login modal
+            $("#login-modal input[name='email']").on('input', function() {
+                toggleVerificationButton("#login-modal input[name='email']", "#login_button");
+            });
+
+            // Initialize verification buttons as disabled
+            $('#register_button').prop('disabled', true);
+            $('#login_button').prop('disabled', true);
     
             function setupTables(data) {
                 // Find indices for the 'Summary', 'Details', and 'Internal' columns
@@ -549,23 +623,54 @@
                 if (event.target == registerModal) {
                     registerModal.style.display = 'none';
                 }
-                if (event.target == loginModal) {
+                else if (event.target == loginModal) {
                     loginModal.style.display = 'none';
+                }
+                else if (event.target.className === "modal") {
+                    $(event.target).hide();
                 }
             }
 
-            function getVerificationCode() {
-                // Implement the verification code logic
-                alert('Verification code logic to be implemented.');
+            function getVerificationCode(email, modalType) {
+                // Placeholder for server call
+                console.log("Server call to send verification code to: " + email);
+
+                // Update the modal content based on the provided image
+                var modalContentHtml = `
+                    <span class="close-btn">&times;</span>
+                    <h2>Log in to your portal</h2>
+                    <p>Email sent to ` + email + `</p>
+                    <p>Check your inbox for your verification code</p>
+                    <input type="text" placeholder="Verification Code" name="verificationCode" required>
+                    <button id="` + modalType + `-verify-button" type="button" class="modal-verify-btn">Sign in</button>
+                `;
+
+                // Set the new HTML inside the modal content
+                $("#" + modalType + "-modal .modal-content").html(modalContentHtml);
+
+                // Add event handler for the close button inside the modal
+                $(".close-btn").click(function() {
+                    $("#" + modalType + "-modal").hide();
+                });
+
+                // Show the updated modal
+                $("#" + modalType + "-modal").show();
             }
 
             // Bind the getVerificationCode function to the click event of the button
             $('#register_button').click(function() {
-                getVerificationCode();
+                var email = $("#register-modal input[name='email']").val();
+                getVerificationCode(email, "register");
             });
 
             $('#login_button').click(function() {
-                getVerificationCode();
+                var email = $("#login-modal input[name='email']").val();
+                getVerificationCode(email, "login");
+            });
+
+            // Event handlers for closing the modals
+            $(".close-btn").click(function() {
+                $(this).closest(".modal").hide();
             });
             
         });
