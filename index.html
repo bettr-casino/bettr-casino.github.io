@@ -284,12 +284,12 @@
                 <label>
                     <input type="checkbox" checked="checked" name="remember"> Remember me
                 </label>
-                <button id="register_button" type="button" onclick="getVerificationCode()">Get verification code</button>
+                <button id="register_button" type="button">Get verification code</button>
             </form>
         </div>
     </div>
 
-        <!-- The Login Modal similar to the Register Modal -->
+    <!-- The Login Modal similar to the Register Modal -->
     <div id="login-modal" class="modal" style="display: none;">
         <!-- Modal content -->
         <div class="login-modal-content">
@@ -305,8 +305,6 @@
             </form>
         </div>
     </div>
-  
-  
 
     <div class="header-buttons">
         <h1>Bettr Casino: Open Source Game Development Platform</h1>
@@ -561,15 +559,14 @@
                 alert('Verification code logic to be implemented.');
             }
 
-            // When the user clicks the button, open the login modal
-            loginBtn.onclick = function() {
-                loginModal.style.display = 'block';
-            }
+            // Bind the getVerificationCode function to the click event of the button
+            $('#register_button').click(function() {
+                getVerificationCode();
+            });
 
-            // When the user clicks on <span> (x), close the login modal
-            loginSpan.onclick = function() {
-                loginModal.style.display = 'none';
-            }            
+            $('#login_button').click(function() {
+                getVerificationCode();
+            });
             
         });
     </script>
