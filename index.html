@@ -173,6 +173,49 @@
             text-align: center; /* Center the text */
         }
 
+        .register-modal-content {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #002246;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            width: auto; /* Auto width based on content */
+            min-width: 200px; /* Minimum width */
+            max-width: 300px; /* Maximum width */
+        }
+
+        /* The Submit Button */
+        #register_button {
+            background-color: #9a9af7; /* Same as highlighted row color */
+            color: white; /* Text color */
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%; /* Full width */
+            border-radius: 5px; /* Rounded corners */
+        }
+
+        #register_button:hover {
+            background-color: #8484f8; /* Slightly lighter color on hover */
+            opacity: 0.9;
+        }
+
+        /* The Close Button */
+        #register_close {
+            color: #002246; /* Color to match the header */
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        #register_close:hover,
+        #register_close:focus {
+            color: #9a9af7; /* Color on hover to match the button */
+            text-decoration: none;
+            cursor: pointer;
+        }
+
 
     </style>
 </head>
@@ -185,6 +228,24 @@
             <p id="modal-message"></p>
         </div>
     </div>
+
+    <!-- The Register Modal -->
+    <div id="register-modal" class="modal" style="display: none;">
+        <!-- Modal content -->
+        <div class="register-modal-content">
+            <span id="register_close" class="close">&times;</span>
+            <h2>Log in to your portal</h2>
+            <p>We’ll send a single use access code to your registered email.</p>
+            <form>
+            <input type="email" placeholder="Email" name="email" required>
+            <label>
+                <input type="checkbox" checked="checked" name="remember"> Remember me
+            </label>
+            <button id="register_button" type="button" onclick="getVerificationCode()">Get verification code</button>
+            </form>
+        </div>
+    </div>
+  
 
     <div class="header-buttons">
         <h1>Bettr Casino: Open Source Game Development Platform</h1>
@@ -359,6 +420,50 @@
             $('.close-btn').on('click', function() {
                 $('#user-modal').hide();
             });
+
+            // Get the register modal
+            var registerModal = document.getElementById('register-modal');
+
+            // Get the button that opens the register modal
+            var btn = document.getElementById('register-account-btn');
+
+            // Get the <span> element that closes the register modal
+            var span = document.getElementById('register_close');
+
+            // When the user clicks the button, open the register modal 
+            btn.onclick = function() {
+                $('#register-modal').show();
+
+                var rect = btn.getBoundingClientRect();
+                var modal = document.getElementById('register-modal');
+                var modalContent = document.querySelector('.register-modal-content');
+
+                // Calculate the modal position
+                var topPosition = rect.top + window.scrollY; // 10px above the button
+                var leftPosition = rect.left - modalContent.offsetWidth + window.scrollX; // Centered above the button
+
+                // Adjust modal position and display it
+                modal.style.display = 'block';
+                modal.style.top = `${topPosition}px`;
+                modal.style.left = `${leftPosition}px`;
+            }
+
+            // When the user clicks on <span> (x), close the register modal
+            span.onclick = function() {
+                registerModal.style.display = 'none';
+            }
+
+            // When the user clicks anywhere outside of the register modal, close it
+            window.onclick = function(event) {
+                if (event.target == registerModal) {
+                    registerModal.style.display = 'none';
+                }
+            }
+
+            function getVerificationCode() {
+                // Implement the verification code logic
+                alert('Verification code logic to be implemented.');
+            }
             
         });
     </script>
