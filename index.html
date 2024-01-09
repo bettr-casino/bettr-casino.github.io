@@ -304,6 +304,18 @@
             opacity: 1; /* No change in opacity */
         }
 
+        .modal-back-btn {
+            display: inline-block;
+            margin-top: 10px;
+            color: #9a9af7; /* Choose a color that fits your design */
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .modal-back-btn:hover {
+            color: #8484f8; /* Slightly lighter color on hover */
+        }
+
     </style>
 </head>
 <body>
@@ -549,6 +561,42 @@
                 modal.style.left = `${leftPosition}px`;
             }
 
+            function showRegisterButton(){
+                $('#register-modal').show();
+                // Get the button that opens the register modal
+                var registerButton = document.getElementById('register-account-btn');
+                var rect = registerButton.getBoundingClientRect();
+                var modal = document.getElementById('register-modal');
+                var modalContent = document.querySelector('.register-modal-content');
+
+                // Calculate the modal position
+                var topPosition = rect.top + window.scrollY;
+                var rightPosition = 20;
+
+                // Adjust modal position and display it
+                modal.style.display = 'block';
+                modal.style.top = `${topPosition}px`;
+                modal.style.right = `${rightPosition}px`;
+            }
+
+            function showLoginButton() {
+                $('#login-modal').show();
+                // Get the button that opens the login modal
+                var loginButton = document.getElementById('login-btn');
+                var rect = loginButton.getBoundingClientRect();
+                var modal = document.getElementById('login-modal');
+                var modalContent = document.querySelector('.login-modal-content');
+
+                // Calculate the modal position
+                var topPosition = rect.top + window.scrollY;
+                var rightPosition = 20;
+
+                // Adjust modal position and display it
+                modal.style.display = 'block';
+                modal.style.top = `${topPosition}px`;
+                modal.style.right = `${rightPosition}px`;
+            }
+
             // Close modal when the close button is clicked
             $('.close-btn').on('click', function() {
                 $('#user-modal').hide();
@@ -565,20 +613,7 @@
 
             // When the user clicks the button, open the register modal 
             registerButton.onclick = function() {
-                $('#register-modal').show();
-
-                var rect = registerButton.getBoundingClientRect();
-                var modal = document.getElementById('register-modal');
-                var modalContent = document.querySelector('.register-modal-content');
-
-                // Calculate the modal position
-                var topPosition = rect.top + window.scrollY;
-                var rightPosition = 20;
-
-                // Adjust modal position and display it
-                modal.style.display = 'block';
-                modal.style.top = `${topPosition}px`;
-                modal.style.right = `${rightPosition}px`;
+                showRegisterButton();                
             }
 
             // When the user clicks on <span> (x), close the register modal
@@ -597,20 +632,7 @@
 
             // When the user clicks the button, open the register modal 
             loginButton.onclick = function() {
-                $('#login-modal').show();
-
-                var rect = loginButton.getBoundingClientRect();
-                var modal = document.getElementById('login-modal');
-                var modalContent = document.querySelector('.login-modal-content');
-
-                // Calculate the modal position
-                var topPosition = rect.top + window.scrollY;
-                var rightPosition = 20;
-
-                // Adjust modal position and display it
-                modal.style.display = 'block';
-                modal.style.top = `${topPosition}px`;
-                modal.style.right = `${rightPosition}px`;
+                showLoginButton();                
             }
 
             // When the user clicks on <span> (x), close the register modal
@@ -651,7 +673,7 @@
                 // Add event handler for the close button inside the modal
                 $("#" + modalType + "-modal .close-btn").click(function() {
                     $("#" + modalType + "-modal").hide();
-                });
+                });                
 
                 // Show the updated modal
                 $("#" + modalType + "-modal").show();
