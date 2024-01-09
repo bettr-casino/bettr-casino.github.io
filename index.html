@@ -631,25 +631,25 @@
                 }
             }
 
-            function getVerificationCode(email, modalType) {
+            function getVerificationCode(email, modalType, buttonText) {
                 // Placeholder for server call
                 console.log("Server call to send verification code to: " + email);
 
                 // Update the modal content based on the provided image
                 var modalContentHtml = `
-                    <span class="close-btn">&times;</span>
-                    <h2>Log in to your portal</h2>
-                    <p>Email sent to ` + email + `</p>
-                    <p>Check your inbox for your verification code</p>
-                    <input type="text" placeholder="Verification Code" name="verificationCode" required>
-                    <button id="` + modalType + `-verify-button" type="button" class="modal-verify-btn">Sign in</button>
-                `;
+                    <div class="` + modalType + `-modal-content">
+                        <span class="close-btn">&times;</span>
+                        <form>
+                            <input type="text" placeholder="Verification Code" name="verificationCode" required>
+                            <button id="` + modalType + `-verify-button" type="button" class="modal-verify-btn">` + buttonText + `</button>
+                        </form>
+                    </div>`;
 
                 // Set the new HTML inside the modal content
-                $("#" + modalType + "-modal .modal-content").html(modalContentHtml);
+                $("#" + modalType + "-modal").html(modalContentHtml);
 
                 // Add event handler for the close button inside the modal
-                $(".close-btn").click(function() {
+                $("#" + modalType + "-modal .close-btn").click(function() {
                     $("#" + modalType + "-modal").hide();
                 });
 
@@ -660,12 +660,12 @@
             // Bind the getVerificationCode function to the click event of the button
             $('#register_button').click(function() {
                 var email = $("#register-modal input[name='email']").val();
-                getVerificationCode(email, "register");
+                getVerificationCode(email, "register", "Register");
             });
 
             $('#login_button').click(function() {
                 var email = $("#login-modal input[name='email']").val();
-                getVerificationCode(email, "login");
+                getVerificationCode(email, "login", "Login");
             });
 
             // Event handlers for closing the modals
