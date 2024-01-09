@@ -136,13 +136,59 @@
         }
 
 
-        /* ... other styles for DataTables elements ... */
+        /* modal */
+        .modal {
+            position: fixed; /* Keep it fixed relative to the viewport */
+            z-index: 2; /* Higher z-index to ensure it's above other content */
+            display: none; /* Initially hidden */
+            background-color: rgba(0, 34, 70, 0.4); /* Semi-transparent background */
+        }
+
+        .modal-content {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #002246;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            width: auto; /* Auto width based on content */
+            min-width: 200px; /* Minimum width */
+            max-width: 300px; /* Maximum width */
+        }
+
+        .close-btn {
+            color: #002246; /* Close button color to match scheme */
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: #9a9af7; /* Color on hover */
+        }
+
+        .modal p {
+            color: #333; /* Text color */
+            font-size: 18px; /* Text size */
+            text-align: center; /* Center the text */
+        }
+
+
     </style>
 </head>
 <body>
+
+    <!-- Modal Structure -->
+    <div id="user-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <p id="modal-message"></p>
+        </div>
+    </div>
+
     <div class="header-buttons">
         <h1>Bettr Casino: Open Source Game Development Platform</h1>
-        <button id="create-account-btn" class="header-btn">Create Account</button>
+        <button id="register-account-btn" class="header-btn">Register</button>
         <button id="login-btn" class="header-btn">Login</button>
     </div>
 
@@ -272,10 +318,47 @@
                 detailsForm.show();
             }
 
-            function downloadChallenge() {
-                // Your code here
-                alert('TODO: Download Challenge'); // Example action
+            function checkUserSession() {
+                var userId = localStorage.getItem('user_id');
+                var sessionToken = localStorage.getItem('session_token');
+
+                if (!userId) {
+                    showModal('Please register to access challenges.');
+                } else if (!sessionToken) {
+                    showModal('Please login to continue.');
+                }
             }
+
+            function showModal(message) {
+                $('#modal-message').text(message);
+                $('#user-modal').show();
+            }
+
+            function downloadChallenge() {
+                checkUserSession();        
+                // Position the modal above the 'Download Challenge' button
+                positionModalAboveButton(this);        
+            }
+
+            function positionModalAboveButton(button) {
+                var rect = button.getBoundingClientRect();
+                var modal = document.getElementById('user-modal');
+                var modalContent = document.querySelector('.modal-content');
+
+                // Calculate the modal position
+                var topPosition = rect.top - modalContent.offsetHeight - 10 + window.scrollY; // 10px above the button
+                var leftPosition = rect.left + (rect.width / 2) - (modalContent.offsetWidth / 2) + window.scrollX; // Centered above the button
+
+                // Adjust modal position and display it
+                modal.style.display = 'block';
+                modal.style.top = `${topPosition}px`;
+                modal.style.left = `${leftPosition}px`;
+            }
+
+            // Close modal when the close button is clicked
+            $('.close-btn').on('click', function() {
+                $('#user-modal').hide();
+            });
             
         });
     </script>
