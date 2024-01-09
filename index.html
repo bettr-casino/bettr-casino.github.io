@@ -268,7 +268,31 @@
 
         .verification-modal-back-btn:hover {
             color: #8484f8;
-        }        
+        }
+        
+        .button-with-spinner {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .spinner {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #0732f3;
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            animation: spin 2s linear infinite;
+            position: absolute;
+            right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
     </style>
 </head>
@@ -294,7 +318,12 @@
                 <label>
                     <input type="checkbox" checked="checked" name="remember"> Remember me
                 </label>
-                <button id="register_button" type="button">Get verification code</button>
+                <button id="register_button" type="button" class="button-with-spinner">
+                    Get verification code
+                    <div id="register-spinner" class="spinner" style="display: none;"></div>
+                </button>
+                <!-- Error message -->
+                <p id="register-error" style="display: none; color: red;"></p>
             </form>
         </div>
     </div>
@@ -311,7 +340,12 @@
                 <label>
                 <input type="checkbox" checked="checked" name="remember"> Remember me
                 </label>
-                <button id="login_button" type="button">Get verification code</button>
+                <button id="login_button" type="button" class="button-with-spinner">
+                    Get verification code
+                    <div id="login-spinner" class="spinner" style="display: none;"></div>
+                </button>
+                <!-- Error message -->
+                <p id="login-error" style="display: none; color: red;"></p>
             </form>
         </div>
     </div>
@@ -669,12 +703,37 @@
             // Bind the showVerificationModal to the click event of the button
             $('#register_button').click(function() {
                 var email = $("#register-modal input[name='email']").val();
-                showVerificationModal(email, "register");
+                // Show spinner
+                $('#register-spinner').show();
+                //showVerificationModal(email, "register");
             });
 
             $('#login_button').click(function() {
                 var email = $("#login-modal input[name='email']").val();
-                showVerificationModal(email, "login");
+                // Show spinner
+                $('#login-spinner').show();
+
+                // Make the HTTP POST request
+                // $.ajax({
+                //     url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/otp',
+                //     type: 'POST',
+                //     contentType: 'application/json',
+                //     data: JSON.stringify({ "email": email }),
+                //     success: function(response) {
+                //         // Hide spinner and error message
+                //         $('#register-spinner').hide();
+                //         $('#register-error').hide();
+                //         // Call showVerificationModal on success
+                //         showVerificationModal(email, "register");
+                //     },
+                //     error: function(xhr, status, error) {
+                //         // Hide spinner and show error message
+                //         $('#register-spinner').hide();
+                //         $('#register-error').text('Failed to send verification code. Please try again.').show();
+                //     }
+                // });
+
+                //showVerificationModal(email, "login");
             });
 
             // Event handlers for closing the modals
