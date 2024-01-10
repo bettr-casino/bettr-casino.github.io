@@ -536,7 +536,9 @@
                 const button = $('<button>')
                     .text('Download Challenge')
                     .addClass('get-started-btn')
-                    .on('click', downloadChallenge); // Bind the click event;
+                    .on('click', function() {
+                        downloadChallenge(this, dataRow);
+                    }); // Bind the click event;
                 detailsForm.append(button);
     
                 // Append the table to the form
@@ -551,9 +553,13 @@
 
                 if (!userId) {
                     showModal('Please register to download challenges.');
+                    return false;
                 } else if (!sessionToken) {
                     showModal('Please login to continue.');
+                    return false;
                 }
+
+                return true;
             }
 
             function showModal(message) {
@@ -579,13 +585,14 @@
             }
 
 
-            function downloadChallenge() {
-                checkUserSession();        
-                // Position the modal above the 'Download Challenge' button
-                positionModalAboveButton(this);        
+            function downloadChallenge(button, dataRow) {
+                if (checkUserSession()) {
+                    // Position the modal above the 'Download Challenge' button
+                    positionModalAboveButton(button, dataRow);        
+                }
             }
 
-            function positionModalAboveButton(button) {
+            function positionModalAboveButton(button, message) {
                 var rect = button.getBoundingClientRect();
                 var modal = document.getElementById('user-modal');
                 var modalContent = document.querySelector('.modal-content');
@@ -593,6 +600,8 @@
                 // Calculate the modal position
                 var topPosition = rect.top - modalContent.offsetHeight - 10 + window.scrollY; // 10px above the button
                 var leftPosition = rect.left + (rect.width / 2) - (modalContent.offsetWidth / 2) + window.scrollX; // Centered above the button
+
+                $('#modal-message').text(message);
 
                 // Adjust modal position and display it
                 modal.style.display = 'block';
