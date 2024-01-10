@@ -372,8 +372,8 @@
 
     <div class="header-buttons">
         <h1>Bettr Casino: Open Source Game Development Platform</h1>
-        <button id="register-btn" class="header-btn">Register</button>
-        <button id="login-btn" class="header-btn">Login</button>
+        <button id="register-btn" class="header-btn" style="display: none;">Register</button>
+        <button id="login-btn" class="header-btn" style="display: none;">Login</button>
         <button id="logout-btn" class="header-btn" style="display: none;">Logout</button>
     </div>
 
@@ -405,6 +405,18 @@
 
     <script>
         $(document).ready(function() {
+
+            var userId = localStorage.getItem('user_id');
+
+            if (userId)
+            {
+                $('#register-btn').hide();
+            }
+            else
+            {
+                $('#register-btn').show();
+            }
+
             const dataUrl = 'https://bettr-casino-tasks.s3.us-west-2.amazonaws.com/gsheets-task-list/allopentasks.json';
     
             // Fetch and process data
@@ -702,19 +714,22 @@
                         $(`#verification-error`).hide();
                         // Store the user id and session token in local storage
                         var user = response.user;
-                        var user_id = user.id;
-                        var session_token = user.session_token;
-                        var is_banned = user.is_banned;
-                        var is_verified = user.is_verified;
-                        if (is_banned) {
+                        var userId = user.id;
+                        var sessionToken = user.session_token;
+                        var isBanned = user.is_banned;
+                        var isVerified = user.is_verified;
+                        if (isBanned) {
                             $(`#verification-error`).text('Your account is currently banned. If this persists, email support@bettr.casino.');
-                        } else if (!is_verified) {
+                        } else if (!isVerified) {
                             $(`#verification-error`).text('Your account is currently not verified using the email verification code. If this persists, email support@bettr.casino.');
                         } else {
                             $(`#verification-error`).hide();
                             $(`#verification-modal`).hide();
-                            localStorage.setItem('user_id', user_id);
-                            localStorage.setItem('session_token', session_token);
+                            localStorage.setItem('user_id', userId);
+                            localStorage.setItem('session_token', sessionToken);
+                            $('#register-btn').hide();
+                            $('#login-btn').hide();
+                            $('#logout-btn').show();
                         }
                     },
                     error: function(xhr, status, error) {
@@ -809,33 +824,50 @@
             }
 
             // Function to validate the session token
-            function validateSessionToken() {
+            function refreshSessionToken() {
                 var userId = localStorage.getItem('user_id');
                 var sessionToken = localStorage.getItem('session_token');
 
+                if (!sessionToken)
+                {
+                    $('#login-btn').show();
+                    $('#logout-btn').hide();
+                    return;
+                }
+
                 if (userId && sessionToken) {
                     $.ajax({
-                        url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/validate',
-                        type: 'POST',
+                        url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/refresh',
+                        type: 'PATCH',
                         contentType: 'application/json',
+                        headers: { 'Token': sessionToken },
                         data: JSON.stringify({ "session_token": sessionToken }),
                         success: function(response) {
+                            console.log(response);
+
                             if (response.is_banned) {
                                 // Clear local storage and show error if not verified or banned
-                                localStorage.removeItem('user_id');
                                 localStorage.removeItem('session_token');
-                                $('#register-btn').show();
                                 $('#login-btn').show();
                                 $('#logout-btn').hide();
                                 showModal('Your account has an issue. If this persists, email support@bettr.casino.');
                                 return;
                             }
 
-                            if (response.user.id !== userId) {
+                            var user = response.user;
+
+                            if (user.id !== userId) {
                                 // Clear local storage if user ID doesn't match
-                                localStorage.removeItem('user_id');
                                 localStorage.removeItem('session_token');
-                                $('#register-btn').show();
+                                $('#login-btn').show();
+                                $('#logout-btn').hide();
+                                showModal('Your will need to relogin. If this persists, email support@bettr.casino.');
+                                return;
+                            }
+
+                            if (!user.session_token) {
+                                // Clear local storage if user ID doesn't match
+                                localStorage.removeItem('session_token');
                                 $('#login-btn').show();
                                 $('#logout-btn').hide();
                                 showModal('Your will need to relogin. If this persists, email support@bettr.casino.');
@@ -843,15 +875,14 @@
                             }
 
                             // Update local storage with new session token and hide buttons
-                            localStorage.setItem('session_token', response.user.session_token);
-                            $('#register-btn').hide();
+                            localStorage.setItem('session_token', user.session_token);
                             $('#login-btn').hide();
                             $('#logout-btn').show();
                         },
                         error: function(xhr, status, error) {
                             // Handle error (optional)
                             console.error(error);
-                            $('#register-btn').show();
+                            localStorage.removeItem('session_token');
                             $('#login-btn').show();
                             $('#logout-btn').hide();
                         }
@@ -877,17 +908,18 @@
             // Logout button click event
             $('#logout-btn').click(function() {
                 // Clear local storage
-                localStorage.removeItem('user_id');
                 localStorage.removeItem('session_token');
 
                 // Hide Logout button and show Register and Login buttons
                 $('#logout-btn').hide();
-                $('#register-btn').show();
                 $('#login-btn').show();
+
+                var userId = localStorage.getItem('user_id');
+                $('#register-btn').toggle(!!userId);
             });
 
             // Call the validateSessionToken function
-            validateSessionToken();        
+            refreshSessionToken();        
             
         });
     </script>
