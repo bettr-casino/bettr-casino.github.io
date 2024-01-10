@@ -558,8 +558,26 @@
 
             function showModal(message) {
                 $('#modal-message').text(message);
-                $('#user-modal').show();
+
+                var modal = $('#user-modal');
+                var windowWidth = $(window).width();
+                var windowHeight = $(window).height();
+                var modalWidth = modal.outerWidth();
+                var modalHeight = modal.outerHeight();
+
+                // Calculating the top and left offset to center the modal
+                var top = Math.max(windowHeight / 2 - modalHeight / 2, 0);
+                var left = Math.max(windowWidth / 2 - modalWidth / 2, 0);
+
+                modal.css({
+                    top: top + $(window).scrollTop(),
+                    left: left + $(window).scrollLeft(),
+                    position: 'absolute'
+                });
+
+                modal.show();
             }
+
 
             function downloadChallenge() {
                 checkUserSession();        
