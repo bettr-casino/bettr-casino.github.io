@@ -374,6 +374,7 @@
         <h1>Bettr Casino: Open Source Game Development Platform</h1>
         <button id="register-btn" class="header-btn">Register</button>
         <button id="login-btn" class="header-btn">Login</button>
+        <button id="logout-btn" class="header-btn" style="display: none;">Logout</button>
     </div>
 
     <div class="content">
@@ -807,6 +808,57 @@
                 });
             }
 
+            // Function to validate the session token
+            function validateSessionToken() {
+                var userId = localStorage.getItem('user_id');
+                var sessionToken = localStorage.getItem('session_token');
+
+                if (userId && sessionToken) {
+                    $.ajax({
+                        url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/validate',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ "session_token": sessionToken }),
+                        success: function(response) {
+                            if (response.is_banned) {
+                                // Clear local storage and show error if not verified or banned
+                                localStorage.removeItem('user_id');
+                                localStorage.removeItem('session_token');
+                                $('#register-btn').show();
+                                $('#login-btn').show();
+                                $('#logout-btn').hide();
+                                showModal('Your account has an issue. If this persists, email support@bettr.casino.');
+                                return;
+                            }
+
+                            if (response.user.id !== userId) {
+                                // Clear local storage if user ID doesn't match
+                                localStorage.removeItem('user_id');
+                                localStorage.removeItem('session_token');
+                                $('#register-btn').show();
+                                $('#login-btn').show();
+                                $('#logout-btn').hide();
+                                showModal('Your will need to relogin. If this persists, email support@bettr.casino.');
+                                return;
+                            }
+
+                            // Update local storage with new session token and hide buttons
+                            localStorage.setItem('session_token', response.user.session_token);
+                            $('#register-btn').hide();
+                            $('#login-btn').hide();
+                            $('#logout-btn').show();
+                        },
+                        error: function(xhr, status, error) {
+                            // Handle error (optional)
+                            console.error(error);
+                            $('#register-btn').show();
+                            $('#login-btn').show();
+                            $('#logout-btn').hide();
+                        }
+                    });
+                }
+            }
+
             // Bind the showVerificationModal to the click event of the button
             $('#register_button').click(function() {
                 generateVerificationCode("register");
@@ -821,6 +873,21 @@
             $(".close-btn").click(function() {
                 $(this).closest(".modal").hide();
             });
+
+            // Logout button click event
+            $('#logout-btn').click(function() {
+                // Clear local storage
+                localStorage.removeItem('user_id');
+                localStorage.removeItem('session_token');
+
+                // Hide Logout button and show Register and Login buttons
+                $('#logout-btn').hide();
+                $('#register-btn').show();
+                $('#login-btn').show();
+            });
+
+            // Call the validateSessionToken function
+            validateSessionToken();        
             
         });
     </script>
