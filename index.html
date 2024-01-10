@@ -360,7 +360,12 @@
             <p>We emailed you a verification code.</p>
             <form id="verification-form">
                 <input type="text" placeholder="Enter Verification Code" name="verification_code" required>
-                <button id="verification_button" type="button">Verify</button>
+                <button id="verification_button" type="button" class="button-with-spinner">
+                    Verify
+                    <div id="verification-spinner" class="spinner" style="display: none;"></div>
+                </button>
+                <!-- Error message -->
+                <p id="verification-error" style="display: none; color: red;"></p>
             </form>
         </div>
     </div>
@@ -665,6 +670,61 @@
                 verificationModal.style.display = 'none';
             }
 
+            function authUser(email, otp, modalType) {
+                // Show spinner
+                $(`#${modalType}-spinner`).show();
+
+                // Define a timeout duration
+                var timeoutDuration = 10000;
+
+                // Set up a timer for the timeout
+                var timeout = setTimeout(function() {
+                    // Hide spinner
+                    $(`#${modalType}-spinner`).hide();
+                    // Show timeout error message
+                    $(`#${modalType}-error`).text('Verify timed out. If this persists, please email support@bettr.casino.').show();
+                }, timeoutDuration);
+
+                var createUser = modalType === "register" ? true : false;
+
+                // Make the HTTP POST request
+                $.ajax({
+                    url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/login/email',
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ "email": email, 'otp': otp, 'create_user': createUser }),
+                    success: function(response) {
+                        // Clear the timeout
+                        clearTimeout(timeout);
+                        // Hide spinner and error message
+                        $(`#verification-spinner`).hide();
+                        $(`#verification-error`).hide();
+                        // Store the user id and session token in local storage
+                        var user = response.user;
+                        var user_id = user.id;
+                        var session_token = user.session_token;
+                        var is_banned = user.is_banned;
+                        var is_verified = user.is_verified;
+                        if (is_banned) {
+                            $(`#verification-error`).text('Your account is currently banned. If this persists, email support@bettr.casino.');
+                        } else if (!is_verified) {
+                            $(`#verification-error`).text('Your account is currently not verified using the email verification code. If this persists, email support@bettr.casino.');
+                        } else {
+                            $(`#verification-error`).hide();
+                            $(`#verification-modal`).hide();
+                            localStorage.setItem('user_id', user_id);
+                            localStorage.setItem('session_token', session_token);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Clear the timeout
+                        clearTimeout(timeout);
+                        // Hide spinner and show error message
+                        $(`#verification-spinner`).hide();
+                        $(`#verification-error`).text(`Verify error. If this persists, email support@bettr.casino.`).show();
+                    }
+                });
+            }
 
             // Function to show the verification modal
             function showVerificationModal(email, modalType) {
@@ -698,9 +758,15 @@
                 modal.style.display = 'block';
                 modal.style.top = `${topPosition}px`;
                 modal.style.right = `${rightPosition}px`;
+
+                $('#verification_button').click(function() {
+                    var otp = $("#verification-form input[name='verification_code']").val();
+                    authUser(email, otp, modalType);
+                });
+
             }
 
-            function handleVerification(modalType) {
+            function generateVerificationCode(modalType) {
                 var email = $(`#${modalType}-modal input[name='email']`).val();
                 // Show spinner
                 $(`#${modalType}-spinner`).show();
@@ -713,7 +779,7 @@
                     // Hide spinner
                     $(`#${modalType}-spinner`).hide();
                     // Show timeout error message
-                    $(`#${modalType}-error`).text('Verification code request timed out. If this persists, please email support@bettr.casino.').show();
+                    $(`#${modalType}-error`).text('Verification code request timed out. If this persists, email support@bettr.casino.').show();
                 }, timeoutDuration);
 
                 // Make the HTTP POST request
@@ -736,19 +802,19 @@
                         clearTimeout(timeout);
                         // Hide spinner and show error message
                         $(`#${modalType}-spinner`).hide();
-                        $(`#${modalType}-error').text('Verification code request error. If this persists, please email support@bettr.casino.`).show();
+                        $(`#${modalType}-error').text('Verification code request error. If this persists, email support@bettr.casino.`).show();
                     }
                 });
             }
 
             // Bind the showVerificationModal to the click event of the button
             $('#register_button').click(function() {
-                handleVerification("register");
+                generateVerificationCode("register");
 
             });
 
             $('#login_button').click(function() {
-                handleVerification("login");
+                generateVerificationCode("login");
             });
 
             // Event handlers for closing the modals
