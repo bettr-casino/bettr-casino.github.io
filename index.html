@@ -465,9 +465,6 @@
                 // Find the index of the "Publish" column
                 const publishIndex = headers.indexOf("Publish");
 
-                headers = filteredHeaders;
-                rows = filteredRows;
-
                 // Find indices for the 'Summary', 'Details', and 'Internal' columns
                 const summaryStartIndex = headers.indexOf("Section");
                 const detailsStartIndex = headers.indexOf("Section", summaryStartIndex + 1);
