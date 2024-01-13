@@ -406,7 +406,10 @@
     <script>
         $(document).ready(function() {
 
-            var userId = localStorage.getItem('user_id');
+            // Create a constant for the prefix
+            const prefix = `${prefix}`;
+
+            var userId = localStorage.getItem(`${prefix}user_id`);
 
             if (userId)
             {
@@ -556,8 +559,8 @@
             }
 
             function checkUserSession() {
-                var userId = localStorage.getItem('user_id');
-                var sessionToken = localStorage.getItem('session_token');
+                var userId = localStorage.getItem(`${prefix}user_id`);
+                var sessionToken = localStorage.getItem(`${prefix}session_token`);
 
                 if (!userId) {
                     showModal('Please register to download challenges.');
@@ -760,8 +763,8 @@
                         } else {
                             $(`#verification-error`).hide();
                             $(`#verification-modal`).hide();
-                            localStorage.setItem('user_id', userId);
-                            localStorage.setItem('session_token', sessionToken);
+                            localStorage.setItem(`${prefix}user_id`, userId);
+                            localStorage.setItem(`${prefix}session_token`, sessionToken);
                             $('#register-btn').hide();
                             $('#login-btn').hide();
                             $('#logout-btn').show();
@@ -860,8 +863,8 @@
 
             // Function to validate the session token
             function refreshSessionToken() {
-                var userId = localStorage.getItem('user_id');
-                var sessionToken = localStorage.getItem('session_token');
+                var userId = localStorage.getItem(`${prefix}user_id`);
+                var sessionToken = localStorage.getItem(`${prefix}session_token`);
 
                 if (!sessionToken)
                 {
@@ -910,7 +913,7 @@
                             }
 
                             // Update local storage with new session token and hide buttons
-                            localStorage.setItem('session_token', user.session_token);
+                            localStorage.setItem(`${prefix}session_token`, user.session_token);
                             $('#login-btn').hide();
                             $('#logout-btn').show();
                         },
@@ -923,6 +926,32 @@
                         }
                     });
                 }
+            }
+
+            function initialize_developer_account(user_id, session_token, task_id) {
+                $.ajax({
+                    url: 'https://zgtla52nt3w5vyh6jhh6e4js6y0qbgji.lambda-url.us-west-2.on.aws/',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        user_id: user_id,
+                        session_token: session_token,
+                        task_id: task_id
+                    }),
+                    success: function(response) {
+                        if (response.statusCode === 200) {
+                            var hash_key = response.hash_key;
+                            console.log("Hash Key:", hash_key);
+                            // Do something with hash_key
+                            localStorage.setItem(`${prefix}hash_key`, hash_key);
+                        } else {
+                            console.error("Error in Lambda response:", response);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error in invoking Lambda:", error);
+                    }
+                });
             }
 
             // Bind the showVerificationModal to the click event of the button
@@ -949,7 +978,7 @@
                 $('#logout-btn').hide();
                 $('#login-btn').show();
 
-                var userId = localStorage.getItem('user_id');
+                var userId = localStorage.getItem(`${prefix}user_id`);
                 $('#register-btn').toggle(!!userId);
             });
 
