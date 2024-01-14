@@ -983,11 +983,11 @@
                     url: 'https://zgtla52nt3w5vyh6jhh6e4js6y0qbgji.lambda-url.us-west-2.on.aws/',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: {
+                    data: JSON.stringify({
                         "user_id": user_id,
                         "session_token": session_token,
                         "task_id": task_id
-                    },
+                    }),
                     success: function(response) {
                         if (response.statusCode === 200) {
                             var hash_key = response.hash_key;
