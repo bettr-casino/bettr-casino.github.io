@@ -983,16 +983,14 @@
                     url: 'https://zgtla52nt3w5vyh6jhh6e4js6y0qbgji.lambda-url.us-west-2.on.aws/',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify({
-                        user_id: user_id,
-                        session_token: session_token,
-                        task_id: task_id
-                    }),
+                    data: {
+                        "user_id": user_id,
+                        "session_token": session_token,
+                        "task_id": task_id
+                    },
                     success: function(response) {
                         if (response.statusCode === 200) {
                             var hash_key = response.hash_key;
-                            console.log("Hash Key:", hash_key);
-                            // Do something with hash_key
                             localStorage.setItem(`${prefix}hash_key`, hash_key);
                         } else {
                             console.error("Error in Lambda response:", response);
