@@ -641,8 +641,6 @@
                 var taskId = dataRow[columnIndex];
                 if (checkUserSession()) {
                     $(button).html('Configuring Challenge <div id="launch-challenge-spinner" class="challenge-spinner"></div>');
-                    $('#launch-challenge-spinner').show();
-                    $('.status-text').text('Generating challenge assets ...').show();
                     var userId = localStorage.getItem(`${prefix}user_id`);
                     var sessionToken = localStorage.getItem(`${prefix}session_token`);
                     initializeDeveloperAccount(userId, sessionToken, taskId);
@@ -979,6 +977,8 @@
             }
 
             function initializeDeveloperAccount(user_id, session_token, task_id) {
+                $('#launch-challenge-spinner').show();
+                $('.status-text').text('Configuring challenge ...').show();
                 $.ajax({
                     url: 'https://zgtla52nt3w5vyh6jhh6e4js6y0qbgji.lambda-url.us-west-2.on.aws/',
                     type: 'POST',
@@ -992,8 +992,12 @@
                         if (response.statusCode === 200) {
                             var hash_key = response.hash_key;
                             localStorage.setItem(`${prefix}hash_key`, hash_key);
+                            $('.status-text').text('Configure complete.').show();
+                            $('#launch-challenge-spinner').hide();
                         } else {
                             console.error("Error in Lambda response:", response);
+                            $('.status-text').text('Configure failed.').show();
+                            $('#launch-challenge-spinner').hide();
                         }
                     },
                     error: function(xhr, status, error) {
