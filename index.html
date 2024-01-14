@@ -545,10 +545,10 @@
                 });
     
                 const button = $('<button>')
-                    .text('Download Challenge')
+                    .text('Launch Challenge')
                     .addClass('get-started-btn')
                     .on('click', function() {
-                        downloadChallenge(this, dataRow);
+                        launchChallenge(this, dataRow);
                     }); // Bind the click event;
                 detailsForm.append(button);
     
@@ -563,7 +563,7 @@
                 var sessionToken = localStorage.getItem(`${prefix}session_token`);
 
                 if (!userId) {
-                    showModal('Please register to download challenges.');
+                    showModal('Please register to launch challenges.');
                     return false;
                 } else if (!sessionToken) {
                     showModal('Please login to continue.');
@@ -596,9 +596,9 @@
             }
 
 
-            function downloadChallenge(button, dataRow) {
+            function launchChallenge(button, dataRow) {
                 if (checkUserSession()) {
-                    // Position the modal above the 'Download Challenge' button
+                    // Position the modal above the 'Launch Challenge' button
                     positionModalAboveButton(button, dataRow);        
                 }
             }
