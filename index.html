@@ -1002,6 +1002,8 @@
                     },
                     error: function(xhr, status, error) {
                         console.error("Error in invoking Lambda:", error);
+                        $('.status-text').text('Configure failed.').show();
+                        $('#launch-challenge-spinner').hide();
                     }
                 });
             }
