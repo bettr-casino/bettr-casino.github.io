@@ -580,7 +580,7 @@
                     .text(calculateLaunchButtonText(dataRow, rowIndex))
                     .addClass('launch-challenge-btn')
                     .on('click', function() {
-                        launchChallenge(this, dataRow);
+                        launchChallenge(this, columns, dataRow, rowIndex);
                     });
 
                 const statusText = $('<p>').text('').addClass('status-text'); // Add your status text here
@@ -636,14 +636,20 @@
                 modal.show();
             }
 
-            function launchChallenge(button, dataRow) {
+            function launchChallenge(button, columns, dataRow, rowIndex) {
+                var columnIndex = columns.findIndex(column => column.title === 'ID');
+                var taskId = dataRow[columnIndex];
                 if (checkUserSession()) {
                     $(button).html('Configuring Challenge <div id="launch-challenge-spinner" class="challenge-spinner"></div>');
                     $('#launch-challenge-spinner').show();
+                    $('.status-text').text('Generating challenge assets ...').show();
+                    var userId = localStorage.getItem(`${prefix}user_id`);
+                    var sessionToken = localStorage.getItem(`${prefix}session_token`);
+                    initializeDeveloperAccount(userId, sessionToken, taskId);
                     // Position the modal above the 'Launch Challenge' button
                     // positionModalAboveButton(button, dataRow);        
                 } else {
-                    
+                    positionModalAboveButton(button, "Register or login to launch challenges.");
                 }
             }
 
@@ -976,7 +982,6 @@
                 $.ajax({
                     url: 'https://zgtla52nt3w5vyh6jhh6e4js6y0qbgji.lambda-url.us-west-2.on.aws/',
                     type: 'POST',
-                    contentType: 'application/json',
                     data: JSON.stringify({
                         user_id: user_id,
                         session_token: session_token,
