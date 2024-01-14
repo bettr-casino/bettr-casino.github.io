@@ -112,7 +112,7 @@
             width: 70%; /* Remaining width for values column */
         }
 
-        .get-started-btn {
+        .launch-challenge-btn {
             background-color: #9a9af7; /* Same as highlighted row color */
             color: white; /* Text color */
             padding: 10px 20px; /* Padding for size */
@@ -123,6 +123,23 @@
             display: block; /* Block level element */
             margin: 20px auto; /* Center align */
             text-align: center; /* Center text */
+
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .challenge-spinner {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #0732f3;
+            width: 8px;
+            height: 8px;
+            margin-left: 20px;
+            animation: spin 2s linear infinite;
+            display: inline-block;
+            position: relative;
+            right: 10px;
         }
 
         .tag {
@@ -275,6 +292,18 @@
             align-items: center;
             justify-content: center;
             position: relative;
+        }
+
+        .button-status-container {
+            display: flex;
+            align-items: center;
+            justify-content: start;
+            margin: 20px 0;
+        }
+
+        .status-text {
+            margin-left: 10px; /* Space between the button and status text */
+            display: none; /* Initially hidden */
         }
 
         .spinner {
@@ -543,19 +572,31 @@
                     }
 
                 });
+
+                // Create a container for the button and the status text
+                const buttonStatusContainer = $('<div>').addClass('button-status-container');
     
                 const button = $('<button>')
-                    .text('Launch Challenge')
-                    .addClass('get-started-btn')
+                    .text(calculateLaunchButtonText(dataRow, rowIndex))
+                    .addClass('launch-challenge-btn')
                     .on('click', function() {
                         launchChallenge(this, dataRow);
-                    }); // Bind the click event;
-                detailsForm.append(button);
+                    });
+
+                const statusText = $('<p>').text('').addClass('status-text'); // Add your status text here
+
+                buttonStatusContainer.append(button).append(statusText);
+
+                detailsForm.append(buttonStatusContainer);
     
                 // Append the table to the form
                 detailsTable.appendTo(detailsForm);
                 // Show the form
                 detailsForm.show();
+            }
+
+            function calculateLaunchButtonText(dataRow, rowIndex) {
+                return "Launch Challenge";
             }
 
             function checkUserSession() {
@@ -595,11 +636,14 @@
                 modal.show();
             }
 
-
             function launchChallenge(button, dataRow) {
                 if (checkUserSession()) {
+                    $(button).html('Configuring Challenge <div id="launch-challenge-spinner" class="challenge-spinner"></div>');
+                    $('#launch-challenge-spinner').show();
                     // Position the modal above the 'Launch Challenge' button
-                    positionModalAboveButton(button, dataRow);        
+                    // positionModalAboveButton(button, dataRow);        
+                } else {
+                    
                 }
             }
 
@@ -928,7 +972,7 @@
                 }
             }
 
-            function initialize_developer_account(user_id, session_token, task_id) {
+            function initializeDeveloperAccount(user_id, session_token, task_id) {
                 $.ajax({
                     url: 'https://zgtla52nt3w5vyh6jhh6e4js6y0qbgji.lambda-url.us-west-2.on.aws/',
                     type: 'POST',
