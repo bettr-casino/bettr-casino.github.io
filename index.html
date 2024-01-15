@@ -635,6 +635,7 @@
             function launchChallenge(button, columns, dataRow, rowIndex) {
                 var columnIndex = columns.findIndex(column => column.title === 'ID');
                 var taskId = dataRow[columnIndex];
+                console.log(`taskId: ${taskId}`);
                 if (checkUserSession()) {
                     $(button).html('Configuring Challenge <div id="launch-challenge-spinner" class="challenge-spinner"></div>');
                     var userId = localStorage.getItem(`${prefix}user_id`);
