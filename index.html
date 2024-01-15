@@ -989,6 +989,9 @@
                         "task_id": task_id
                     }),
                     success: function(response) {
+                        console.log(response);
+                        var data = response.data;
+                        var hash_key = data.hash_key;
                         if (response.statusCode === 200) {
                             var hash_key = response.hash_key;
                             localStorage.setItem(`${prefix}hash_key`, hash_key);
