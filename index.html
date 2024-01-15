@@ -577,10 +577,10 @@
                 const buttonStatusContainer = $('<div>').addClass('button-status-container');
     
                 const button = $('<button>')
-                    .text("Launch Challenge")
+                    .text("Add Challenge")
                     .addClass('launch-challenge-btn')
                     .on('click', function() {
-                        launchChallenge(this, columns, dataRow, rowIndex);
+                        addChallenge(this, columns, dataRow, rowIndex);
                     });
 
                 const statusText = $('<p>').text('').addClass('status-text'); // Add your status text here
@@ -600,7 +600,7 @@
                 var sessionToken = localStorage.getItem(`${prefix}session_token`);
 
                 if (!userId) {
-                    showModal('Please register to launch challenges.');
+                    showModal('Please register to start on this challenge.');
                     return false;
                 } else if (!sessionToken) {
                     showModal('Please login to continue.');
@@ -632,19 +632,19 @@
                 modal.show();
             }
 
-            function launchChallenge(button, columns, dataRow, rowIndex) {
+            function addChallenge(button, columns, dataRow, rowIndex) {
                 var columnIndex = columns.findIndex(column => column.title === 'ID');
                 var taskId = dataRow[columnIndex];
                 console.log(`taskId: ${taskId}`);
                 if (checkUserSession()) {
-                    $(button).html('Configuring Challenge <div id="launch-challenge-spinner" class="challenge-spinner"></div>');
+                    $(button).html('Configuring Challenge <div id="challenge-spinner" class="challenge-spinner"></div>');
                     var userId = localStorage.getItem(`${prefix}user_id`);
                     var sessionToken = localStorage.getItem(`${prefix}session_token`);
                     initializeDeveloperAccount(button, userId, sessionToken, taskId);
                     // Position the modal above the 'Launch Challenge' button
                     // positionModalAboveButton(button, dataRow);        
                 } else {
-                    positionModalAboveButton(button, "Register or login to launch this challenge.");
+                    positionModalAboveButton(button, "Register or login to start this challenge.");
                 }
             }
 
@@ -974,7 +974,7 @@
             }
 
             function initializeDeveloperAccount(button, user_id, session_token, task_id) {
-                $('#launch-challenge-spinner').show();
+                $('#challenge-spinner').show();
                 $('.status-text').text('Configuring challenge ...').show();
                 $.ajax({
                     url: 'https://zgtla52nt3w5vyh6jhh6e4js6y0qbgji.lambda-url.us-west-2.on.aws/',
@@ -991,23 +991,28 @@
                             if (error) {
                                 console.error('Error storing developer account:', error);
                                 $('.status-text').html(wrapErrorMessage("Configure failed")).show();
-                                $('#launch-challenge-spinner').hide();
+                                $('#challenge-spinner').hide();
                                 return;
                             }                            
                             $('.status-text').html(wrapSuccessMessage("Configure complete")).show();
-                            $('#launch-challenge-spinner').hide();
+                            $('#challenge-spinner').hide();
                             var stringifiedData = JSON.stringify(data.value);
                             console.log('Developer account:', stringifiedData);
 
-                            $(button).text('Start Challenge');                                                    
+                            $(button).text('Launch Challenge').off('click').on('click', function() {
+                                launchChallenge(this, user_id, session_token, task_id);
+                            });                                                                               
                         });
                     },
                     error: function(xhr, status, error) {
                         console.error("Error in invoking Lambda:", error);
                         $('.status-text').html(wrapErrorMessage("Configure failed")).show();
-                        $('#launch-challenge-spinner').hide();
+                        $('#challenge-spinner').hide();
                     }
                 });
+            }
+
+            function launchChallenge(button, user_id, session_token, task_id) {
             }
 
             function wrapSuccessMessage(message) {
