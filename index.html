@@ -1037,6 +1037,13 @@
                 });
                 $('#details-form').before(allChallengesBtn);
                 $('.section1').slideUp(500);
+                $(button).text('Start Challenge').off('click').on('click', function() {
+                    startChallenge(this, user_id, session_token, task_id);
+                });
+            }
+
+            function startChallenge(button, user_id, session_token, task_id) {
+
             }
 
             function wrapSuccessMessage(message) {
