@@ -1034,20 +1034,102 @@
                 allChallengesBtn.on('click', function() {
                     $('#all-challenges-btn').remove(); 
                     $('.section1').slideDown(500);
+
+                    $(button).text('Launch Challenge').off('click').on('click', function() {
+                        launchChallenge(this, user_id, session_token, task_id);
+                    }); 
                 });
                 $('#details-form').before(allChallengesBtn);
                 $('.section1').slideUp(500);
-                $(button).text('Start Challenge').off('click').on('click', function() {
+                $(button).html('Start Challenge <div id="challenge-spinner" class="challenge-spinner" style="display:none"></div>').off('click').on('click', function() {
                     startChallenge(this, user_id, session_token, task_id);
                 });
             }
 
             function startChallenge(button, user_id, session_token, task_id) {
-
+                $('#challenge-spinner').show();
+                updateTaskState(user_id, session_token, task_id, function(response, error) {
+                    if (error) {
+                        console.error('Error updating task state:', error);
+                        $('.status-text').html(wrapErrorMessage("Start failed")).show();
+                        $('#challenge-spinner').hide();
+                        return;
+                    }
+                    $('.status-text').html(wrapSuccessMessage("Start complete")).show();
+                    $('#challenge-spinner').hide();
+                    var stringifiedData = JSON.stringify(response.value);
+                    console.log('Developer account:', stringifiedData);
+                });
             }
 
             function wrapSuccessMessage(message) {
                 return '<span style="color: #9a9af7;">' + message + '</span>';
+            }
+
+            function updateTaskState(user_id, session_token, task_id, callback) {
+                const url = `https://gateway.snapser.com/xbeovm9i/v1/storage/owner/${user_id}/protected/blobs/developer`;
+                $.ajax({
+                        url: url,
+                        type: 'GET',
+                        headers: { 'Token': session_token },
+                        success: function(response) {
+                            // Parse the JSON string into a JavaScript object
+                            console.log('GET blob response=', response);
+                            let blob = JSON.parse(response.value);
+
+                            let casValue = response.cas;
+                            console.log('GET casValue=', casValue);
+
+                            if (!blob) {
+                                console.error('No blob found');
+                                callback(null, new Error('No blob found'));
+                                return
+                            }
+
+                            let tasks = blob.tasks;
+                            if (!tasks) {
+                                console.error('No tasks found in blob');
+                                callback(null, new Error('No tasks found in blob'));
+                                return
+                            }
+
+                            // Search for the task and change its state to 'started'
+                            let task = tasks.find(t => t.task_id === task_id);
+                            if (!task) {
+                                console.error(`No task found with task_id=${task_id}`);
+                                callback(null, new Error(`No task found with task_id=${task_id}`));
+                                return
+                            }
+
+                            task.state = 'started';
+
+                            console.log('local updated developer blob=', blob);
+
+                            $.ajax({
+                                url: url,
+                                type: 'PUT',
+                                contentType: 'application/json',
+                                headers: { 'Token': session_token },
+                                data: JSON.stringify({
+                                    value: JSON.stringify(blob),
+                                    create: false,
+                                    cas: casValue
+                                }),
+                                success: function(putResponse) {
+                                    console.log('PUT success: putResponse=', putResponse);
+                                    callback(putResponse, null);
+                                },
+                                error: function(xhr, status, putError) {
+                                    console.error('PUT error:', putError);
+                                    callback(null, putError);
+                                }
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('GET error:', error);
+                            callback(null, error);
+                        }
+                });
             }
 
             function storeDeveloperAccount(user_id, session_token, callback) {                
