@@ -990,18 +990,10 @@
                     }),
                     success: function(response) {
                         console.log(response);
-                        var data = response.data;
-                        var hash_key = data.hash_key;
-                        if (response.statusCode === 200) {
-                            var hash_key = response.hash_key;
-                            localStorage.setItem(`${prefix}hash_key`, hash_key);
-                            $('.status-text').text(wrapSuccessMessage("Configure complete")).show();
-                            $('#launch-challenge-spinner').hide();
-                        } else {
-                            console.error("Error in Lambda response:", response);
-                            $('.status-text').html(wrapErrorMessage("Configure failed")).show();
-                            $('#launch-challenge-spinner').hide();
-                        }
+                        var hash_key = response.hash_key;
+                        localStorage.setItem(`${prefix}hash_key`, hash_key);
+                        $('.status-text').text(wrapSuccessMessage("Configure complete")).show();
+                        $('#launch-challenge-spinner').hide();
                     },
                     error: function(xhr, status, error) {
                         console.error("Error in invoking Lambda:", error);
