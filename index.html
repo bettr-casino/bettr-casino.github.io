@@ -1042,6 +1042,7 @@
                 $('#details-form').before(allChallengesBtn);
                 $('.section1').slideUp(500);
                 $(button).html('Start Challenge <div id="challenge-spinner" class="challenge-spinner" style="display:none"></div>').off('click').on('click', function() {
+                    $('.status-text').text('Configuring Intro...').show();
                     startChallenge(this, user_id, session_token, task_id);
                 });
             }
@@ -1051,14 +1052,17 @@
                 updateTaskState(user_id, session_token, task_id, function(response, error) {
                     if (error) {
                         console.error('Error updating task state:', error);
-                        $('.status-text').html(wrapErrorMessage("Start failed")).show();
+                        $('.status-text').html(wrapErrorMessage("Configuring Intro failed")).show();
                         $('#challenge-spinner').hide();
                         return;
                     }
-                    $('.status-text').html(wrapSuccessMessage("Start complete")).show();
+                    $('.status-text').html(wrapSuccessMessage("Configuring Intro complete")).show();
                     $('#challenge-spinner').hide();
-                    var stringifiedData = JSON.stringify(response.value);
-                    console.log('Developer account:', stringifiedData);
+
+                    $(button).html('Start Challenge Intro <div id="challenge-spinner" class="challenge-spinner" style="display:none"></div>').off('click').on('click', function() {
+                        $('.status-text').text('Starting Intro...').show();
+                    });
+                    
                 });
             }
 
