@@ -987,11 +987,20 @@
                     }),
                     success: function(response) {
                         console.log(response);
-                        var hash_key = response.hash_key;
-                        localStorage.setItem(`${prefix}hash_key`, hash_key);
-                        $('.status-text').html(wrapSuccessMessage("Configure complete")).show();
-                        $('#launch-challenge-spinner').hide();
-                        $(button).text('Start Challenge');                        
+                        storeDeveloperAccount(user_id, session_token, function(data, error) {
+                            if (error) {
+                                console.error('Error storing developer account:', error);
+                                $('.status-text').html(wrapErrorMessage("Configure failed")).show();
+                                $('#launch-challenge-spinner').hide();
+                                return;
+                            }                            
+                            $('.status-text').html(wrapSuccessMessage("Configure complete")).show();
+                            $('#launch-challenge-spinner').hide();
+                            var stringifiedData = JSON.stringify(data.value);
+                            console.log('Developer account:', stringifiedData);
+
+                            $(button).text('Start Challenge');                                                    
+                        });
                     },
                     error: function(xhr, status, error) {
                         console.error("Error in invoking Lambda:", error);
@@ -1005,6 +1014,24 @@
                 return '<span style="color: #9a9af7;">' + message + '</span>';
             }
 
+            function storeDeveloperAccount(user_id, session_token, callback) {                
+                const url = `https://gateway.snapser.com/xbeovm9i/v1/storage/owner/${user_id}/protected/blobs/developer`;
+
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    headers: { 'Token': session_token },
+                    success: function(data) {
+                        console.log('Fetch success:', data);
+                        callback(data, null);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Fetch error:', error);
+                        callback(null, error);
+                    }
+                });
+            }
+            
             function wrapErrorMessage(message) {
                 return '<span style="color: #f79a9a;">' + message + '</span>';
             }
