@@ -577,7 +577,7 @@
                 const buttonStatusContainer = $('<div>').addClass('button-status-container');
     
                 const button = $('<button>')
-                    .text(calculateLaunchButtonText(dataRow, rowIndex))
+                    .text("Launch Challenge")
                     .addClass('launch-challenge-btn')
                     .on('click', function() {
                         launchChallenge(this, columns, dataRow, rowIndex);
@@ -593,10 +593,6 @@
                 detailsTable.appendTo(detailsForm);
                 // Show the form
                 detailsForm.show();
-            }
-
-            function calculateLaunchButtonText(dataRow, rowIndex) {
-                return "Launch Challenge";
             }
 
             function checkUserSession() {
@@ -643,7 +639,7 @@
                     $(button).html('Configuring Challenge <div id="launch-challenge-spinner" class="challenge-spinner"></div>');
                     var userId = localStorage.getItem(`${prefix}user_id`);
                     var sessionToken = localStorage.getItem(`${prefix}session_token`);
-                    initializeDeveloperAccount(userId, sessionToken, taskId);
+                    initializeDeveloperAccount(button, userId, sessionToken, taskId);
                     // Position the modal above the 'Launch Challenge' button
                     // positionModalAboveButton(button, dataRow);        
                 } else {
@@ -976,7 +972,7 @@
                 }
             }
 
-            function initializeDeveloperAccount(user_id, session_token, task_id) {
+            function initializeDeveloperAccount(button, user_id, session_token, task_id) {
                 $('#launch-challenge-spinner').show();
                 $('.status-text').text('Configuring challenge ...').show();
                 $.ajax({
@@ -994,6 +990,7 @@
                         localStorage.setItem(`${prefix}hash_key`, hash_key);
                         $('.status-text').html(wrapSuccessMessage("Configure complete")).show();
                         $('#launch-challenge-spinner').hide();
+                        $(button).text('Start Challenge');                        
                     },
                     error: function(xhr, status, error) {
                         console.error("Error in invoking Lambda:", error);
