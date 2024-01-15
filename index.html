@@ -992,20 +992,28 @@
                         if (response.statusCode === 200) {
                             var hash_key = response.hash_key;
                             localStorage.setItem(`${prefix}hash_key`, hash_key);
-                            $('.status-text').text('Configure complete.').show();
+                            $('.status-text').text(wrapSuccessMessage("Configure complete")).show();
                             $('#launch-challenge-spinner').hide();
                         } else {
                             console.error("Error in Lambda response:", response);
-                            $('.status-text').text('Configure failed.').show();
+                            $('.status-text').html(wrapErrorMessage("Configure failed")).show();
                             $('#launch-challenge-spinner').hide();
                         }
                     },
                     error: function(xhr, status, error) {
                         console.error("Error in invoking Lambda:", error);
-                        $('.status-text').text('Configure failed.').show();
+                        $('.status-text').text(wrapErrorMessage("Configure failed")).show();
                         $('#launch-challenge-spinner').hide();
                     }
                 });
+            }
+
+            function wrapSuccessMessage(message) {
+                return '<span color="blue">' + message + '</span>';
+            }
+
+            function wrapErrorMessage(message) {
+                return '<span color="red">' + message + '</span>';
             }
 
             // Bind the showVerificationModal to the click event of the button
