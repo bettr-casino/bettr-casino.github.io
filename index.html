@@ -406,7 +406,7 @@
         <button id="logout-btn" class="header-btn" style="display: none;">Logout</button>
     </div>
 
-    <div class="content">
+    <div class="content section1">
             
         <h2>Open Source Game Development Platform</h2>
         <p>Bettr Casino is an open source game development platform... yawn... blah blah blah... Our mission is to build and deploy online games through &lt;<strong>insert corporate speak here</strong>&gt; ... snore... zzzz... Oh, excuse me! I must have nodded off. Is the room still spinning?</p>
@@ -418,7 +418,7 @@
     </div>        
 
     <!-- Summary Table -->
-    <table id="summary-table" class="display" width="100%">
+    <table id="summary-table" class="display section1" width="100%">
         <thead>
             <!-- Headers will be dynamically populated -->
         </thead>
@@ -428,7 +428,7 @@
     </table>
 
     <!-- Details Form -->
-    <div id="details-form" style="display: none;">
+    <div id="details-form" class="section2" style="display: none;">
         <!-- Dynamic form fields will be populated here -->
     </div>
 
@@ -515,6 +515,8 @@
                     pageLength: 5,  // Default number of rows per page
                     lengthMenu: [5, 10, 20, 50]
                 });
+
+                $(summaryTable.table().container()).addClass('section1');
 
                 // Event listener for row click in Summary table
                 $('#summary-table tbody').on('click', 'tr', function() {
@@ -1013,6 +1015,7 @@
             }
 
             function launchChallenge(button, user_id, session_token, task_id) {
+                $('.section1').hide();
             }
 
             function wrapSuccessMessage(message) {
