@@ -992,12 +992,12 @@
                         console.log(response);
                         var hash_key = response.hash_key;
                         localStorage.setItem(`${prefix}hash_key`, hash_key);
-                        $('.status-text').text(wrapSuccessMessage("Configure complete")).show();
+                        $('.status-text').html(wrapSuccessMessage("Configure complete")).show();
                         $('#launch-challenge-spinner').hide();
                     },
                     error: function(xhr, status, error) {
                         console.error("Error in invoking Lambda:", error);
-                        $('.status-text').text(wrapErrorMessage("Configure failed")).show();
+                        $('.status-text').html(wrapErrorMessage("Configure failed")).show();
                         $('#launch-challenge-spinner').hide();
                     }
                 });
