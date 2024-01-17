@@ -1008,7 +1008,7 @@
                     }),
                     success: function(response) {
                         console.log(response);
-                        storeDeveloperAccount(user_id, session_token, function(data, error) {
+                        getDeveloperAccount(user_id, session_token, function(data, error) {
                             if (error) {
                                 console.error('Error storing developer account:', error);
                                 $('.status-text').html(wrapErrorMessage("Configure failed")).show();
@@ -1017,9 +1017,7 @@
                             }                            
                             $('.status-text').html(wrapSuccessMessage("Configure complete")).show();
                             $('#challenge-spinner').hide();
-                            var stringifiedData = JSON.stringify(data.value);
-                            console.log('Developer account:', stringifiedData);
-
+                            
                             $(button).text('Launch Challenge').off('click').on('click', function() {
                                 launchChallenge(this, user_id, session_token, task_id);
                             });                                                                               
@@ -1054,94 +1052,80 @@
 
             function startChallenge(button, user_id, session_token, task_id) {
                 $('#challenge-spinner').show();
-                updateTaskState(user_id, session_token, task_id, function(response, error) {
-                    if (error) {
-                        console.error('Error updating task state:', error);
-                        $('.status-text').html(wrapErrorMessage("Configuring Intro failed")).show();
-                        $('#challenge-spinner').hide();
-                        return;
-                    }
-                    $('.status-text').html(wrapSuccessMessage("Configuring Intro complete")).show();
-                    $('#challenge-spinner').hide();
+                getDeveloperAccount(user_id, session_token, function(data, error) {
+                    let cas = data.cas;
+                    let blob = JSON.parse(data.value);
+                    updateTaskState(blob, task_id, 'started', function(blob_upgraded, error) {
+                        updateDeveloperAccount(user_id, session_token, blob, cas, function(response, error) {
+                            if (error) {
+                                console.error('Error updating task state:', error);
+                                $('.status-text').html(wrapErrorMessage("Configuring Intro failed")).show();
+                                $('#challenge-spinner').hide();
+                                return;
+                            }
+                            $('.status-text').html(wrapSuccessMessage("Configuring Intro complete")).show();
+                            $('#challenge-spinner').hide();
 
-                    $(button).html('Start Challenge Intro <div id="challenge-spinner" class="challenge-spinner" style="display:none"></div>').off('click').on('click', function() {
-                        $('.status-text').text('Starting Intro...').show();
-                    });
-                    
-                });
+                            $(button).html('Start Challenge Intro <div id="challenge-spinner" class="challenge-spinner" style="display:none"></div>').off('click').on('click', function() {
+                                $('.status-text').text('Starting Intro...').show();
+                            });                            
+                        });
+                    })
+                });                
             }
 
             function wrapSuccessMessage(message) {
                 return '<span style="color: #9a9af7;">' + message + '</span>';
             }
 
-            function updateTaskState(user_id, session_token, task_id, callback) {
+            function updateTaskState(blob, task_id, task_state, callback) {
+                if (!blob) {
+                    console.error('No blob found');
+                    callback(null, new Error('No blob found'));
+                    return;
+                }
+                let tasks = blob.tasks;
+                if (!tasks) {
+                    console.error('No tasks found in blob');
+                    callback(null, new Error('No tasks found in blob'));
+                    return;
+                }
+                // Search for the task and change its state to 'started'
+                let task = tasks.find(t => t.task_id === task_id);
+                if (!task) {
+                    console.error(`No task found with task_id=${task_id}`);
+                    callback(null, new Error(`No task found with task_id=${task_id}`));
+                    return
+                }
+                task.state = task_state;
+                console.log('local updated developer blob=', blob);
+                callback(blob, null);
+            }
+
+            function updateDeveloperAccount(user_id, session_token, blob, cas, callback) {
                 const url = `https://gateway.snapser.com/xbeovm9i/v1/storage/owner/${user_id}/protected/blobs/developer`;
                 $.ajax({
-                        url: url,
-                        type: 'GET',
-                        headers: { 'Token': session_token },
-                        success: function(response) {
-                            // Parse the JSON string into a JavaScript object
-                            console.log('GET blob response=', response);
-                            let blob = JSON.parse(response.value);
-
-                            let casValue = response.cas;
-                            console.log('GET casValue=', casValue);
-
-                            if (!blob) {
-                                console.error('No blob found');
-                                callback(null, new Error('No blob found'));
-                                return
-                            }
-
-                            let tasks = blob.tasks;
-                            if (!tasks) {
-                                console.error('No tasks found in blob');
-                                callback(null, new Error('No tasks found in blob'));
-                                return
-                            }
-
-                            // Search for the task and change its state to 'started'
-                            let task = tasks.find(t => t.task_id === task_id);
-                            if (!task) {
-                                console.error(`No task found with task_id=${task_id}`);
-                                callback(null, new Error(`No task found with task_id=${task_id}`));
-                                return
-                            }
-
-                            task.state = 'started';
-
-                            console.log('local updated developer blob=', blob);
-
-                            $.ajax({
-                                url: url,
-                                type: 'PUT',
-                                contentType: 'application/json',
-                                headers: { 'Token': session_token },
-                                data: JSON.stringify({
-                                    value: JSON.stringify(blob),
-                                    create: false,
-                                    cas: casValue
-                                }),
-                                success: function(putResponse) {
-                                    console.log('PUT success: putResponse=', putResponse);
-                                    callback(putResponse, null);
-                                },
-                                error: function(xhr, status, putError) {
-                                    console.error('PUT error:', putError);
-                                    callback(null, putError);
-                                }
-                            });
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('GET error:', error);
-                            callback(null, error);
-                        }
+                    url: url,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    headers: { 'Token': session_token },
+                    data: JSON.stringify({
+                        value: JSON.stringify(blob),
+                        create: false,
+                        cas: cas
+                    }),
+                    success: function(putResponse) {
+                        console.log('PUT success: putResponse=', putResponse);
+                        callback(putResponse, null);
+                    },
+                    error: function(xhr, status, putError) {
+                        console.error('PUT error:', putError);
+                        callback(null, putError);
+                    }
                 });
             }
 
-            function storeDeveloperAccount(user_id, session_token, callback) {                
+            function getDeveloperAccount(user_id, session_token, callback) {                
                 const url = `https://gateway.snapser.com/xbeovm9i/v1/storage/owner/${user_id}/protected/blobs/developer`;
 
                 $.ajax({
