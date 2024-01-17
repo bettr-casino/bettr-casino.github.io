@@ -206,8 +206,7 @@
 
         .register-modal-content,
         .login-modal-content,
-        .verification-modal-content,
-        .verifyenv-modal-content {
+        .verification-modal-content {
             background-color: #f9f9f9;
             padding: 10px;
             border: 1px solid #002246;
@@ -221,8 +220,7 @@
         /* The Submit Button */
         #register_button,
         #login_button,
-        #verification_button,
-        #verifyenv_button {
+        #verification_button {
             background-color: #9a9af7; /* Same as highlighted row color */
             color: white; /* Text color */
             padding: 14px 20px;
@@ -235,8 +233,7 @@
 
         #register_button:hover,
         #login_button:hover,
-        #verification_button,
-        #verifyenv_button {
+        #verification_button {
             background-color: #8484f8; /* Slightly lighter color on hover */
             opacity: 0.9;
         }
@@ -244,8 +241,7 @@
         /* The Close Button */
         #register_close,
         #login_close,
-        #verification_close,
-        #verifyenv_close {
+        #verification_close {
             color: #002246; /* Color to match the header */
             float: right;
             font-size: 28px;
@@ -257,8 +253,7 @@
         #login_close:hover,
         #login_close:focus, 
         #verification_close:hover,
-        #verification_close:focus,
-        #verifyenv_close:focus {
+        #verification_close:focus {
             color: #9a9af7; /* Color on hover to match the button */
             text-decoration: none;
             cursor: pointer;
@@ -279,8 +274,7 @@
         /* Disabled state of the button */
         #register_button:disabled,
         #login_button:disabled,
-        #verification_button:disabled,
-        #verifyenv_button:disabled {
+        #verification_button:disabled {
             background-color: #cccccc; /* Light gray background to indicate it's disabled */
             color: #666666; /* Darker gray text */
             cursor: not-allowed; /* Cursor to indicate the button is not clickable */
@@ -290,8 +284,7 @@
         /* Hover state of the disabled button to ensure there's no change */
         #register_button:disabled:hover,
         #login_button:disabled:hover,
-        #verification_button:disabled:hover,
-        #verifyenv_button:disabled:hover {
+        #verification_button:disabled:hover {
             background-color: #cccccc; /* Same as the normal disabled state */
             opacity: 1; /* No change in opacity */
         }
@@ -417,28 +410,6 @@
                 </button>
                 <!-- Error message -->
                 <p id="verification-error" style="display: none; color: red;"></p>
-            </form>
-        </div>
-    </div>
-
-    <!-- The Verify Environment Modal -->
-    <div id="verifyenv-modal" class="modal" style="display: none;">
-        <!-- Modal content -->
-        <div class="verifyenv-modal-content">
-            <span id="verifyenv_close" class="close">&times;</span>
-            <h2>Register</h2>
-            <p>We’ll email you a verification code.</p>
-            <form id="verifyenv-form">
-                <input type="email" placeholder="Email" name="email" required>
-                <label>
-                    <input type="checkbox" checked="checked" name="remember"> Remember me
-                </label>
-                <button id="verifyenv_button" type="button" class="button-with-spinner">
-                    Get verification code
-                    <div id="verifyenv-spinner" class="spinner" style="display: none;"></div>
-                </button>
-                <!-- Error message -->
-                <p id="verifyenv-error" style="display: none; color: red;"></p>
             </form>
         </div>
     </div>
