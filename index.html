@@ -214,8 +214,7 @@
             border-radius: 5px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             width: auto; /* Auto width based on content */
-            min-width: 200px; /* Minimum width */
-            max-width: 300px; /* Maximum width */
+            min-width: 300px; /* Minimum width */
         }
 
         /* The Submit Button */
@@ -426,15 +425,23 @@
         <!-- Modal content -->
         <div class="verifyenv-modal-content">
             <span id="verifyenv_close" class="close-btn">&times;</span>
-            <h2>Register</h2>
-            <p>We’ll email you a verification code.</p>
+            <h2>Verify the following</h2>
+            <p>The following should be installed in your dev env.</p>
             <form id="verifyenv-form">
-                <input type="email" placeholder="Email" name="email" required>
-                <label>
-                    <input type="checkbox" checked="checked" name="remember"> Remember me
-                </label>
+                <!-- Checkbox for Unity Installed -->
+                <div style="margin-bottom: 10px;">
+                    <label>
+                        <input type="checkbox" name="unityInstalled"> Unity 2022.3.16f1
+                    </label>
+                </div>
+                <!-- Checkbox for Git Installed -->
+                <div style="margin-bottom: 10px;">
+                    <label>
+                        <input type="checkbox" name="gitInstalled"> Git
+                    </label>
+                </div>
                 <button id="verifyenv_button" type="button" class="button-with-spinner">
-                    Get verification code
+                    Verify
                     <div id="verifyenv-spinner" class="spinner" style="display: none;"></div>
                 </button>
                 <!-- Error message -->
@@ -442,6 +449,7 @@
             </form>
         </div>
     </div>
+
 
     <div class="header-buttons">
         <h1>Bettr Casino: Open Source Game Development Platform</h1>
@@ -688,7 +696,7 @@
                 console.log(`taskId: ${taskId}`);
                 if (checkUserSession()) {
 
-                    $(button).html('Verify Dev Environment <div id="challenge-spinner" class="challenge-spinner" style="display:none"></div>')
+                    $(button).html('Verify Your Dev Environment <div id="challenge-spinner" class="challenge-spinner" style="display:none"></div>')
                     .off('click').on('click', function() {
                         showVerifyEnvPanel(this);
                     })
