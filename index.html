@@ -425,7 +425,7 @@
     <div id="verifyenv-modal" class="modal" style="display: none;">
         <!-- Modal content -->
         <div class="verifyenv-modal-content">
-            <span id="verifyenv_close" class="close">&times;</span>
+            <span id="verifyenv_close" class="close-btn">&times;</span>
             <h2>Register</h2>
             <p>We’ll email you a verification code.</p>
             <form id="verifyenv-form">
@@ -690,7 +690,7 @@
 
                     $(button).html('Verify Dev Environment <div id="challenge-spinner" class="challenge-spinner" style="display:none"></div>')
                     .off('click').on('click', function() {
-                        
+                        showVerifyEnvPanel(this);
                     })
 
                     // OLD
@@ -721,6 +721,20 @@
                 modal.style.display = 'block';
                 modal.style.top = `${topPosition}px`;
                 modal.style.left = `${leftPosition}px`;
+            }
+
+            function showVerifyEnvPanel(button) {
+                var modal = document.getElementById('verifyenv-modal');
+                modal.style.display = 'block';
+                var rect = button.getBoundingClientRect();
+                var modalHeight = modal.offsetHeight;
+                var modalWidth = modal.offsetWidth;
+                var bottomPosition = rect.top + window.scrollY - modalHeight;
+                var buttonCenter = rect.left + rect.width / 2;
+                var leftPosition = buttonCenter - modalWidth / 2;
+                modal.style.top = `${bottomPosition}px`;
+                modal.style.left = `${leftPosition}px`;
+                modal.style.right = ''; // Reset right style if previously set
             }
 
             function showRegisterPanel(){
