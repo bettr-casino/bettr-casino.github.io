@@ -433,7 +433,7 @@
         </div>
     </div>
 
-    <div class="header-buttons">
+    <div class="header-buttons section1">
         <h1>Bettr Casino: Open Source Game Development Platform</h1>
         <button id="challenges-button" class="header-btn" style="display: none;">My Challenges</button>
         <button id="register-btn" class="header-btn" style="display: none;">Register</button>
@@ -621,7 +621,8 @@
                     .text("Show Details")
                     .addClass('show-challenge-btn')
                     .on('click', function() {
-                        alert('Showing details...TODO'); // Placeholder action
+                        detailsTable.hide();
+                        $('.section1').slideUp(500);
                     });
     
                 const button = $('<button>')
