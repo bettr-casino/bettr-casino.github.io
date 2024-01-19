@@ -416,6 +416,7 @@
 
     <div class="header-buttons">
         <h1>Bettr Casino: Open Source Game Development Platform</h1>
+        <button id="challenges-button" class="header-btn" style="display: none;">My Challenges</button>
         <button id="register-btn" class="header-btn" style="display: none;">Register</button>
         <button id="login-btn" class="header-btn" style="display: none;">Login</button>
         <button id="logout-btn" class="header-btn" style="display: none;">Logout</button>
@@ -834,6 +835,7 @@
                             $('#register-btn').hide();
                             $('#login-btn').hide();
                             $('#logout-btn').show();
+                            showUserChallenges(true);
                         }
                     },
                     error: function(xhr, status, error) {
@@ -936,6 +938,7 @@
                 {
                     $('#login-btn').show();
                     $('#logout-btn').hide();
+                    showUserChallenges(false);
                     return;
                 }
 
@@ -954,6 +957,7 @@
                                 localStorage.removeItem(prefix_local_store('session_token'));
                                 $('#login-btn').show();
                                 $('#logout-btn').hide();
+                                showUserChallenges(false);
                                 showModal('Your account has an issue. If this persists, email support@bettr.casino.');
                                 return;
                             }
@@ -965,6 +969,7 @@
                                 localStorage.removeItem(prefix_local_store('session_token'));
                                 $('#login-btn').show();
                                 $('#logout-btn').hide();
+                                showUserChallenges(false);
                                 showModal('Your will need to relogin. If this persists, email support@bettr.casino.');
                                 return;
                             }
@@ -974,6 +979,7 @@
                                 localStorage.removeItem(prefix_local_store('session_token'));
                                 $('#login-btn').show();
                                 $('#logout-btn').hide();
+                                showUserChallenges(false);
                                 showModal('Your will need to relogin. If this persists, email support@bettr.casino.');
                                 return;
                             }
@@ -982,6 +988,7 @@
                             localStorage.setItem(prefix_local_store('session_token'), user.session_token);
                             $('#login-btn').hide();
                             $('#logout-btn').show();
+                            showUserChallenges(true);
                         },
                         error: function(xhr, status, error) {
                             // Handle error (optional)
@@ -989,6 +996,7 @@
                             localStorage.removeItem(prefix_local_store('session_token'));
                             $('#login-btn').show();
                             $('#logout-btn').hide();
+                            showUserChallenges(false);
                         }
                     });
                 }
@@ -1072,6 +1080,14 @@
                         });
                     })
                 });                
+            }
+
+            function showUserChallenges(show) {
+                if (show) {
+                    $('#challenges-button').show();
+                } else {
+                    $('#challenges-button').hide();
+                }
             }
 
             function wrapSuccessMessage(message) {
@@ -1169,9 +1185,10 @@
                 localStorage.removeItem(prefix_local_store('session_token'));
 
                 // Hide Logout button and show Register and Login buttons
-                $('#logout-btn').hide();
                 $('#login-btn').show();
                 $('#register-btn').show();
+                $('#logout-btn').hide();
+                showUserChallenges(false);
             });
 
             // Call the validateSessionToken function
