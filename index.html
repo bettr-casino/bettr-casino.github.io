@@ -130,34 +130,34 @@
         .show-challenge-btn {
             background-color: #9a9af7; /* Same as highlighted row color */
             color: white; /* Text color */
-            padding: 10px 20px; /* Padding for size */
+            padding: 10px 10px; /* Padding for size */
             border: none; /* No border */
             border-radius: 5px; /* Rounded corners */
             font-size: 16px; /* Font size */
             cursor: pointer; /* Pointer cursor on hover */
             display: block; /* Block level element */
-            margin: 20px auto; /* Center align */
-            text-align: center; /* Center text */
+            margin: 10px; /* Center align */
+            text-align: left; /* Center text */
 
-            align-items: center;
-            justify-content: center;
+            align-items: left;
+            justify-content: left;
             position: relative;
         }
 
-        .launch-challenge-btn {
+        .add-challenge-btn {
             background-color: #9a9af7; /* Same as highlighted row color */
             color: white; /* Text color */
-            padding: 10px 20px; /* Padding for size */
+            padding: 10px 10px; /* Padding for size */
             border: none; /* No border */
             border-radius: 5px; /* Rounded corners */
             font-size: 16px; /* Font size */
             cursor: pointer; /* Pointer cursor on hover */
             display: block; /* Block level element */
-            margin: 20px auto; /* Center align */
-            text-align: center; /* Center text */
+            margin: 10px; /* Center align */
+            text-align: left; /* Center text */
 
-            align-items: center;
-            justify-content: center;
+            align-items: left;
+            justify-content: left;
             position: relative;
         }
 
@@ -328,11 +328,10 @@
         }
 
         .button-status-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0px;
-            width: 20%; /* this ensures the container takes full width */
+            display: block;
+            justify-content: left;
+            align-items: left;
+            padding: 5px;
         }
 
         .status-text {
@@ -467,6 +466,12 @@
         <!-- Dynamic form fields will be populated here -->
     </div>
 
+    <!-- Show Challenge Editor Form -->
+    <div id="show-challenge-editor-form" class="section3" style="display: none;">
+        <!-- Dynamic form fields will be populated here -->
+        <h1>Test</h1>
+    </div>
+
     <script>
         // Create a constant for the prefix
         const prefix = 'BETTR__';
@@ -580,6 +585,15 @@
                 }    
 
             }
+
+            function populateChallengeEditorPanel(button, columns, dataRow, rowIndex) {
+                const detailsTable = $('.details-table');
+                detailsTable.hide();
+                $('.section1').slideUp(500);
+                $('.section3').show();
+                $(button).hide();
+                $('.add-challenge-btn').show();
+            }
     
             function populateDetailsForm(columns, dataRow, rowIndex) {
                 const detailsForm = $('#details-form');
@@ -617,24 +631,24 @@
                 // Create a container for the button and the status text
                 const buttonStatusContainer = $('<div>').addClass('button-status-container');
 
-                const showDetailsButton = $('<button>')
+                const showChallengeButton = $('<button>')
                     .text("Show Details")
                     .addClass('show-challenge-btn')
                     .on('click', function() {
-                        detailsTable.hide();
-                        $('.section1').slideUp(500);
+                        populateChallengeEditorPanel(this, columns, dataRow, rowIndex);
                     });
     
-                const button = $('<button>')
+                const addChallengeButton = $('<button>')
                     .text("Add Challenge")
-                    .addClass('launch-challenge-btn')
+                    .addClass('add-challenge-btn')
                     .on('click', function() {
                         addChallenge(this, columns, dataRow, rowIndex);
-                    });
+                    })
+                    .hide();
 
                 const statusText = $('<p>').text('').addClass('status-text'); // Add your status text here
 
-                buttonStatusContainer.append(showDetailsButton, button, statusText);
+                buttonStatusContainer.append(showChallengeButton, addChallengeButton, statusText);
 
                 detailsForm.append(buttonStatusContainer);
     
