@@ -631,12 +631,12 @@
                 // Create a container for the button and the status text
                 const buttonStatusContainer = $('<div>').addClass('button-status-container');
 
-                const showChallengeButton = $('<button>')
-                    .text("Show Details")
-                    .addClass('show-challenge-btn')
-                    .on('click', function() {
-                        populateChallengeEditorPanel(this, columns, dataRow, rowIndex);
-                    });
+                // const showChallengeButton = $('<button>')
+                //     .text("Show Details")
+                //     .addClass('show-challenge-btn')
+                //     .on('click', function() {
+                //         populateChallengeEditorPanel(this, columns, dataRow, rowIndex);
+                //     });
     
                 const addChallengeButton = $('<button>')
                     .text("Add Challenge")
@@ -648,7 +648,8 @@
 
                 const statusText = $('<p>').text('').addClass('status-text'); // Add your status text here
 
-                buttonStatusContainer.append(showChallengeButton, addChallengeButton, statusText);
+                // buttonStatusContainer.append(showChallengeButton, addChallengeButton, statusText);
+                buttonStatusContainer.append(addChallengeButton, statusText);
 
                 detailsForm.append(buttonStatusContainer);
     
