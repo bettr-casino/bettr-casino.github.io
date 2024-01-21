@@ -78,8 +78,8 @@
 
         #details-form {
             border: 1px solid #ddd; /* Border for the form box */
-            padding: 15px; /* Padding inside the form */
-            margin-top: 20px; /* Space above the form */
+            padding: 5px; /* Padding inside the form */
+            margin-top: 5px; /* Space above the form */
             background-color: #f9f9f9; /* Light background for the form */
             border-radius: 5px; /* Rounded corners for the form */
         }
@@ -329,9 +329,10 @@
 
         .button-status-container {
             display: block;
+            position: relative;
             justify-content: left;
             align-items: left;
-            padding: 5px;
+            padding: 0px;
         }
 
         .status-text {
@@ -354,6 +355,25 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        /* Style for the container that holds the two panels */
+        #show-challenge-editor-form {
+            display: flex; /* Use flexbox for layout */
+            justify-content: space-between; /* Space out the children */
+            padding-top: 10px; /* Add some padding */
+        }
+
+        /* Style for each panel */
+        .panel {
+            flex: 1; /* Each panel takes up an equal amount of space */
+            margin-left: 5px; /* Add some margin between panels */
+            margin-right: 5px; /* Add some margin between panels */
+            padding-left: 5px; /* Add some padding inside each panel */
+            padding-right: 5px; /* Add some padding inside each panel */
+            border: 1px solid #ddd; /* Add a border to each panel */
+            border-radius: 5px; /* Round the corners of the border */
+            background-color: #f9f9f9; /* Light background color */
         }
 
     </style>
@@ -468,8 +488,21 @@
 
     <!-- Show Challenge Editor Form -->
     <div id="show-challenge-editor-form" class="section3" style="display: none;">
-        <!-- Dynamic form fields will be populated here -->
-        <h1>Test</h1>
+        <!-- Left panel -->
+        <div class="panel left-panel">
+            <!-- Content for the left panel goes here -->
+            <h2>Left Panel Title</h2>
+            <p>Content for the left panel...</p>
+            <!-- Add more content as needed -->
+        </div>
+
+        <!-- Right panel -->
+        <div class="panel right-panel">
+            <!-- Content for the right panel goes here -->
+            <h2>Right Panel Title</h2>
+            <p>Content for the right panel...</p>
+            <!-- Add more content as needed -->
+        </div>
     </div>
 
     <script>
@@ -599,10 +632,6 @@
                 const detailsForm = $('#details-form');
                 // Clear existing content
                 detailsForm.empty();
-
-                // Create and append the h3 header
-                const header = $('<h3>').text('Challenge Details');
-                detailsForm.append(header);
 
                 // Start the table
                 const detailsTable = $('<table>').addClass('details-table');
