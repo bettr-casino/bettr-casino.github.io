@@ -414,6 +414,35 @@
             height: 245px;
         }
 
+        /* Adjust sizes for small devices */
+        @media only screen and (max-width: 375px) { /* iPhone portrait width */
+            #iphone13, #iphone14, #iphone15 {
+                width: 90%; /* Take up most of the screen */
+                height: auto; /* Keep the aspect ratio */
+                aspect-ratio: 9 / 19.5; /* Standard iPhone aspect ratio */
+                margin: 5% auto; /* Smaller margin for smaller devices */
+            }
+        }
+
+        /* For slightly larger devices, you can set a fixed height or larger width */
+        @media only screen and (min-width: 376px) and (max-width: 768px) {
+            #iphone13, #iphone14, #iphone15 {
+                width: 75%; /* Larger than on the smallest screen, but not full width */
+                height: auto; /* Keep the aspect ratio */
+                aspect-ratio: 9 / 19.5; /* Standard iPhone aspect ratio */
+                margin: 5% auto; /* Consistent margin for all devices within this range */
+            }
+        }
+
+        /* You may want to adjust for landscape orientation as well */
+        @media only screen and (orientation: landscape) {
+            #iphone13, #iphone14, #iphone15 {
+                width: 50%; /* Half the width in landscape */
+                height: auto; /* Keep the aspect ratio */
+                aspect-ratio: 9 / 19.5; /* Standard iPhone aspect ratio */
+            }
+        }
+
         /* Container for the iPhone buttons */
         .iphone-buttons-container {
             display: flex; /* Align items in a row */
