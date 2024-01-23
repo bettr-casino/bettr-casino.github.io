@@ -702,12 +702,13 @@
                 // Find indices for the 'Summary', 'Details', and 'Internal' columns
                 const summaryStartIndex = headers.indexOf("Section");
                 const detailsStartIndex = headers.indexOf("Section", summaryStartIndex + 1);
-                const internalStartIndex = headers.indexOf("Section", detailsStartIndex + 1);
+                const setupStartIndex = headers.indexOf("Section", detailsStartIndex + 1);
+                const internalStartIndex = headers.indexOf("Section", setupStartIndex + 1);
     
                 // Create column definitions for Summary and Internal tables
                 const summaryColumns = headers.slice(summaryStartIndex + 1, detailsStartIndex)
                     .map(header => ({ title: header }));
-                const detailsColumns = headers.slice(detailsStartIndex + 1, internalStartIndex)
+                const detailsColumns = headers.slice(detailsStartIndex + 1, setupStartIndex)
                     .map(header => ({ title: header }));
     
                 // // Initialize the Summary DataTable
@@ -731,7 +732,7 @@
 
                     const table = $('#summary-table').DataTable();
                     const rowIndex = table.row(this).index(); // Gets the index of the clicked row
-                    const detailsRowData = rows.map(row => row.slice(detailsStartIndex + 1, internalStartIndex)); // Extract Details columns
+                    const detailsRowData = rows.map(row => row.slice(detailsStartIndex + 1, setupStartIndex)); // Extract Details columns
                     const detailsRow = detailsRowData[rowIndex];
                     populateDetailsForm(detailsColumns, detailsRow, rowIndex);
                 });
