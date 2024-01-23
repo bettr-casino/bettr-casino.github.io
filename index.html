@@ -499,18 +499,7 @@
             return `${prefix}${local_store_value}`
         }
 
-        $(document).ready(function() {
-
-            var userId = localStorage.getItem(prefix_local_store('user_id'));
-
-            if (userId)
-            {
-                $('#register-btn').hide();
-            }
-            else
-            {
-                $('#register-btn').show();
-            }
+        $(document).ready(function() {            
 
             const dataUrl = 'https://bettr-casino-tasks.s3.us-west-2.amazonaws.com/gsheets-task-list/allopentasks.json';
     
@@ -525,6 +514,20 @@
             function isValidEmail(email) {
                 var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 return regex.test(email);
+            }
+
+            function updateSignInButtons() {
+                var userId = localStorage.getItem(prefix_local_store('user_id'));
+                if (userId)
+                {
+                    $('#register-btn').hide();
+                }
+                else
+                {
+                    $('#register-btn').show();
+                }
+                // Call the validateSessionToken function
+                refreshSessionToken();
             }
 
             // Function to enable/disable verification button based on email validity
@@ -1304,9 +1307,6 @@
                 showUserChallenges(false);
             });
 
-            // Call the validateSessionToken function
-            refreshSessionToken();        
-            
         });
     </script>
     
