@@ -488,21 +488,7 @@
 
     <!-- Show Challenge Editor Form -->
     <div id="show-challenge-editor-form" class="section3" style="display: none;">
-        <!-- Left panel -->
-        <div class="panel left-panel">
-            <!-- Content for the left panel goes here -->
-            <h2>Left Panel Title</h2>
-            <p>Content for the left panel...</p>
-            <!-- Add more content as needed -->
-        </div>
-
-        <!-- Right panel -->
-        <div class="panel right-panel">
-            <!-- Content for the right panel goes here -->
-            <h2>Right Panel Title</h2>
-            <p>Content for the right panel...</p>
-            <!-- Add more content as needed -->
-        </div>
+        <!-- Dynamic form fields will be populated here -->
     </div>
 
     <script>
@@ -563,7 +549,7 @@
 
             // Initialize verification buttons as disabled
             $('#register_button').prop('disabled', true);
-            $('#login_button').prop('disabled', true);
+            $('#login_button').prop('disabled', true);            
 
             function setupTables(data) {
 
@@ -626,6 +612,59 @@
                 $('.section3').show();
                 $(button).hide();
                 $('.add-challenge-btn').show();
+                updatePageHash("show-details");
+
+                populateShowChallengeForm(columns, dataRow, rowIndex);
+                
+                $(window).off('hashchange').on('hashchange', function() {
+                    var hash = window.location.hash;
+                    if (hash === "") {
+                        detailsTable.show();
+                        $('.section1').slideDown(500);
+                        $(button).show();
+                        $('.add-challenge-btn').hide();
+                    }
+                });
+
+            }
+
+            function populateShowChallengeForm(columns, dataRow, rowIndex) {
+                const detailsForm = $('#show-challenge-editor-form');
+                // Clear existing content
+                detailsForm.empty();
+
+                // Start the table
+                const detailsTable = $('<table>').addClass('details-table');
+
+                // Iterate over columns and add rows to the table
+                columns.forEach((column, index) => {
+                    const columnName = column.title;  // Assuming column object has a 'title' property
+                    const columnValue = dataRow[index];
+
+                    // Check if the column is 'Tags' and process accordingly
+                    if (columnName === 'Tags' || columnName === 'Skill Sets') {
+                        const tags = columnValue.split(',').map(tag => tag.trim());
+                        const tagsContainer = $('<td>');
+                        tags.forEach(tag => {
+                            $('<span>').addClass('tag').text(tag).appendTo(tagsContainer);
+                        });
+                        const row = $('<tr>').append($('<td>').text(columnName)).append(tagsContainer);
+                        detailsTable.append(row);
+                    } else {
+                        const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').text(columnValue));
+                        detailsTable.append(row);
+                    }
+
+                });
+
+                const statusText = $('<p>').text('').addClass('status-text'); // Add your status text here
+
+                detailsForm.append(statusText);
+    
+                // Append the table to the form
+                detailsTable.appendTo(detailsForm);
+                // Show the form
+                detailsForm.show();
             }
     
             function populateDetailsForm(columns, dataRow, rowIndex) {
@@ -660,12 +699,12 @@
                 // Create a container for the button and the status text
                 const buttonStatusContainer = $('<div>').addClass('button-status-container');
 
-                // const showChallengeButton = $('<button>')
-                //     .text("Show Details")
-                //     .addClass('show-challenge-btn')
-                //     .on('click', function() {
-                //         populateChallengeEditorPanel(this, columns, dataRow, rowIndex);
-                //     });
+                const showChallengeButton = $('<button>')
+                    .text("Show Details")
+                    .addClass('show-challenge-btn')
+                    .on('click', function() {
+                        populateChallengeEditorPanel(this, columns, dataRow, rowIndex);
+                    });
     
                 const addChallengeButton = $('<button>')
                     .text("Add Challenge")
@@ -677,8 +716,7 @@
 
                 const statusText = $('<p>').text('').addClass('status-text'); // Add your status text here
 
-                // buttonStatusContainer.append(showChallengeButton, addChallengeButton, statusText);
-                buttonStatusContainer.append(addChallengeButton, statusText);
+                buttonStatusContainer.append(showChallengeButton, addChallengeButton, statusText);
 
                 detailsForm.append(buttonStatusContainer);
     
@@ -686,6 +724,10 @@
                 detailsTable.appendTo(detailsForm);
                 // Show the form
                 detailsForm.show();
+            }
+
+            function updatePageHash(hashStr) {
+                window.location.hash = hashStr;
             }
 
             function checkUserSession() {
