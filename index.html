@@ -144,6 +144,10 @@
             position: relative;
         }
 
+        .show-challenge-btn:hover {
+            background-color: #8484f8; /* Slightly lighter color on hover */
+        }
+
         .start-challenge-btn {
             background-color: #9a9af7; /* Same as highlighted row color */
             color: white; /* Text color */
@@ -375,6 +379,62 @@
             border-radius: 5px; /* Round the corners of the border */
             background-color: #f9f9f9; /* Light background color */
         }
+
+        /* Style for iPhone containers */
+        .iphone {
+            /* Common iPhone styling */
+            background-color: #000; /* Dark background to mimic screen off */
+            border-radius: 25px; /* Rounded corners like an iPhone */
+            border: 2px solid #333; /* Thin bezel effect */
+            box-shadow: 0 0 10px rgba(0,0,0,0.5); /* Shadow for 3D effect */
+            margin: 20px auto;
+            display: none; /* Initially hidden */
+        }
+
+        /* Individual iPhone sizes */
+        #iphone13 {
+            width: 506px;
+            height: 234px;
+        }
+
+        #iphone14 {
+            width: 520px;
+            height: 240px;
+        }
+
+        #iphone15 {
+            width: 530px;
+            height: 245px;
+        }
+
+        /* Container for the iPhone buttons */
+        .iphone-buttons-container {
+            display: flex; /* Align items in a row */
+            justify-content: center; /* Center items horizontally */
+            margin-top: 20px; /* Margin at the top */
+            margin-bottom: 20px; /* Spacing before the iPhone displays */
+        }
+
+        /* iPhone Toggle Button Style */
+        .toggle-button {
+            background-color: #ccc; /* Default color for inactive state */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 0 10px; /* Space between buttons */
+        }
+
+        .toggle-button.active {
+            background-color: #9a9af7; /* Highlight color for active state */
+        }
+
+        .toggle-button:hover {
+            background-color: #8484f8;
+        }        
+
 
     </style>
 </head>
@@ -685,7 +745,7 @@
                     const columnValue = dataRow[index];
 
                     // Check if the column is 'Tags' and process accordingly
-                    if (columnName === 'Tags' || columnName === 'Skill Sets') {
+                    if (columnName === 'Tags' || columnName === 'Skill Sets' || columnName == 'Setup Requirements') {
                         const tags = columnValue.split(',').map(tag => tag.trim());
                         const tagsContainer = $('<td>');
                         tags.forEach(tag => {
@@ -704,10 +764,16 @@
                 const buttonStatusContainer = $('<div>').addClass('button-status-container');
 
                 const showChallengeButton = $('<button>')
-                    .text("Show Details")
+                    .text("Setup Challenge")
                     .addClass('show-challenge-btn')
-                    .on('click', function() {
-                        populateChallengeEditorPanel(this, columns, dataRow, rowIndex);
+                    .show();
+
+                showChallengeButton.on('click', function() {
+                        // Scroll to the top of the button
+                        $('html, body').animate({
+                            scrollTop: showChallengeButton.offset().top
+                        }, 500);
+                        //populateChallengeEditorPanel(this, columns, dataRow, rowIndex);
                     });
     
                 const startChallengeButton = $('<button>')
@@ -1308,9 +1374,40 @@
                 showUserChallenges(false);
             });
 
+            $('.toggle-button').click(function() {
+                // Remove 'active' class from all buttons and hide all iPhones
+                $('.toggle-button').removeClass('active');
+                $('.iphone').hide();
+
+                // Add 'active' class to the clicked button and show corresponding iPhone
+                $(this).addClass('active');
+                var containerId = this.id.replace('toggle-', '') + '-container';
+                $('#' + containerId + ' .iphone').show();
+            });
+
+            // Trigger click on the first button to show iPhone 13 by default
+            $('#toggle-iphone13').click();
+
         });
     </script>
+
+    <div class="iphone-buttons-container">
+        <button id="toggle-iphone13" class="toggle-button">iPhone 13</button>
+        <button id="toggle-iphone14" class="toggle-button">iPhone 14</button>
+        <button id="toggle-iphone15" class="toggle-button">iPhone 15</button>
+    </div>
+
+    <div id="iphone13-container">
+        <div id="iphone13" class="iphone"></div>
+    </div>
     
+    <div id="iphone14-container">
+        <div id="iphone14" class="iphone"></div>
+    </div>
+    
+    <div id="iphone15-container">
+        <div id="iphone15" class="iphone"></div>
+    </div>
 
     <footer>
         <p>&copy; 2024 Bettr Casino</p>
