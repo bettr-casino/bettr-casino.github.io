@@ -448,7 +448,7 @@
 
         #setup-div {
             width: 100%;
-            height: 200px;
+            height: 160px;
             padding: 5px 5px; /* Padding inside the div */
             margin-top: 10px; /* Margin at the top */
             text-align: center; /* Center content horizontally */
@@ -469,7 +469,7 @@
         }
 
         .setup-step-button {
-            background-color: #9a9af7; /* Background color */
+            background-color: #ccc; /* Default color for inactive state */
             color: white; /* Text color */
             margin-top: 10px; /* Space between steps */
             padding: 10px 20px;
@@ -478,6 +478,22 @@
             font-size: 16px; /* Font size */
             cursor: pointer; /* Pointer cursor on hover */
             position: relative; /* Absolute positioning within the setup-step */
+        }
+
+        /* Disabled state for the button */
+        .setup-step-button:disabled {
+            background-color: #cccccc; /* Light gray background for disabled state */
+            color: #666666; /* Darker gray text */
+            cursor: default; /* Default cursor to not suggest it's clickable */
+            pointer-events: none; /* Prevents click and hover events */
+        }
+
+        .setup-step-button.active {
+            background-color: #9a9af7; /* Highlight color for active state */
+        }
+
+        .setup-step-button:not(:disabled):hover {
+            background-color: #8484f8;
         }
 
     </style>
@@ -813,6 +829,7 @@
                     .show();
 
                 showChallengeButton.on('click', function() {
+                        $(".setup-step-button").prop("disabled", true);
                         $(".setup").show();
                         // Scroll to the top of the button
                         $('html, body').animate({
