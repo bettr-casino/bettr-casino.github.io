@@ -441,18 +441,40 @@
         .toggle-button:hover {
             background-color: #8484f8;
         }
-        
+
         #setup-div {
             width: 100%;
             height: 200px;
-            border: 1px solid #ddd; /* Border color similar to the table */
-            background-color: #f9f9f9; /* Background color similar to the table */
-            padding: 5px;
+            padding: 10px; /* Padding inside the div */
+            margin-top: 10px; /* Margin at the top */
+            text-align: center; /* Center content horizontally */
             box-sizing: border-box; /* To include padding in the width and height */
-            margin-top: 5px; /* Space above the div */
-            display: none; /* Initially hidden */
-            border: 1px solid #ddd; /* Border for the form box */
+            background-color: #f9f9f9; /* Background color similar to the table */
+            border: 1px solid #ddd; /* Border style similar to the table */
             border-radius: 5px; /* Rounded corners for the form */
+            display: none; /* Initially hidden */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+        }
+
+        .centered-button {
+            background-color: #9a9af7; /* Background color */
+            color: white; /* Text color */
+            padding: 10px 10px; /* Padding */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded corners */
+            font-size: 16px; /* Font size */
+            cursor: pointer; /* Pointer cursor on hover */
+            margin-top: 20px; /* Margin at the top for vertical centering */
+            display: inline-block; /* Allows for text-align center to work on the button */
+        }
+
+        .centered-button:hover {
+            background-color: #8484f8; /* Slightly lighter color on hover */
+        }
+        
+        #setup-div {
+            border: 1px solid #ddd; /* Border color similar to the table */
         }
 
         #setup-div h3 {
@@ -794,7 +816,7 @@
                     .show();
 
                 showChallengeButton.on('click', function() {
-                        $('#setup-div').show()
+                        $("#setup-div").css("display", "flex");
                         // Scroll to the top of the button
                         $('html, body').animate({
                             scrollTop: showChallengeButton.offset().top
@@ -1421,7 +1443,7 @@
     </script>
 
     <div id="setup-div">
-        <h3>Setup Wizard</h3>
+        <button id="start-setup-btn" class="centered-button">Start Setup</button>
         <!-- Additional content can go here -->
     </div>
 
