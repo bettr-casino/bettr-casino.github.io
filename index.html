@@ -144,7 +144,7 @@
             position: relative;
         }
 
-        .add-challenge-btn {
+        .start-challenge-btn {
             background-color: #9a9af7; /* Same as highlighted row color */
             color: white; /* Text color */
             padding: 10px 10px; /* Padding for size */
@@ -614,7 +614,7 @@
                 $('.section1').slideUp(500);
                 $('.section3').show();
                 $(button).hide();
-                $('.add-challenge-btn').show();
+                $('.start-challenge-btn').show();
                 updatePageHash("show-details");
 
                 populateShowChallengeForm(columns, dataRow, rowIndex);
@@ -626,7 +626,7 @@
                         $('.section1').slideDown(500);
                         $('.section3').hide();
                         $(button).show();
-                        $('.add-challenge-btn').hide();
+                        $('.start-challenge-btn').hide();
                     }
                 });
 
@@ -710,17 +710,17 @@
                         populateChallengeEditorPanel(this, columns, dataRow, rowIndex);
                     });
     
-                const addChallengeButton = $('<button>')
-                    .text("Add Challenge")
-                    .addClass('add-challenge-btn')
+                const startChallengeButton = $('<button>')
+                    .text("Start Challenge")
+                    .addClass('start-challenge-btn')
                     .on('click', function() {
-                        addChallenge(this, columns, dataRow, rowIndex);
+                        startChallenge(this, columns, dataRow, rowIndex);
                     })
                     .hide();
 
                 const statusText = $('<p>').text('').addClass('status-text'); // Add your status text here
 
-                buttonStatusContainer.append(showChallengeButton, addChallengeButton, statusText);
+                buttonStatusContainer.append(showChallengeButton, startChallengeButton, statusText);
 
                 detailsForm.append(buttonStatusContainer);
     
@@ -771,7 +771,7 @@
                 modal.show();
             }
 
-            function addChallenge(button, columns, dataRow, rowIndex) {
+            function startChallenge(button, columns, dataRow, rowIndex) {
                 var columnIndex = columns.findIndex(column => column.title === 'ID');
                 var taskId = dataRow[columnIndex];
                 console.log(`taskId: ${taskId}`);
