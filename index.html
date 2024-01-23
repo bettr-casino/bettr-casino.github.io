@@ -148,6 +148,13 @@
             background-color: #8484f8; /* Slightly lighter color on hover */
         }
 
+        .show-challenge-btn:disabled {
+            background-color: #cccccc; /* Light gray background for disabled state */
+            color: #666666; /* Darker gray text */
+            cursor: not-allowed; /* Change cursor to indicate non-clickable */
+            border: 1px solid #bbbbbb; /* Border color for disabled state */
+        }
+
         .start-challenge-btn {
             background-color: #9a9af7; /* Same as highlighted row color */
             color: white; /* Text color */
@@ -791,7 +798,10 @@
                         // Scroll to the top of the button
                         $('html, body').animate({
                             scrollTop: showChallengeButton.offset().top
-                        }, 500);
+                        }, 500, function() {
+                            // Focus on the first input
+                            $(showChallengeButton).prop("disabled", true);
+                        });
                         //populateChallengeEditorPanel(this, columns, dataRow, rowIndex);
                     });
     
