@@ -433,7 +433,25 @@
 
         .toggle-button:hover {
             background-color: #8484f8;
-        }        
+        }
+        
+        #setup-div {
+            width: 100%;
+            height: 200px;
+            border: 1px solid #ddd; /* Border color similar to the table */
+            background-color: #f9f9f9; /* Background color similar to the table */
+            padding: 5px;
+            box-sizing: border-box; /* To include padding in the width and height */
+            margin-top: 5px; /* Space above the div */
+            display: none; /* Initially hidden */
+            border: 1px solid #ddd; /* Border for the form box */
+            border-radius: 5px; /* Rounded corners for the form */
+        }
+
+        #setup-div h3 {
+            color: #002246; /* Color similar to other titles */
+            margin: 0px; /* Spacing after the title */
+        }
 
 
     </style>
@@ -769,10 +787,13 @@
                     .show();
 
                 showChallengeButton.on('click', function() {
+                        $('#setup-div').show()
                         // Scroll to the top of the button
                         $('html, body').animate({
                             scrollTop: showChallengeButton.offset().top
-                        }, 500);
+                        }, 500, function() {
+                            $(showChallengeButton).text("Start Setup");
+                        });
                         //populateChallengeEditorPanel(this, columns, dataRow, rowIndex);
                     });
     
@@ -1390,6 +1411,11 @@
 
         });
     </script>
+
+    <div id="setup-div">
+        <h3>Setup Wizard</h3>
+        <!-- Additional content can go here -->
+    </div>
 
     <div class="iphone-buttons-container">
         <button id="toggle-iphone13" class="toggle-button">iPhone 13</button>
