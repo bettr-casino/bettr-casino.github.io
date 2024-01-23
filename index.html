@@ -442,10 +442,14 @@
             background-color: #8484f8;
         }
 
+        #setup-btn {
+            display: none; /* Initially hidden */
+        }
+
         #setup-div {
             width: 100%;
             height: 200px;
-            padding: 10px; /* Padding inside the div */
+            padding: 5px 5px; /* Padding inside the div */
             margin-top: 10px; /* Margin at the top */
             text-align: center; /* Center content horizontally */
             box-sizing: border-box; /* To include padding in the width and height */
@@ -457,31 +461,26 @@
             align-items: center; /* Center vertically */
         }
 
-        .centered-button {
+        .setup-step {
+            /* other styles for setup steps */
+            width: 100%;
+            height: 185px;
+            position: relative; /* This allows absolute positioning of children relative to this parent */
+            padding: 0px; /* Padding inside each step for content */
+            border: 1px solid #ddd; /* Border for visual separation */
+        }
+
+        .setup-step-button {
             background-color: #9a9af7; /* Background color */
             color: white; /* Text color */
-            padding: 10px 10px; /* Padding */
+            margin-top: 10px; /* Space between steps */
+            padding: 10px 20px;
             border: none; /* No border */
             border-radius: 5px; /* Rounded corners */
             font-size: 16px; /* Font size */
             cursor: pointer; /* Pointer cursor on hover */
-            margin-top: 20px; /* Margin at the top for vertical centering */
-            display: inline-block; /* Allows for text-align center to work on the button */
+            position: relative; /* Absolute positioning within the setup-step */
         }
-
-        .centered-button:hover {
-            background-color: #8484f8; /* Slightly lighter color on hover */
-        }
-        
-        #setup-div {
-            border: 1px solid #ddd; /* Border color similar to the table */
-        }
-
-        #setup-div h3 {
-            color: #002246; /* Color similar to other titles */
-            margin: 0px; /* Spacing after the title */
-        }
-
 
     </style>
 </head>
@@ -816,7 +815,7 @@
                     .show();
 
                 showChallengeButton.on('click', function() {
-                        $("#setup-div").css("display", "flex");
+                        $(".setup").show();
                         // Scroll to the top of the button
                         $('html, body').animate({
                             scrollTop: showChallengeButton.offset().top
@@ -1442,30 +1441,23 @@
         });
     </script>
 
-    <div id="setup-div">
-        <button id="start-setup-btn" class="centered-button">Start Setup</button>
-        <!-- Additional content can go here -->
+    <div id="setup-div" class="setup">
         <div class="setup-step" id="step-1">
-            <h3>Step 1</h3>
-            <!-- Content for Step 1 -->
-            <button class="next-btn">Next</button>
         </div>
-    
+
         <div class="setup-step" id="step-2" style="display: none;">
-            <h3>Step 2</h3>
-            <!-- Content for Step 2 -->
-            <button class="back-btn">Back</button>
-            <button class="next-btn">Next</button>
         </div>
-    
+
         <!-- Add more steps as needed -->
-    
+
         <div class="setup-step" id="step-3" style="display: none;">
-            <h3>Step 3</h3>
-            <!-- Content for Step 3 -->
-            <button class="back-btn">Back</button>
-            <button class="finish-btn">Finish</button>
         </div>
+    </div>
+
+    <div id="setup-btn" class="setup">
+        <button class="setup-step-button back-btn">Back</button>
+        <button class="setup-step-button next-btn">Next</button>
+        <button class="setup-step-button finish-btn">Finish</button>
     </div>
 
     <div class="iphone-buttons-container">
