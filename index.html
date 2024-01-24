@@ -736,17 +736,18 @@
                     const rowIndex = table.row(this).index(); // Gets the index of the clicked row
                     const detailsRowData = rows.map(row => row.slice(detailsStartIndex + 1, setupStartIndex)); // Extract Details columns
                     const detailsRow = detailsRowData[rowIndex];
-                    var taskIdIndex = detailsColumns.findIndex(column => column.title === 'ID');
-                    var taskId = detailsRow[taskIdIndex];
+                    const taskIdIndex = detailsColumns.findIndex(column => column.title === 'ID');
+                    const taskId = detailsRow[taskIdIndex];
+                    const stepKey = `${prefix}TaskID__${taskId}__SetupIndex`;
 
                     function showNextWizardStep(rowIndex) {
                         const setupRowData = rows.map(row => row.slice(setupStartIndex + 1, internalStartIndex)); // Extract Setup columns
                         const setupRow = setupRowData[rowIndex];
                         const totalSteps = setupRow[0];
-                        const completedSetupIndex = parseInt(localStorage.getItem(`${prefix}$__TaskID__${taskId}__SetupIndex`), 10) || 0;
+                        const completedSetupIndex = parseInt(localStorage.getItem(stepKey), 10) || 0;
                         const nextStepIndex = completedSetupIndex + 1;
                         if (nextStepIndex <= totalSteps) {
-                            localStorage.setItem(`${prefix}__TaskID__${taskId}__SetupIndex`, `${nextStepIndex}`);
+                            localStorage.setItem(stepKey, `${nextStepIndex}`);
                             var stepIndex = setupColumns.findIndex(column => column.title === `Step${nextStepIndex}`);
                             const stepText = setupRow[stepIndex];
                             $('.setup-step').hide();
