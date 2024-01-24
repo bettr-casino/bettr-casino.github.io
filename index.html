@@ -665,7 +665,11 @@
             const wizardOnClickFunctions = {
                 "RegisterUser": function(evt) {
                     evt.preventDefault();  // Prevents the default link action
-                    showRegisterPanel(evt.target);
+                    if (isUserRegistered()) {
+                        showLoginPanel(evt.target);
+                    } else {
+                        showRegisterPanel(evt.target);
+                    }
                 }
             }
 
