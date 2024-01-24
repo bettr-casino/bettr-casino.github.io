@@ -650,6 +650,13 @@
                     setupTables(data);
                 });
 
+            const wizardOnClickFunctions = {
+                "RegisterUser": function(evt) {
+                    evt.preventDefault();  // Prevents the default link action
+                    showRegisterPanel();
+                }
+            }
+
             // Function to validate email using simple regex
             function isValidEmail(email) {
                 var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -755,6 +762,10 @@
                             var stepIndex = setupColumns.findIndex(column => column.title === `Step${nextStepIndex}`);
                             const stepText = setupRow[stepIndex];
                             $('.setup-step').hide();
+                            const stepOnClickFn = wizardOnClickFunctions[stepText];
+                            if (stepOnClickFn) {
+                                $(`#${stepText}Action`).off('click').on('click', stepOnClickFn)
+                            }
                             $(`.${stepText}`).show();
                             $('.setup-step-button').prop('disabled', true);
                             if (nextStepIndex > 1) {
@@ -1470,7 +1481,7 @@
         </div>
 
         <div class="setup-step RegisterUser" id="Step3" style="display: none;">
-            <h3><a href="https://testflight.apple.com/join/6japRuf7">Register</a>.</h3>
+            <h3><a id="RegisterUserAction" href="#">Register</a>.</h3>
             <p>We do not store email ids. Read our <a href="https://bettr.casino/privacy.html">Privacy</a> policy.</p>
         </div>
 
