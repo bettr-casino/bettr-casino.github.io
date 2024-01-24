@@ -235,6 +235,7 @@
 
         .register-modal-content,
         .login-modal-content,
+        .generate-challenge-code-modal-content,
         .verification-modal-content {
             background-color: #f9f9f9;
             padding: 10px;
@@ -243,12 +244,13 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             width: auto; /* Auto width based on content */
             min-width: 200px; /* Minimum width */
-            max-width: 300px; /* Maximum width */
+            max-width: 350px; /* Maximum width */
         }
 
         /* The Submit Button */
         #register_button,
         #login_button,
+        #generate_challenge_code_button,
         #verification_button {
             background-color: #9a9af7; /* Same as highlighted row color */
             color: white; /* Text color */
@@ -262,6 +264,7 @@
 
         #register_button:hover,
         #login_button:hover,
+        #generate_challenge_code_button:hover,
         #verification_button {
             background-color: #8484f8; /* Slightly lighter color on hover */
             opacity: 0.9;
@@ -270,6 +273,7 @@
         /* The Close Button */
         #register_close,
         #login_close,
+        #generate_challenge_code_close,
         #verification_close {
             color: #002246; /* Color to match the header */
             float: right;
@@ -281,6 +285,8 @@
         #register_close:focus,
         #login_close:hover,
         #login_close:focus, 
+        #generate_challenge_code_close:hover,
+        #generate_challenge_code_close:focus,
         #verification_close:hover,
         #verification_close:focus {
             color: #9a9af7; /* Color on hover to match the button */
@@ -291,6 +297,7 @@
         /* Style for the verification code input */
         #register-modal input[type="text"],
         #login-modal input[type="text"],
+        #generate-challenge-code-modal input[type="text"],
         #verification-modal input[type="text"] {
             width: calc(100% - 20px);
             padding: 10px;
@@ -303,6 +310,7 @@
         /* Disabled state of the button */
         #register_button:disabled,
         #login_button:disabled,
+        #generate_challenge_code_button:disabled,
         #verification_button:disabled {
             background-color: #cccccc; /* Light gray background to indicate it's disabled */
             color: #666666; /* Darker gray text */
@@ -313,6 +321,7 @@
         /* Hover state of the disabled button to ensure there's no change */
         #register_button:disabled:hover,
         #login_button:disabled:hover,
+        #generate_challenge_code_button:disabled:hover,
         #verification_button:disabled:hover {
             background-color: #cccccc; /* Same as the normal disabled state */
             opacity: 1; /* No change in opacity */
@@ -572,6 +581,28 @@
         </div>
     </div>
 
+    <!-- The Login Modal similar to the Register Modal -->
+    <div id="generate-challenge-code-modal" class="modal" style="display: none;">
+        <!-- Modal content -->
+        <div class="generate-challenge-code-modal-content">
+            <span id="generate_challenge_code_close" class="close">&times;</span>
+            <h2>Generate Challenge Code</h2>
+            <p>We’ll email you a verification code.</p>
+            <form id="generate-challenge-code-form">
+                <input type="email" placeholder="Email" name="email" required>
+                <label>
+                <input type="checkbox" checked="checked" name="remember"> Remember me
+                </label>
+                <button id="generate_challenge_code_button" type="button" class="button-with-spinner">
+                    Get verification code
+                    <div id="generate-challenge-code-spinner" class="spinner" style="display: none;"></div>
+                </button>
+                <!-- Error message -->
+                <p id="generate-challenge-code-error" style="display: none; color: red;"></p>
+            </form>
+        </div>
+    </div>
+
     <!-- The Verification Modal -->
     <div id="verification-modal" class="modal" style="display: none;">
         <!-- Modal content -->
@@ -671,6 +702,10 @@
                     } else {
                         showRegisterPanel(evt.target);
                     }
+                },
+                "GenerateChallengeCode": function(evt) {
+                    evt.preventDefault();  // Prevents the default link action
+                    showGenerateChallengeCodePanel(evt.target);
                 }
             }
 
@@ -1032,6 +1067,21 @@
                 });
             }
 
+            function showGenerateChallengeCodePanel(evtTgt) {
+                var $generateChallengeCodeModal = $('#generate-challenge-code-modal');
+                $generateChallengeCodeModal.show();
+
+                var targetPosition = $(evtTgt).offset(); // Using offset() to consider the document's top and left
+                var targetHeight = $(evtTgt).outerHeight(); // Height of the clicked element
+
+                $generateChallengeCodeModal.css({
+                    "top": targetPosition.top + targetHeight, // Position above evtTgt
+                    "left": targetPosition.left - $generateChallengeCodeModal.innerWidth(), // Adjust for horizontal scroll
+                    "position": "absolute", // Ensure the modal is positioned absolutely
+                    "display": "block"
+                });
+            }
+
             // Close modal when the close button is clicked
             $('.close-btn').on('click', function() {
                 $('#user-modal').hide();
@@ -1040,18 +1090,18 @@
             // Get the register modal
             var registerModal = document.getElementById('register-modal');
 
-            // Get the button that opens the register modal
+            // Get the button that opens the modal
             var registerButton = document.getElementById('register-btn');
 
-            // Get the <span> element that closes the register modal
+            // Get the <span> element that closes the modal
             var registerClose = document.getElementById('register_close');
 
-            // When the user clicks the button, open the register modal 
+            // When the user clicks the button, open the modal 
             registerButton.onclick = function() {
                 showRegisterPanel(registerButton);                
             }
 
-            // When the user clicks on <span> (x), close the register modal
+            // When the user clicks on <span> (x), close the modal
             registerClose.onclick = function() {
                 registerModal.style.display = 'none';
             }
@@ -1059,20 +1109,31 @@
             // Get the login modal
             var loginModal = document.getElementById('login-modal');
 
-            // Get the button that opens the login modal
+            // Get the button that opens the modal
             var loginButton = document.getElementById('login-btn');
 
-            // Get the <span> element that closes the login modal
+            // Get the <span> element that closes the modal
             var loginClose = document.getElementById('login_close');
 
-            // When the user clicks the button, open the register modal 
+            // When the user clicks the button, open the modal 
             loginButton.onclick = function() {
                 showLoginPanel(loginButton);                
             }
 
-            // When the user clicks on <span> (x), close the register modal
+            // When the user clicks on <span> (x), close the modal
             loginClose.onclick = function() {
                 loginModal.style.display = 'none';
+            }
+
+            // Get the generate-challenge-code modal
+            var generateChallengeCodeModal = document.getElementById('generate-challenge-code-modal');
+
+            // Get the <span> element that closes the modal
+            var generateChallengeCodeClose = document.getElementById('generate_challenge_code_close');
+
+            // When the user clicks on <span> (x), close the modal
+            generateChallengeCodeClose.onclick = function() {
+                generateChallengeCodeModal.style.display = 'none';
             }
 
             // When the user clicks anywhere outside of the register modal, close it
@@ -1538,8 +1599,8 @@
         </div>
 
         <div class="setup-step" id="GenerateChallengeCode" style="display: none;">
-            <h3><a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Generate Challenge Code</a>.</h3>
-            <p>This is a randomly generated 6 digit code to test your changes.</p>
+            <h3><a id="GenerateChallengeCodeAction" href="#">Generate Challenge Code</a>.</h3>
+            <p>This is a randomly generated 6 digit code.</p>
         </div>
     </div>
 
