@@ -740,12 +740,12 @@
                     const taskId = detailsRow[taskIdIndex];
                     const stepKey = `${prefix}TaskID__${taskId}__SetupIndex`;
 
-                    function showNextWizardStep(rowIndex) {
+                    function showNextWizardStep(rowIndex, offset) {
                         const setupRowData = rows.map(row => row.slice(setupStartIndex + 1, internalStartIndex)); // Extract Setup columns
                         const setupRow = setupRowData[rowIndex];
                         const totalSteps = setupRow[0];
                         const completedSetupIndex = parseInt(localStorage.getItem(stepKey), 10) || 0;
-                        const nextStepIndex = completedSetupIndex + 1;
+                        const nextStepIndex = completedSetupIndex + offset;
                         if (nextStepIndex <= totalSteps) {
                             localStorage.setItem(stepKey, `${nextStepIndex}`);
                             var stepIndex = setupColumns.findIndex(column => column.title === `Step${nextStepIndex}`);
@@ -756,25 +756,28 @@
                             if (nextStepIndex > 1) {
                                 $('.back-btn').prop('disabled', false);
                                 $('.back-btn').off('click').on('click', function() {
-                                    showNextWizardStep(rowIndex);
+                                    showNextWizardStep(rowIndex, -1);
                                 });
                             }
                             if (nextStepIndex == totalSteps) {
                                 $('.finish-btn').prop('disabled', false);
                                 $('.finish-btn').off('click').on('click', function() {
-                                    showNextWizardStep(rowIndex);
+                                    alert('complete task');
                                 });
                             }
                             if (nextStepIndex < totalSteps) {
                                 $('.next-btn').prop('disabled', false);
                                 $('.next-btn').off('click').on('click', function() {
-                                    showNextWizardStep(rowIndex);
+                                    showNextWizardStep(rowIndex, 1);
                                 });
                             }
                         }
                     }
 
-                    populateDetailsForm(detailsColumns, detailsRow, rowIndex, showNextWizardStep);
+                    populateDetailsForm(detailsColumns, detailsRow, rowIndex, function(rowIndex) {
+                        localStorage.removeItem(stepKey);
+                        showNextWizardStep(rowIndex, 1);
+                    });
                 });
 
                 // Check if there are rows in the table
