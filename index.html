@@ -414,9 +414,9 @@
             height: 245px;
         }
 
-        /* High-resolution (Retina) display styles */
-        @media only screen and (min-resolution: 192dpi), 
-            only screen and (min-resolution: 2dppx) {
+        /* High-resolution (Retina) display styles for desktops */
+        @media only screen and (min-width: 1024px) and (min-resolution: 192dpi), 
+            only screen and (min-width: 1024px) and (min-resolution: 2dppx) {
 
             #iphone13 {
                 width: 1012px; /* 2x width for Retina display */
