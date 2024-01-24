@@ -654,6 +654,7 @@
                 "RegisterUser": function(evt) {
                     if (isUserLoggedIn()) {
                         $('#RegisterUserText').text('You are already logged in. Click the Login button to register as a different user, else click Next.');
+                        $('#RegisterUserAction').text('Login');
                         return;
                     } 
                     if (isUserRegistered()) {
