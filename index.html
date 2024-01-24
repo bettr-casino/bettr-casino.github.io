@@ -653,7 +653,7 @@
             const wizardOnClickFunctions = {
                 "RegisterUser": function(evt) {
                     evt.preventDefault();  // Prevents the default link action
-                    showRegisterPanel();
+                    showRegisterPanel(evt.target);
                 }
             }
 
@@ -766,7 +766,7 @@
                             if (stepOnClickFn) {
                                 $(`#${stepText}Action`).off('click').on('click', stepOnClickFn)
                             }
-                            $(`.${stepText}`).show();
+                            $(`#${stepText}`).show();
                             $('.setup-step-button').prop('disabled', true);
                             if (nextStepIndex > 1) {
                                 $('.back-btn').prop('disabled', false);
@@ -946,21 +946,19 @@
                 modal.style.left = `${leftPosition}px`;
             }
 
-            function showRegisterPanel(){
-                $('#register-modal').show();
-                // Get the button that opens the register modal
-                var registerButton = document.getElementById('register-btn');
-                var rect = registerButton.getBoundingClientRect();
-                var modal = document.getElementById('register-modal');
+            function showRegisterPanel(evtTgt) {
+                var $registerModal = $('#register-modal');
+                $registerModal.show();
 
-                // Calculate the modal position
-                var topPosition = rect.top + window.scrollY;
-                var rightPosition = 20;
+                var targetPosition = $(evtTgt).offset(); // Using offset() to consider the document's top and left
+                var targetHeight = $(evtTgt).outerHeight(); // Height of the clicked element
 
-                // Adjust modal position and display it
-                modal.style.display = 'block';
-                modal.style.top = `${topPosition}px`;
-                modal.style.right = `${rightPosition}px`;
+                $registerModal.css({
+                    "top": targetPosition.top + targetHeight, // Position above evtTgt
+                    "left": targetPosition.left, // Adjust for horizontal scroll
+                    "position": "absolute", // Ensure the modal is positioned absolutely
+                    "display": "block"
+                });
             }
 
             function showLoginPanel() {
@@ -996,7 +994,7 @@
 
             // When the user clicks the button, open the register modal 
             registerButton.onclick = function() {
-                showRegisterPanel();                
+                showRegisterPanel(registerButton);                
             }
 
             // When the user clicks on <span> (x), close the register modal
@@ -1470,17 +1468,17 @@
     </script>
 
     <div id="setup-div" class="setup">
-        <div class="setup-step DownloadTestFlightApp" id="Step1" style="display: none;">
+        <div class="setup-step" id="DownloadTestFlightApp" style="display: none;">
             <h3><a href="https://apps.apple.com/us/app/testflight/id899247664/" target="_blank">Install TestFlight</a>.</h3>
             <p>Install the TestFlight App from the AppStore.</p>
         </div>
 
-        <div class="setup-step InstallBettrApp" id="Step2" style="display: none;">
+        <div class="setup-step" id="InstallBettrApp" style="display: none;">
             <h3><a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Install Bettr</a>.</h3>
             <p>Install the Bettr TestFlight App using the testflight public link above.</p>
         </div>
 
-        <div class="setup-step RegisterUser" id="Step3" style="display: none;">
+        <div class="setup-step" id="RegisterUser" style="display: none;">
             <h3><a id="RegisterUserAction" href="#">Register</a>.</h3>
             <p>We do not store email ids. Read our <a href="https://bettr.casino/privacy.html">Privacy</a> policy.</p>
         </div>
