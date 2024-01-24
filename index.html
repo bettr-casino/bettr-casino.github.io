@@ -710,6 +710,8 @@
                     .map(header => ({ title: header }));
                 const detailsColumns = headers.slice(detailsStartIndex + 1, setupStartIndex)
                     .map(header => ({ title: header }));
+                const setupColumns = headers.slice(setupStartIndex + 1, internalStartIndex)
+                    .map(header => ({ title: header }));
     
                 // // Initialize the Summary DataTable
                 const summaryTable = $('#summary-table').DataTable({
@@ -734,7 +736,21 @@
                     const rowIndex = table.row(this).index(); // Gets the index of the clicked row
                     const detailsRowData = rows.map(row => row.slice(detailsStartIndex + 1, setupStartIndex)); // Extract Details columns
                     const detailsRow = detailsRowData[rowIndex];
-                    populateDetailsForm(detailsColumns, detailsRow, rowIndex);
+                    var taskIdIndex = detailsColumns.findIndex(column => column.title === 'ID');
+                    var taskId = detailsRow[taskIdIndex];
+                    populateDetailsForm(detailsColumns, detailsRow, rowIndex, function(showChallengeBtn, rowIndex) {
+                        const setupRowData = rows.map(row => row.slice(setupStartIndex + 1, internalStartIndex)); // Extract Setup columns
+                        const setupRow = setupRowData[rowIndex];
+                        const totalSteps = setupRow[0];
+                        const completedSetupIndex = localStorage.getItem(`${prefix}$__TaskID__${taskId}__SetupIndex`, 0);
+                        const nextStepIndex = completedSetupIndex + 1;
+                        if (nextStepIndex <= totalSteps) {
+                            var stepIndex = setupColumns.findIndex(column => column.title === `Step${nextStepIndex}`);
+                            const stepText = setupRow[stepIndex];
+                            $('.setup-step').hide();
+                            $(`.${stepText}`).show();
+                        }
+                    });
                 });
 
                 // Check if there are rows in the table
@@ -745,70 +761,7 @@
 
             }
 
-            function populateChallengeEditorPanel(button, columns, dataRow, rowIndex) {
-                const detailsTable = $('.details-table');
-                detailsTable.hide();
-                $('.section1').slideUp(500);
-                $('.section3').show();
-                $(button).hide();
-                $('.start-challenge-btn').show();
-                updatePageHash("show-details");
-
-                populateShowChallengeForm(columns, dataRow, rowIndex);
-                
-                $(window).off('hashchange').on('hashchange', function() {
-                    var hash = window.location.hash;
-                    if (hash === "") {
-                        detailsTable.show();
-                        $('.section1').slideDown(500);
-                        $('.section3').hide();
-                        $(button).show();
-                        $('.start-challenge-btn').hide();
-                    }
-                });
-
-            }
-
-            function populateShowChallengeForm(columns, dataRow, rowIndex) {
-                const detailsForm = $('#show-challenge-editor-form');
-                // Clear existing content
-                detailsForm.empty();
-
-                // Start the table
-                const detailsTable = $('<table>').addClass('details-table');
-
-                // Iterate over columns and add rows to the table
-                columns.forEach((column, index) => {
-                    const columnName = column.title;  // Assuming column object has a 'title' property
-                    const columnValue = dataRow[index];
-
-                    // Check if the column is 'Tags' and process accordingly
-                    if (columnName === 'Tags' || columnName === 'Skill Sets') {
-                        const tags = columnValue.split(',').map(tag => tag.trim());
-                        const tagsContainer = $('<td>');
-                        tags.forEach(tag => {
-                            $('<span>').addClass('tag').text(tag).appendTo(tagsContainer);
-                        });
-                        const row = $('<tr>').append($('<td>').text(columnName)).append(tagsContainer);
-                        detailsTable.append(row);
-                    } else {
-                        const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').text(columnValue));
-                        detailsTable.append(row);
-                    }
-
-                });
-
-                const statusText = $('<p>').text('').addClass('status-text'); // Add your status text here
-
-                detailsForm.append(statusText);
-    
-                // Append the table to the form
-                detailsTable.appendTo(detailsForm);
-                // Show the form
-                detailsForm.show();
-            }
-    
-            function populateDetailsForm(columns, dataRow, rowIndex) {
+            function populateDetailsForm(columns, dataRow, rowIndex, callback) {
                 const detailsForm = $('#details-form');
                 // Clear existing content
                 detailsForm.empty();
@@ -852,10 +805,9 @@
                         $('html, body').animate({
                             scrollTop: showChallengeButton.offset().top
                         }, 500, function() {
-                            // Focus on the first input
                             $(showChallengeButton).prop("disabled", true);
                         });
-                        //populateChallengeEditorPanel(this, columns, dataRow, rowIndex);
+                        callback(this, rowIndex);
                     });
     
                 const startChallengeButton = $('<button>')
@@ -1474,15 +1426,16 @@
     </script>
 
     <div id="setup-div" class="setup">
-        <div class="setup-step" id="step-1">
+        <div class="setup-step DownloadTestFlightApp" id="Step1" style="display: none;">
+            <h3><a href="https://apps.apple.com/us/app/testflight/id899247664/">Install TestFlight from the App Store</a></h3>
         </div>
 
-        <div class="setup-step" id="step-2" style="display: none;">
+        <div class="setup-step InstallBettrApp" id="Step2" style="display: none;">
+            <h3><a href="https://testflight.apple.com/join/6japRuf7">Install Bettr via TestFlight</a></h3>
         </div>
 
-        <!-- Add more steps as needed -->
-
-        <div class="setup-step" id="step-3" style="display: none;">
+        <div class="setup-step ConfigureTask" id="Step3" style="display: none;">
+            <button id="configure-task-btn" class="header-btn">Configure Task</button>
         </div>
     </div>
 
