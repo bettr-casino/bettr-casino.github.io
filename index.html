@@ -1453,6 +1453,8 @@
             // Trigger click on the first button to show iPhone 13 by default
             $('#toggle-iphone13').click();
 
+            updateSignInButtons();
+
         });
     </script>
 
@@ -1468,7 +1470,7 @@
         </div>
 
         <div class="setup-step RegisterUser" id="Step3" style="display: none;">
-            <h3><a href="https://testflight.apple.com/join/6japRuf7">Register User</a>.</h3>
+            <h3><a id="RegisterUserTitle" href="https://testflight.apple.com/join/6japRuf7">Register.</a>.</h3>
             <p>We do not store email ids. Read our <a href="https://bettr.casino/privacy.html">Privacy</a> policy.</p>
         </div>
 
