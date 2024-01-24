@@ -650,6 +650,18 @@
                     setupTables(data);
                 });
 
+            const wizardOnShowFunctions = {
+                "RegisterUser": function(evt) {
+                    if (isUserLoggedIn()) {
+                        $('#RegisterUserText').text('You are already logged in. Click the Login button to register as a different user, else click Next.');
+                        return;
+                    } 
+                    if (isUserRegistered()) {
+                        $('#RegisterUserAction').text('Login');
+                    }
+                }
+            }
+
             const wizardOnClickFunctions = {
                 "RegisterUser": function(evt) {
                     evt.preventDefault();  // Prevents the default link action
@@ -762,9 +774,13 @@
                             var stepIndex = setupColumns.findIndex(column => column.title === `Step${nextStepIndex}`);
                             const stepText = setupRow[stepIndex];
                             $('.setup-step').hide();
+                            const stepOnShowFn = wizardOnShowFunctions[stepText];
+                            if (stepOnShowFn) {
+                                stepOnShowFn();
+                            }
                             const stepOnClickFn = wizardOnClickFunctions[stepText];
                             if (stepOnClickFn) {
-                                $(`#${stepText}Action`).off('click').on('click', stepOnClickFn)
+                                $(`#${stepText}Action`).off('click').on('click', stepOnClickFn);
                             }
                             $(`#${stepText}`).show();
                             $('.setup-step-button').prop('disabled', true);
@@ -876,6 +892,17 @@
                 window.location.hash = hashStr;
             }
 
+            function isUserRegistered() {
+                var userId = localStorage.getItem(prefix_local_store('user_id'));
+                return userId ? true : false;
+            }
+
+            function isUserLoggedIn() {
+                var userId = localStorage.getItem(prefix_local_store('user_id'));
+                var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
+                return userId && sessionToken ? true : false;
+            }
+
             function checkUserSession() {
                 var userId = localStorage.getItem(prefix_local_store('user_id'));
                 var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
@@ -893,7 +920,7 @@
 
             function showModal(message) {
                 $('#modal-message').text(message);
-
+    
                 var modal = $('#user-modal');
                 var windowWidth = $(window).width();
                 var windowHeight = $(window).height();
@@ -1478,7 +1505,7 @@
 
         <div class="setup-step" id="RegisterUser" style="display: none;">
             <h3><a id="RegisterUserAction" href="#">Register</a>.</h3>
-            <p>We do not store email ids. Read our <a href="https://bettr.casino/privacy.html">Privacy</a> policy.</p>
+            <p id="RegisterUserText">We do not store email ids. Read our <a href="https://bettr.casino/privacy.html">Privacy</a> policy.</p>
         </div>
 
         <div class="setup-step RegisterChallenge" id="Step4" style="display: none;">
