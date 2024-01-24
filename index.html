@@ -414,6 +414,26 @@
             height: 245px;
         }
 
+        /* High-resolution (Retina) display styles */
+        @media only screen and (min-resolution: 192dpi), 
+            only screen and (min-resolution: 2dppx) {
+
+            #iphone13 {
+                width: 1012px; /* 2x width for Retina display */
+                height: 468px; /* 2x height for Retina display */
+            }
+
+            #iphone14 {
+                width: 1040px; /* 2x width for Retina display */
+                height: 480px; /* 2x height for Retina display */
+            }
+
+            #iphone15 {
+                width: 1060px; /* 2x width for Retina display */
+                height: 490px; /* 2x height for Retina display */
+            }
+        }
+
         /* Container for the iPhone buttons */
         .iphone-buttons-container {
             display: flex; /* Align items in a row */
