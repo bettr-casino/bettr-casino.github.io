@@ -673,6 +673,19 @@
                 }
             }
 
+            const wizardOnNextFunctions = {
+                "RegisterUser": function(evt) {
+                    if (isUserLoggedIn()) {
+                        return true;
+                    }
+                    showModal('Complete this step to continue.');
+                    return false;
+                }
+            }
+
+            const wizardOnFinishFunctions = {                
+            }
+
             // Function to validate email using simple regex
             function isValidEmail(email) {
                 var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -774,10 +787,10 @@
                         const completedSetupIndex = parseInt(localStorage.getItem(stepKey), 10) || 0;
                         const nextStepIndex = completedSetupIndex + offset;
                         if (nextStepIndex <= totalSteps) {
-                            localStorage.setItem(stepKey, `${nextStepIndex}`);
                             var stepIndex = setupColumns.findIndex(column => column.title === `Step${nextStepIndex}`);
                             const stepText = setupRow[stepIndex];
                             $('.setup-step').hide();
+                            localStorage.setItem(stepKey, `${nextStepIndex}`);
                             const stepOnShowFn = wizardOnShowFunctions[stepText];
                             if (stepOnShowFn) {
                                 stepOnShowFn();
@@ -797,12 +810,23 @@
                             if (nextStepIndex == totalSteps) {
                                 $('.finish-btn').prop('disabled', false);
                                 $('.finish-btn').off('click').on('click', function() {
-                                    alert('complete task');
+                                    const stepOnFinishFn = wizardOnFinishFunctions[stepText];
+                                    if (stepOnFinishFn) {
+                                        if (!stepOnFinishFn()) {
+                                            return;
+                                        }
+                                    }
                                 });
                             }
                             if (nextStepIndex < totalSteps) {
                                 $('.next-btn').prop('disabled', false);
                                 $('.next-btn').off('click').on('click', function() {
+                                    const stepOnNextFn = wizardOnNextFunctions[stepText];
+                                    if (stepOnNextFn) {
+                                        if (!stepOnNextFn()) {
+                                            return;
+                                        }
+                                    }
                                     showNextWizardStep(rowIndex, 1);
                                 });
                             }
