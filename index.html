@@ -585,20 +585,13 @@
     <div id="generate-challenge-code-modal" class="modal" style="display: none;">
         <!-- Modal content -->
         <div class="generate-challenge-code-modal-content">
-            <span id="generate_challenge_code_close" class="close">&times;</span>
-            <h2>Generate Challenge Code</h2>
-            <p>We’ll email you a verification code.</p>
+            <span id="generate_challenge_code_close" class="close">&times;</span>            
+            <h2>Generating the code <span id="generated-challenge-code">...</span> <span id="generate-challenge-code-spinner" class="spinner" style="display: none;"></span></h2>
             <form id="generate-challenge-code-form">
-                <input type="email" placeholder="Email" name="email" required>
-                <label>
-                <input type="checkbox" checked="checked" name="remember"> Remember me
-                </label>
                 <button id="generate_challenge_code_button" type="button" class="button-with-spinner">
-                    Get verification code
-                    <div id="generate-challenge-code-spinner" class="spinner" style="display: none;"></div>
+                    Copy Code To Clipboard
                 </button>
                 <!-- Error message -->
-                <p id="generate-challenge-code-error" style="display: none; color: red;"></p>
             </form>
         </div>
     </div>
@@ -691,6 +684,9 @@
                     if (isUserRegistered()) {
                         $('#RegisterUserAction').text('Login');
                     }
+                },
+                "GenerateChallengeCode": function(evt) {
+                    $(`#generate-challenge-code-spinner`).show();
                 }
             }
 
