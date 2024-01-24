@@ -738,19 +738,42 @@
                     const detailsRow = detailsRowData[rowIndex];
                     var taskIdIndex = detailsColumns.findIndex(column => column.title === 'ID');
                     var taskId = detailsRow[taskIdIndex];
-                    populateDetailsForm(detailsColumns, detailsRow, rowIndex, function(showChallengeBtn, rowIndex) {
+
+                    function showNextWizardStep(rowIndex) {
                         const setupRowData = rows.map(row => row.slice(setupStartIndex + 1, internalStartIndex)); // Extract Setup columns
                         const setupRow = setupRowData[rowIndex];
                         const totalSteps = setupRow[0];
-                        const completedSetupIndex = localStorage.getItem(`${prefix}$__TaskID__${taskId}__SetupIndex`, 0);
+                        const completedSetupIndex = parseInt(localStorage.getItem(`${prefix}$__TaskID__${taskId}__SetupIndex`), 10) || 0;
                         const nextStepIndex = completedSetupIndex + 1;
                         if (nextStepIndex <= totalSteps) {
+                            localStorage.setItem(`${prefix}__TaskID__${taskId}__SetupIndex`, `${nextStepIndex}`);
                             var stepIndex = setupColumns.findIndex(column => column.title === `Step${nextStepIndex}`);
                             const stepText = setupRow[stepIndex];
                             $('.setup-step').hide();
                             $(`.${stepText}`).show();
+                            $('.setup-step-button').prop('disabled', true);
+                            if (nextStepIndex > 1) {
+                                $('.back-btn').prop('disabled', false);
+                                $('.back-btn').off('click').on('click', function() {
+                                    showNextWizardStep(rowIndex);
+                                });
+                            }
+                            if (nextStepIndex == totalSteps) {
+                                $('.finish-btn').prop('disabled', false);
+                                $('.finish-btn').off('click').on('click', function() {
+                                    showNextWizardStep(rowIndex);
+                                });
+                            }
+                            if (nextStepIndex < totalSteps) {
+                                $('.next-btn').prop('disabled', false);
+                                $('.next-btn').off('click').on('click', function() {
+                                    showNextWizardStep(rowIndex);
+                                });
+                            }
                         }
-                    });
+                    }
+
+                    populateDetailsForm(detailsColumns, detailsRow, rowIndex, showNextWizardStep);
                 });
 
                 // Check if there are rows in the table
@@ -807,7 +830,7 @@
                         }, 500, function() {
                             $(showChallengeButton).prop("disabled", true);
                         });
-                        callback(this, rowIndex);
+                        callback(rowIndex);
                     });
     
                 const startChallengeButton = $('<button>')
