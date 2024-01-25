@@ -1038,9 +1038,9 @@
                             <input type="text" inputmode="text" pattern="[0-9a-z]*" maxlength="1" />
                             <input type="text" inputmode="text" pattern="[0-9a-z]*" maxlength="1" />
                             <input type="text" inputmode="text" pattern="[0-9a-z]*" maxlength="1" />
-                            <input type="text" inputmode="text" pattern="[0-9a-z]*" maxlength="1" />
-                            <input type="text" inputmode="text" pattern="[0-9a-z]*" maxlength="1" />
-                            <input type="text" inputmode="text" pattern="[0-9a-z]*" maxlength="1" />
+                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
+                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
+                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
                         </div>
                         <p>This six-character alphanumeric code will be used to test and submit this challenge. Click Next after code generation.</p>
                     </div>
@@ -1572,7 +1572,8 @@
                     data: JSON.stringify({
                         "user_id": userId,
                         "session_token": sessionToken,
-                        "task_id": taskId
+                        "task_id": taskId,
+                        "task_state": "GENERATE_CODE"
                     }),
                     success: function(response) {
                         console.log("Response received: ", JSON.stringify(response));
