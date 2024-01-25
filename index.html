@@ -442,7 +442,7 @@
                 width: 371px; /* 530px * 0.7 */
                 height: 171.5px; /* 245px * 0.7 */
             }
-            
+
         }
 
         /* Container for the iPhone buttons */
@@ -706,7 +706,7 @@
                 });
 
             const wizardOnShowFunctions = {
-                "RegisterUser": function(evt) {
+                "RegisterUser": function() {
                     if (isUserLoggedIn()) {
                         $('#RegisterUserText').text('You are logged in. Click the Login button to register as a different user, else click Next.');
                         $('#RegisterUserAction').text('Login');
@@ -715,9 +715,21 @@
                     if (isUserRegistered()) {
                         $('#RegisterUserAction').text('Login');
                     }
-                },
-                "GenerateChallengeCode": function(evt) {
+                }            
+            }
+
+            const wizardAfterShowFunctions = {
+                "GenerateChallengeCode": function(taskId) {
                     $(`#generate-challenge-code-spinner`).show();
+                    var generateChallengeCodeA = $('#GenerateChallengeCodeAction');
+                    initializeDeveloperAccount(taskId, function(response, error) {
+                        if (error) {
+                            console.log(error);
+                            showModalPanel(generateChallengeCodeA, 'Code Generation error. If this persists, please email support@bettr.casino.', 'center');
+                        } else {
+                            
+                        }
+                    })
                 }
             }
 
@@ -743,8 +755,8 @@
                     if (isUserLoggedIn()) {
                         return true;
                     }
-                    var registerUserH3 = $('#RegisterUserAction');
-                    showModalPanel(registerUserH3, 'Complete this step to continue.', 'center');
+                    var registerUserA = $('#RegisterUserAction');
+                    showModalPanel(registerUserA, 'Complete this step to continue.', 'center');
                     return false;
                 }
             }
@@ -909,6 +921,10 @@
                                     }
                                     showNextWizardStep(rowIndex, 1);
                                 });
+                            }
+                            const stepAfterShowFn = wizardAfterShowFunctions[stepText];
+                            if (stepAfterShowFn) {
+                                stepAfterShowFn(taskId);
                             }
                         }
                     }
@@ -1513,39 +1529,25 @@
                 }
             }
 
-            function initializeDeveloperAccount(button, user_id, session_token, task_id) {
-                $('#challenge-spinner').show();
-                $('.status-text').text('Configuring challenge ...').show();
+            function initializeDeveloperAccount(taskId, callback) {
+                userId = localStorage.getItem(prefix_local_store('user_id'));
+                sessionToken = localStorage.getItem(prefix_local_store('session_token'));
                 $.ajax({
                     url: 'https://zgtla52nt3w5vyh6jhh6e4js6y0qbgji.lambda-url.us-west-2.on.aws/',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify({
-                        "user_id": user_id,
-                        "session_token": session_token,
-                        "task_id": task_id
+                        "user_id": userId,
+                        "session_token": sessionToken,
+                        "task_id": taskId
                     }),
                     success: function(response) {
                         console.log(response);
-                        getDeveloperAccount(user_id, session_token, function(data, error) {
-                            if (error) {
-                                console.error('Error storing developer account:', error);
-                                $('.status-text').html(wrapErrorMessage("Configure failed")).show();
-                                $('#challenge-spinner').hide();
-                                return;
-                            }                            
-                            $('.status-text').html(wrapSuccessMessage("Configure complete")).show();
-                            $('#challenge-spinner').hide();
-                            
-                            $(button).text('Launch Challenge').off('click').on('click', function() {
-                                launchChallenge(this, user_id, session_token, task_id);
-                            });                                                                               
-                        });
+                        callback(response, null);
                     },
                     error: function(xhr, status, error) {
                         console.error("Error in invoking Lambda:", error);
-                        $('.status-text').html(wrapErrorMessage("Configure failed")).show();
-                        $('#challenge-spinner').hide();
+                        callback(null, error);
                     }
                 });
             }
