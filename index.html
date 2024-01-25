@@ -1015,13 +1015,14 @@
 
                 var targetPosition = $(evtTgt).offset(); // Using offset() to consider the document's top and left
                 var targetHeight = $(evtTgt).outerHeight(); // Height of the clicked element
+                var targetWidth = $(evtTgt).outerWidth(); // Width of the clicked element
 
                 var top = targetPosition.top + targetHeight;
                 var left = 0;
 
                 switch (panelPosition) {
                     case "center":
-                        left = targetPosition.left - ($registerModal.innerWidth() / 2);
+                        left = targetPosition.left + targetWidth / 2 - ($registerModal.innerWidth() / 2);
                         break;
                     case "left":
                         left = targetPosition.left - $registerModal.innerWidth();
@@ -1045,13 +1046,14 @@
 
                 var targetPosition = $(evtTgt).offset(); // Using offset() to consider the document's top and left
                 var targetHeight = $(evtTgt).outerHeight(); // Height of the clicked element
+                var targetWidth = $(evtTgt).outerWidth(); // Width of the clicked element
 
                 var top = targetPosition.top + targetHeight;
                 var left = 0;
 
                 switch (panelPosition) {
                     case "center":
-                        left = targetPosition.left - ($loginModal.innerWidth() / 2);
+                        left = targetPosition.left + targetWidth / 2 - ($loginModal.innerWidth() / 2);
                         break;
                     case "left":
                         left = targetPosition.left - $loginModal.innerWidth();
