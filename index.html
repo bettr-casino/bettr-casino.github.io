@@ -701,11 +701,12 @@
             }
 
             const wizardOnNextFunctions = {
-                "RegisterUser": function(evt) {
+                "RegisterUser": function() {
                     if (isUserLoggedIn()) {
                         return true;
                     }
-                    showModal('Complete this step to continue.');
+                    var registerUserH3 = $('#RegisterUserAction');
+                    showModalPanel(registerUserH3, 'Complete this step to continue.', 'center');
                     return false;
                 }
             }
@@ -1066,21 +1067,38 @@
                 modal.show();
             }            
 
-            function positionModalAboveButton(button, message) {
-                var rect = button.getBoundingClientRect();
-                var modal = document.getElementById('user-modal');
-                var modalContent = document.querySelector('.modal-content');
+            function showModalPanel(evtTgt, message, panelPosition = "left") {
+                var $modalText = $('#modal-message');
+                $modalText.text(message);
 
-                // Calculate the modal position
-                var topPosition = rect.top - modalContent.offsetHeight - 10 + window.scrollY; // 10px above the button
-                var leftPosition = rect.left + (rect.width / 2) - (modalContent.offsetWidth / 2) + window.scrollX; // Centered above the button
+                var $modal = $('#user-modal');
+                $modal.show();
 
-                $('#modal-message').text(message);
+                var targetPosition = $(evtTgt).offset(); // Using offset() to consider the document's top and left
+                var targetHeight = $(evtTgt).outerHeight(); // Height of the clicked element
+                var targetWidth = $(evtTgt).outerWidth(); // Width of the clicked element
 
-                // Adjust modal position and display it
-                modal.style.display = 'block';
-                modal.style.top = `${topPosition}px`;
-                modal.style.left = `${leftPosition}px`;
+                var top = targetPosition.top + targetHeight;
+                var left = 0;
+
+                switch (panelPosition) {
+                    case "center":
+                        left = targetPosition.left + targetWidth / 2 - ($modal.innerWidth() / 2);
+                        break;
+                    case "left":
+                        left = targetPosition.left - $modal.innerWidth();
+                        break;
+                    case "right":
+                        left = targetPosition.left + $modal.innerWidth();
+                        break;
+                }
+                
+                $modal.css({
+                    "top": top, // Position above evtTgt
+                    "left": left, // Adjust for horizontal scroll
+                    "position": "absolute", // Ensure the modal is positioned absolutely
+                    "display": "block"
+                });
             }
 
             function showRegisterPanel(evtTgt, panelPosition = "left") {
