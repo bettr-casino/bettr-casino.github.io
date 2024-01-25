@@ -235,7 +235,6 @@
 
         .register-modal-content,
         .login-modal-content,
-        .generate-challenge-code-modal-content,
         .verification-modal-content {
             background-color: #f9f9f9;
             padding: 10px;
@@ -250,7 +249,6 @@
         /* The Submit Button */
         #register_button,
         #login_button,
-        #generate_challenge_code_button,
         #verification_button {
             background-color: #9a9af7; /* Same as highlighted row color */
             color: white; /* Text color */
@@ -264,7 +262,6 @@
 
         #register_button:hover,
         #login_button:hover,
-        #generate_challenge_code_button:hover,
         #verification_button {
             background-color: #8484f8; /* Slightly lighter color on hover */
             opacity: 0.9;
@@ -273,7 +270,6 @@
         /* The Close Button */
         #register_close,
         #login_close,
-        #generate_challenge_code_close,
         #verification_close {
             color: #002246; /* Color to match the header */
             float: right;
@@ -285,8 +281,6 @@
         #register_close:focus,
         #login_close:hover,
         #login_close:focus, 
-        #generate_challenge_code_close:hover,
-        #generate_challenge_code_close:focus,
         #verification_close:hover,
         #verification_close:focus {
             color: #9a9af7; /* Color on hover to match the button */
@@ -297,7 +291,6 @@
         /* Style for the verification code input */
         #register-modal input[type="text"],
         #login-modal input[type="text"],
-        #generate-challenge-code-modal input[type="text"],
         #verification-modal input[type="text"] {
             width: calc(100% - 20px);
             padding: 10px;
@@ -310,7 +303,6 @@
         /* Disabled state of the button */
         #register_button:disabled,
         #login_button:disabled,
-        #generate_challenge_code_button:disabled,
         #verification_button:disabled {
             background-color: #cccccc; /* Light gray background to indicate it's disabled */
             color: #666666; /* Darker gray text */
@@ -321,7 +313,6 @@
         /* Hover state of the disabled button to ensure there's no change */
         #register_button:disabled:hover,
         #login_button:disabled:hover,
-        #generate_challenge_code_button:disabled:hover,
         #verification_button:disabled:hover {
             background-color: #cccccc; /* Same as the normal disabled state */
             opacity: 1; /* No change in opacity */
@@ -370,6 +361,17 @@
             animation: spin 2s linear infinite;
             position: absolute;
             right: 10px;
+        }
+
+        .spinner2 {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #0732f3;
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            animation: spin 2s linear infinite;
+            position: absolute;
         }
 
         @keyframes spin {
@@ -525,6 +527,35 @@
             background-color: #8484f8;
         }
 
+        .code-container {
+            display: flex;
+            justify-content: space-between;
+            max-width: 300px; /* Adjust the width as needed */
+            margin: auto;
+        }
+
+        .code-container input[type="text"] {
+            border: 2px solid #cccccc;
+            border-radius: 1px;
+            padding: 4px 4px;
+            text-align: center;
+            width: 20px;
+            height: 20px;
+            margin: 0px;
+            font-size: 16px;
+        }
+
+        /* Style to remove spinner arrows from input type number */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type='number'] {
+            -moz-appearance: textfield; /* Firefox */
+        }
+
     </style>
 </head>
 <body>
@@ -577,21 +608,6 @@
                 </button>
                 <!-- Error message -->
                 <p id="login-error" style="display: none; color: red;"></p>
-            </form>
-        </div>
-    </div>
-
-    <!-- The Login Modal similar to the Register Modal -->
-    <div id="generate-challenge-code-modal" class="modal" style="display: none;">
-        <!-- Modal content -->
-        <div class="generate-challenge-code-modal-content">
-            <span id="generate_challenge_code_close" class="close">&times;</span>            
-            <h2>Generating the code <span id="generated-challenge-code">...</span> <span id="generate-challenge-code-spinner" class="spinner" style="display: none;"></span></h2>
-            <form id="generate-challenge-code-form">
-                <button id="generate_challenge_code_button" type="button" class="button-with-spinner">
-                    Copy Code To Clipboard
-                </button>
-                <!-- Error message -->
             </form>
         </div>
     </div>
@@ -718,8 +734,7 @@
                     }
                 },
                 "GenerateChallengeCode": function(evt) {
-                    evt.preventDefault();  // Prevents the default link action
-                    showGenerateChallengeCodePanel(evt.target);
+                    evt.preventDefault();  // Prevents the default link action                    
                 }
             }
 
@@ -986,7 +1001,16 @@
 
                     <div class="setup-step" id="GenerateChallengeCode" style="display: none;">
                         <h3><a id="GenerateChallengeCodeAction" href="#">Generate Challenge Code</a>.</h3>
-                        <p>This is a 6 digit code required to submit this challenge. Click Next after code generation.</p>
+                        <p>Generating Code <span id="generate-challenge-code-spinner" class="spinner2" style="display: none;"></span></p>
+                        <div class="code-container">
+                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
+                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
+                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
+                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
+                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
+                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
+                        </div>
+                        <p>This is the 6 digit code required to submit this challenge. Click Next after code generation.</p>
                     </div>
 
                     <div class="setup-step" id="DownloadTestFlightApp" style="display: none;">
@@ -1200,21 +1224,6 @@
                 });
             }
 
-            function showGenerateChallengeCodePanel(evtTgt) {
-                var $generateChallengeCodeModal = $('#generate-challenge-code-modal');
-                $generateChallengeCodeModal.show();
-
-                var targetPosition = $(evtTgt).offset(); // Using offset() to consider the document's top and left
-                var targetHeight = $(evtTgt).outerHeight(); // Height of the clicked element
-
-                $generateChallengeCodeModal.css({
-                    "top": targetPosition.top + targetHeight, // Position above evtTgt
-                    "left": targetPosition.left - $generateChallengeCodeModal.innerWidth(), // Adjust for horizontal scroll
-                    "position": "absolute", // Ensure the modal is positioned absolutely
-                    "display": "block"
-                });
-            }
-
             // Close modal when the close button is clicked
             $('.close-btn').on('click', function() {
                 $('#user-modal').hide();
@@ -1256,17 +1265,6 @@
             // When the user clicks on <span> (x), close the modal
             loginClose.onclick = function() {
                 loginModal.style.display = 'none';
-            }
-
-            // Get the generate-challenge-code modal
-            var generateChallengeCodeModal = document.getElementById('generate-challenge-code-modal');
-
-            // Get the <span> element that closes the modal
-            var generateChallengeCodeClose = document.getElementById('generate_challenge_code_close');
-
-            // When the user clicks on <span> (x), close the modal
-            generateChallengeCodeClose.onclick = function() {
-                generateChallengeCodeModal.style.display = 'none';
             }
 
             // When the user clicks anywhere outside of the register modal, close it
