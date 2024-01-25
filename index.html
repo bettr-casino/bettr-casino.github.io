@@ -722,7 +722,8 @@
                 "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
                     $(`#generate-challenge-code-spinner`).show();
                     var generateChallengeCodeA = $('#GenerateChallengeCodeAction');
-                        initializeDeveloperAccount(taskId, function(response, error) {
+                    initializeDeveloperAccount(taskId, function(response, error) {
+                        $(`#generate-challenge-code-spinner`).hide();
                         if (error) {
                             console.log(error);
                             showModalPanel(generateChallengeCodeA, 'Code Generation error. Support email: support@bettr.casino.', 'center');
