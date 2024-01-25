@@ -729,12 +729,12 @@
                             showModalPanel(generateChallengeCodeA, 'Code Generation error. Support email: support@bettr.casino.', 'center');
                         } else {
                             // Access the properties from the parsed body
-                            var hashKey = response.hash_key;
+                            var hashKey = response.task_hash_key;
                             if (hashKey && hashKey.length == 6) {
                                 fillHashKey(hashKey);
                                 localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
                             } else {
-                                console.log(`incorrect hash_key (length != 6) in response body=${response}`);
+                                console.log(`incorrect hash_key (length != 6) in response body=${JSON.stringify(response)}`);
                                 showModalPanel(generateChallengeCodeA, 'Code Generation error. Go Back and retry. Support email: support@bettr.casino.', 'center');
                             }
                         }
@@ -769,7 +769,7 @@
                     return false;
                 },
                 "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
-                    if (isTaskHashKeyGenerated()) {
+                    if (isTaskHashKeyGenerated(taskId)) {
                         return true;
                     }
                     var registerUserA = $('#RegisterUserAction');
@@ -1136,8 +1136,8 @@
                 return userId && sessionToken ? true : false;
             }
 
-            function isTaskHashKeyGenerated() {
-                var hash_key = localStorage.getItem(prefix_local_store(`TASK_ID__${task_id}__hash_key`));
+            function isTaskHashKeyGenerated(taskId) {
+                var hash_key = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
                 return hash_key ? true : false;
             }
 
