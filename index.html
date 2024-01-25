@@ -694,9 +694,9 @@
                 "RegisterUser": function(evt) {
                     evt.preventDefault();  // Prevents the default link action
                     if (isUserRegistered()) {
-                        showLoginPanel(evt.target);
+                        showLoginPanel(evt.target, "center");
                     } else {
-                        showRegisterPanel(evt.target);
+                        showRegisterPanel(evt.target, "center");
                     }
                 },
                 "GenerateChallengeCode": function(evt) {
@@ -1009,31 +1009,61 @@
                 modal.style.left = `${leftPosition}px`;
             }
 
-            function showRegisterPanel(evtTgt) {
+            function showRegisterPanel(evtTgt, panelPosition = "left") {
                 var $registerModal = $('#register-modal');
                 $registerModal.show();
 
                 var targetPosition = $(evtTgt).offset(); // Using offset() to consider the document's top and left
                 var targetHeight = $(evtTgt).outerHeight(); // Height of the clicked element
 
+                var top = targetPosition.top + targetHeight;
+                var left = 0;
+
+                switch (panelPosition) {
+                    case "center":
+                        left = targetPosition.left - ($loginModal.innerWidth() / 2);
+                        break;
+                    case "left":
+                        left = targetPosition.left - $loginModal.innerWidth();
+                        break;
+                    case "right":
+                        left = targetPosition.left + $loginModal.innerWidth();
+                        break;
+                }
+                
                 $registerModal.css({
-                    "top": targetPosition.top + targetHeight, // Position above evtTgt
-                    "left": targetPosition.left - $registerModal.innerWidth(), // Adjust for horizontal scroll
+                    "top": top, // Position above evtTgt
+                    "left": left, // Adjust for horizontal scroll
                     "position": "absolute", // Ensure the modal is positioned absolutely
                     "display": "block"
                 });
             }
 
-            function showLoginPanel(evtTgt) {
+            function showLoginPanel(evtTgt, panelPosition = "left") {
                 var $loginModal = $('#login-modal');
                 $loginModal.show();
 
                 var targetPosition = $(evtTgt).offset(); // Using offset() to consider the document's top and left
                 var targetHeight = $(evtTgt).outerHeight(); // Height of the clicked element
 
+                var top = targetPosition.top + targetHeight;
+                var left = 0;
+
+                switch (panelPosition) {
+                    case "center":
+                        left = targetPosition.left - ($loginModal.innerWidth() / 2);
+                        break;
+                    case "left":
+                        left = targetPosition.left - $loginModal.innerWidth();
+                        break;
+                    case "right":
+                        left = targetPosition.left + $loginModal.innerWidth();
+                        break;
+                }
+                
                 $loginModal.css({
-                    "top": targetPosition.top + targetHeight, // Position above evtTgt
-                    "left": targetPosition.left - $loginModal.innerWidth(), // Adjust for horizontal scroll
+                    "top": top, // Position above evtTgt
+                    "left": left, // Adjust for horizontal scroll
                     "position": "absolute", // Ensure the modal is positioned absolutely
                     "display": "block"
                 });
