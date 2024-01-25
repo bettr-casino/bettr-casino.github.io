@@ -719,15 +719,23 @@
             }
 
             const wizardAfterShowFunctions = {
-                "GenerateChallengeCode": function(taskId) {
+                "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
                     $(`#generate-challenge-code-spinner`).show();
                     var generateChallengeCodeA = $('#GenerateChallengeCodeAction');
-                    initializeDeveloperAccount(taskId, function(response, error) {
+                        initializeDeveloperAccount(taskId, function(response, error) {
                         if (error) {
                             console.log(error);
-                            showModalPanel(generateChallengeCodeA, 'Code Generation error. If this persists, please email support@bettr.casino.', 'center');
+                            showModalPanel(generateChallengeCodeA, 'Code Generation error. Support email: support@bettr.casino.', 'center');
                         } else {
-                            
+                            // Access the properties from the parsed body
+                            var hashKey = response.hash_key;
+                            if (hashKey && hashKey.length == 6) {
+                                fillHashKey(hashKey);
+                                localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
+                            } else {
+                                console.log(`incorrect hash_key (length != 6) in response body=${response}`);
+                                showModalPanel(generateChallengeCodeA, 'Code Generation error. Go Back and retry. Support email: support@bettr.casino.', 'center');
+                            }
                         }
                     })
                 }
@@ -751,8 +759,16 @@
             }
 
             const wizardOnNextFunctions = {
-                "RegisterUser": function() {
+                "RegisterUser": function(stepKey, taskId, rowIndex) {
                     if (isUserLoggedIn()) {
+                        return true;
+                    }
+                    var registerUserA = $('#RegisterUserAction');
+                    showModalPanel(registerUserA, 'Complete this step to continue.', 'center');
+                    return false;
+                },
+                "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
+                    if (isTaskHashKeyGenerated()) {
                         return true;
                     }
                     var registerUserA = $('#RegisterUserAction');
@@ -915,7 +931,7 @@
                                 $('.next-btn').off('click').on('click', function() {
                                     const stepOnNextFn = wizardOnNextFunctions[stepText];
                                     if (stepOnNextFn) {
-                                        if (!stepOnNextFn()) {
+                                        if (!stepOnNextFn(stepKey, taskId, rowIndex)) {
                                             return;
                                         }
                                     }
@@ -924,7 +940,7 @@
                             }
                             const stepAfterShowFn = wizardAfterShowFunctions[stepText];
                             if (stepAfterShowFn) {
-                                stepAfterShowFn(taskId);
+                                stepAfterShowFn(stepKey, taskId, rowIndex);
                             }
                         }
                     }
@@ -1019,14 +1035,14 @@
                         <h3><a id="GenerateChallengeCodeAction" href="#">Generate Challenge Code</a>.</h3>
                         <p>Generating Code <span id="generate-challenge-code-spinner" class="spinner2" style="display: none;"></span></p>
                         <div class="code-container">
-                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
-                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
-                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
-                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
-                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
-                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
+                            <input type="text" inputmode="text" pattern="[0-9a-z]*" maxlength="1" />
+                            <input type="text" inputmode="text" pattern="[0-9a-z]*" maxlength="1" />
+                            <input type="text" inputmode="text" pattern="[0-9a-z]*" maxlength="1" />
+                            <input type="text" inputmode="text" pattern="[0-9a-z]*" maxlength="1" />
+                            <input type="text" inputmode="text" pattern="[0-9a-z]*" maxlength="1" />
+                            <input type="text" inputmode="text" pattern="[0-9a-z]*" maxlength="1" />
                         </div>
-                        <p>This is the 6 digit code required to submit this challenge. Click Next after code generation.</p>
+                        <p>This six-character alphanumeric code will be used to test and submit this challenge. Click Next after code generation.</p>
                     </div>
 
                     <div class="setup-step" id="DownloadTestFlightApp" style="display: none;">
@@ -1092,6 +1108,18 @@
 
             }
 
+            function fillHashKey(hash_key) {
+                if(hash_key.length !== 6) {
+                    console.error("hash_key must be exactly 6 characters long.");
+                    return;
+                }
+
+                var inputs = $('.code-container input');
+                for(var i = 0; i < hash_key.length; i++) {
+                    inputs.eq(i).val(hash_key[i]);
+                }
+            }
+
             function updatePageHash(hashStr) {
                 window.location.hash = hashStr;
             }
@@ -1105,6 +1133,11 @@
                 var userId = localStorage.getItem(prefix_local_store('user_id'));
                 var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
                 return userId && sessionToken ? true : false;
+            }
+
+            function isTaskHashKeyGenerated() {
+                var hash_key = localStorage.getItem(prefix_local_store(`TASK_ID__${task_id}__hash_key`));
+                return hash_key ? true : false;
             }
 
             function checkUserSession() {
@@ -1319,7 +1352,7 @@
                     // Hide spinner
                     $(`#${modalType}-spinner`).hide();
                     // Show timeout error message
-                    $(`#${modalType}-error`).text('Verify timed out. If this persists, please email support@bettr.casino.').show();
+                    $(`#${modalType}-error`).text('Verify timed out. Support email: support@bettr.casino.').show();
                 }, timeoutDuration);
 
                 var createUser = modalType === "register" ? true : false;
@@ -1345,7 +1378,7 @@
                         if (isBanned) {
                             $(`#verification-error`).text('Your account is currently banned. If this persists, email support@bettr.casino.');
                         } else if (!isVerified) {
-                            $(`#verification-error`).text('Your account is currently not verified using the email verification code. If this persists, email support@bettr.casino.');
+                            $(`#verification-error`).text('Your account is currently not verified using the email verification code. Support email: support@bettr.casino.');
                         } else {
                             $(`#verification-error`).hide();
                             $(`#verification-modal`).hide();
@@ -1542,7 +1575,7 @@
                         "task_id": taskId
                     }),
                     success: function(response) {
-                        console.log(response);
+                        console.log("Response received: ", JSON.stringify(response));
                         callback(response, null);
                     },
                     error: function(xhr, status, error) {
