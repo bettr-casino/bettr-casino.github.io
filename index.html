@@ -658,7 +658,27 @@
             return `${prefix}${local_store_value}`
         }
 
-        $(document).ready(function() {            
+        $(document).ready(function() {  
+            
+            class ObserverManager {
+                constructor() {
+                    this.observers = [];
+                }
+
+                subscribe(observerFunction) {
+                    this.observers.push(observerFunction);
+                }
+
+                unsubscribe(observerFunction) {
+                    this.observers = this.observers.filter(subscriber => subscriber !== observerFunction);
+                }
+
+                notify(data) {
+                    this.observers.forEach(observerFunction => observerFunction(data));
+                }
+            }
+
+            const authObserverManager = new ObserverManager();
 
             const dataUrl = 'https://bettr-casino-tasks.s3.us-west-2.amazonaws.com/gsheets-task-list/allopentasks.json';
     
@@ -691,6 +711,9 @@
                     if (isUserRegistered()) {
                         showLoginPanel(evt.target, "center");
                     } else {
+                        authObserverManager.subscribe(function() {
+                            wizardOnShowFunctions["RegisterUser"]();
+                        });
                         showRegisterPanel(evt.target, "center");
                     }
                 },
@@ -1318,6 +1341,7 @@
                             $('#login-btn').hide();
                             $('#logout-btn').show();
                             showUserChallenges(true);
+                            authObserverManager.notify({});
                         }
                     },
                     error: function(xhr, status, error) {
