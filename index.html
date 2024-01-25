@@ -545,7 +545,7 @@
             <h2>Register</h2>
             <p>We’ll email you a verification code.</p>
             <form id="register-form">
-                <input type="email" placeholder="Email" name="email" required>
+                <input id="register-modal-input" type="email" placeholder="Email" name="email" required>
                 <label>
                     <input type="checkbox" checked="checked" name="remember"> Remember me
                 </label>
@@ -567,7 +567,7 @@
             <h2>Login</h2>
             <p>We’ll email you a verification code.</p>
             <form id="login-form">
-                <input type="email" placeholder="Email" name="email" required>
+                <input id="login-modal-input" type="email" placeholder="Email" name="email" required>
                 <label>
                 <input type="checkbox" checked="checked" name="remember"> Remember me
                 </label>
@@ -605,7 +605,7 @@
             <h2>Verification</h2>
             <p>We emailed you a verification code.</p>
             <form id="verification-form">
-                <input type="text" placeholder="Enter Verification Code" name="verification_code" required>
+                <input id="verification-modal-input" type="text" placeholder="Enter Verification Code" name="verification_code" required>
                 <button id="verification_button" type="button" class="button-with-spinner">
                     Verify
                     <div id="verification-spinner" class="spinner" style="display: none;"></div>
@@ -756,7 +756,21 @@
 
             // Initialize verification buttons as disabled
             $('#register_button').prop('disabled', true);
-            $('#login_button').prop('disabled', true);            
+            $('#login_button').prop('disabled', true); 
+            
+            $('#register-modal-input').off('keydown').on('keydown', function(event) {
+                if (event.keyCode === 13) { // 13 is the key code for Enter
+                    event.preventDefault();
+                    generateVerificationCode("register");
+                }
+            });
+
+            $('#login-modal-input').off('keydown').on('keydown', function(event) {
+                if (event.keyCode === 13) {
+                    event.preventDefault();
+                    $('#login_button').click(); // Programmatically click the login button
+                }
+            });
 
             function setupTables(data) {
 
@@ -1318,7 +1332,6 @@
 
             // Function to show the verification modal
             function showVerificationModal(email, modalType) {
-
                 // Get the register modal
                 var parentModal = $(`#${modalType}-modal`);
                 parentModal.hide();
@@ -1352,6 +1365,14 @@
                 $('#verification_button').click(function() {
                     var otp = $("#verification-form input[name='verification_code']").val();
                     authUser(email, otp, modalType);
+                });
+
+                $('#verification-modal-input').off('keydown').on('keydown', function(event) {
+                    if (event.keyCode === 13) {
+                        event.preventDefault();
+                        var otp = $("#verification-form input[name='verification_code']").val();
+                        authUser(email, otp, modalType);
+                    }
                 });
 
             }
