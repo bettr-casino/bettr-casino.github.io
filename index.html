@@ -425,24 +425,24 @@
             height: 245px;
         }
 
-        /* High-resolution (Retina) display styles for desktops */
-        @media only screen and (min-width: 1024px) and (min-resolution: 192dpi), 
-            only screen and (min-width: 1024px) and (min-resolution: 2dppx) {
+        /* Styles for iPhones with Retina displays */
+        @media only screen and (max-width: 430px) {
 
             #iphone13 {
-                width: 1012px; /* 2x width for Retina display */
-                height: 468px; /* 2x height for Retina display */
+                width: 354.2px; /* 506px * 0.7 */
+                height: 163.8px; /* 234px * 0.7 */
             }
 
             #iphone14 {
-                width: 1040px; /* 2x width for Retina display */
-                height: 480px; /* 2x height for Retina display */
+                width: 364px; /* 520px * 0.7 */
+                height: 168px; /* 240px * 0.7 */
             }
 
             #iphone15 {
-                width: 1060px; /* 2x width for Retina display */
-                height: 490px; /* 2x height for Retina display */
+                width: 371px; /* 530px * 0.7 */
+                height: 171.5px; /* 245px * 0.7 */
             }
+            
         }
 
         /* Container for the iPhone buttons */
@@ -479,7 +479,7 @@
 
         #setup-div {
             width: 100%;
-            height: 160px;
+            height: 200px;
             padding: 5px 5px; /* Padding inside the div */
             margin-top: 10px; /* Margin at the top */
             text-align: center; /* Center content horizontally */
