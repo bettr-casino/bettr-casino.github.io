@@ -472,7 +472,7 @@
         }
 
         #setup-btn {
-            display: none; /* Initially hidden */
+            display: block;
         }
 
         #setup-div {
@@ -485,7 +485,7 @@
             background-color: #f9f9f9; /* Background color similar to the table */
             border: 1px solid #ddd; /* Border style similar to the table */
             border-radius: 5px; /* Rounded corners for the form */
-            display: none; /* Initially hidden */
+            display: block;
             justify-content: center; /* Center horizontally */
             align-items: center; /* Center vertically */
         }
@@ -647,11 +647,6 @@
 
     <!-- Details Form -->
     <div id="details-form" class="section2" style="display: none;">
-        <!-- Dynamic form fields will be populated here -->
-    </div>
-
-    <!-- Show Challenge Editor Form -->
-    <div id="show-challenge-editor-form" class="section3" style="display: none;">
         <!-- Dynamic form fields will be populated here -->
     </div>
 
@@ -908,36 +903,115 @@
 
                 });
 
-                // Create a container for the button and the status text
-                const buttonStatusContainer = $('<div>').addClass('button-status-container');
-
-                const showChallengeButton = $('<button>')
-                    .text("Start Challenge")
-                    .addClass('show-challenge-btn')
-                    .show();
-
-                showChallengeButton.on('click', function() {
-                        $(".setup-step-button").prop("disabled", true);
-                        $(".setup").show();
-                        // Scroll to the top of the button
-                        $('html, body').animate({
-                            scrollTop: showChallengeButton.offset().top
-                        }, 500, function() {
-                            $(showChallengeButton).prop("disabled", true);
-                        });
-                        callback(rowIndex);
-                    });
-    
-                const statusText = $('<p>').text('').addClass('status-text'); // Add your status text here
-
-                buttonStatusContainer.append(showChallengeButton, statusText);
-
-                detailsForm.append(buttonStatusContainer);
-    
                 // Append the table to the form
                 detailsTable.appendTo(detailsForm);
+
+                // Create a container for the button and the status text
+                const buttonStatusContainer = $('<div>').addClass('button-status-container');
+                const showChallengeButton = $('<button>')
+                    .text("Setup Challenge")
+                    .addClass('show-challenge-btn')
+                    .show();
+                showChallengeButton.on('click', function() {
+                    $(".setup-step-button").prop("disabled", true);
+                    $(".setup").show();
+                    // Scroll to the top of the button
+                    $('html, body').animate({
+                        scrollTop: showChallengeButton.offset().top
+                    }, 500, function() {
+                        $(showChallengeButton).prop("disabled", true);
+                    });
+                    callback(rowIndex);
+                });
+                const statusText = $('<p>').text('').addClass('status-text'); // Add your status text here
+                buttonStatusContainer.append(showChallengeButton, statusText);
+                detailsForm.append(buttonStatusContainer);
+
+                const showChallengeEditorForm = $('<div>', {
+                    id: 'show-challenge-editor-form',
+                    class: 'section3',
+                    css: 'display: none;'
+                });
+                detailsForm.append(showChallengeEditorForm);
+
+                var setupDiv = `
+                <div id="setup-div" class="setup">
+                    <div class="setup-step" id="Start" style="display: block;">
+                        <h3>Setup Wizard.</h3>
+                        <p>Click on Setup Challenge to get started.</p>
+                    </div>
+
+                    <div class="setup-step" id="RegisterUser" style="display: none;">
+                        <h3><a id="RegisterUserAction" href="#">Register</a>.</h3>
+                        <p id="RegisterUserText">We do not store email ids. Read our <a href="https://bettr.casino/privacy.html">Privacy</a> policy.</p>
+                    </div>
+
+                    <div class="setup-step" id="DownloadTestFlightApp" style="display: none;">
+                        <h3><a href="https://apps.apple.com/us/app/testflight/id899247664/" target="_blank">Install Apple TestFlight</a>.</h3>
+                        <p>Install the TestFlight App from the AppStore. TestFlight is managed by Apple. Click Next after installation.</p>
+                    </div>
+
+                    <div class="setup-step" id="InstallBettrApp" style="display: none;">
+                        <h3><a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Install Bettr Beta Testing App</a>.</h3>
+                        <p>The Bettr Beta Testing App is managed by TestFlight. Install using the link above. Click Next after installation.</p>
+                    </div>
+
+                    <div class="setup-step" id="GenerateChallengeCode" style="display: none;">
+                        <h3><a id="GenerateChallengeCodeAction" href="#">Generate Challenge Code</a>.</h3>
+                        <p>This is a 6 digit code required to submit this challenge. Click Next after code generation.</p>
+                    </div>
+
+                    <div class="setup-step" id="StartChallenge" style="display: none;">
+                        <h3><a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Nice work Bro</a>!</h3>
+                        <p>Open the Bettr Beta Testing App on your iPhone to get started. Click on Finish to dismiss the Setup Wizard.</p>
+                    </div>
+                </div>
+
+                <div id="setup-btn" class="setup">
+                    <button class="setup-step-button back-btn">Back</button>
+                    <button class="setup-step-button next-btn">Next</button>
+                    <button class="setup-step-button finish-btn">Finish</button>
+                </div>
+
+                <div class="iphone-buttons-container">
+                    <button id="toggle-iphone13" class="toggle-button">iPhone 13</button>
+                    <button id="toggle-iphone14" class="toggle-button">iPhone 14</button>
+                    <button id="toggle-iphone15" class="toggle-button">iPhone 15</button>
+                </div>
+
+                <div id="iphone13-container">
+                    <div id="iphone13" class="iphone"></div>
+                </div>
+                
+                <div id="iphone14-container">
+                    <div id="iphone14" class="iphone"></div>
+                </div>
+                
+                <div id="iphone15-container">
+                    <div id="iphone15" class="iphone"></div>
+                </div>`
+
+                detailsForm.append(setupDiv);
+
+                $('.setup-step-button').prop('disabled', true);
+
+                $('.toggle-button').click(function() {
+                    // Remove 'active' class from all buttons and hide all iPhones
+                    $('.toggle-button').removeClass('active');
+                    $('.iphone').hide();
+
+                    // Add 'active' class to the clicked button and show corresponding iPhone
+                    $(this).addClass('active');
+                    var containerId = this.id.replace('toggle-', '') + '-container';
+                    $('#' + containerId + ' .iphone').show();
+                });
+
                 // Show the form
                 detailsForm.show();
+
+                // Trigger click on the first button to show iPhone 13 by default
+                $('#toggle-iphone13').click();
+
             }
 
             function updatePageHash(hashStr) {
@@ -1567,75 +1641,10 @@
                 showUserChallenges(false);
             });
 
-            $('.toggle-button').click(function() {
-                // Remove 'active' class from all buttons and hide all iPhones
-                $('.toggle-button').removeClass('active');
-                $('.iphone').hide();
-
-                // Add 'active' class to the clicked button and show corresponding iPhone
-                $(this).addClass('active');
-                var containerId = this.id.replace('toggle-', '') + '-container';
-                $('#' + containerId + ' .iphone').show();
-            });
-
-            // Trigger click on the first button to show iPhone 13 by default
-            $('#toggle-iphone13').click();
-
             updateSignInButtons();
 
         });
     </script>
-
-    <div id="setup-div" class="setup">
-        <div class="setup-step" id="RegisterUser" style="display: none;">
-            <h3><a id="RegisterUserAction" href="#">Register</a>.</h3>
-            <p id="RegisterUserText">We do not store email ids. Read our <a href="https://bettr.casino/privacy.html">Privacy</a> policy.</p>
-        </div>
-
-        <div class="setup-step" id="DownloadTestFlightApp" style="display: none;">
-            <h3><a href="https://apps.apple.com/us/app/testflight/id899247664/" target="_blank">Install Apple TestFlight</a>.</h3>
-            <p>Install the TestFlight App from the AppStore. TestFlight is managed by Apple. Click Next after installation.</p>
-        </div>
-
-        <div class="setup-step" id="InstallBettrApp" style="display: none;">
-            <h3><a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Install Bettr Beta Testing App</a>.</h3>
-            <p>The Bettr Beta Testing App is managed by TestFlight. Install using the link above. Click Next after installation.</p>
-        </div>
-
-        <div class="setup-step" id="GenerateChallengeCode" style="display: none;">
-            <h3><a id="GenerateChallengeCodeAction" href="#">Generate Challenge Code</a>.</h3>
-            <p>This is a 6 digit code required to submit this challenge. Click Next after code generation.</p>
-        </div>
-
-        <div class="setup-step" id="StartChallenge" style="display: none;">
-            <h3><a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Nice work Bro</a>!</h3>
-            <p>Open the Bettr Beta Testing App on your iPhone to get started. Click on Finish to dismiss the Setup Wizard.</p>
-        </div>
-    </div>
-
-    <div id="setup-btn" class="setup">
-        <button class="setup-step-button back-btn">Back</button>
-        <button class="setup-step-button next-btn">Next</button>
-        <button class="setup-step-button finish-btn">Finish</button>
-    </div>
-
-    <div class="iphone-buttons-container">
-        <button id="toggle-iphone13" class="toggle-button">iPhone 13</button>
-        <button id="toggle-iphone14" class="toggle-button">iPhone 14</button>
-        <button id="toggle-iphone15" class="toggle-button">iPhone 15</button>
-    </div>
-
-    <div id="iphone13-container">
-        <div id="iphone13" class="iphone"></div>
-    </div>
-    
-    <div id="iphone14-container">
-        <div id="iphone14" class="iphone"></div>
-    </div>
-    
-    <div id="iphone15-container">
-        <div id="iphone15" class="iphone"></div>
-    </div>
 
     <footer>
         <p>&copy; 2024 Bettr Casino</p>
