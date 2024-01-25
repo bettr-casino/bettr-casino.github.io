@@ -912,7 +912,7 @@
                 const buttonStatusContainer = $('<div>').addClass('button-status-container');
 
                 const showChallengeButton = $('<button>')
-                    .text("Setup Challenge")
+                    .text("Start Challenge")
                     .addClass('show-challenge-btn')
                     .show();
 
@@ -928,17 +928,9 @@
                         callback(rowIndex);
                     });
     
-                const startChallengeButton = $('<button>')
-                    .text("Start Challenge")
-                    .addClass('start-challenge-btn')
-                    .on('click', function() {
-                        startChallenge(this, columns, dataRow, rowIndex);
-                    })
-                    .hide();
-
                 const statusText = $('<p>').text('').addClass('status-text'); // Add your status text here
 
-                buttonStatusContainer.append(showChallengeButton, startChallengeButton, statusText);
+                buttonStatusContainer.append(showChallengeButton, statusText);
 
                 detailsForm.append(buttonStatusContainer);
     
@@ -998,23 +990,7 @@
                 });
 
                 modal.show();
-            }
-
-            function startChallenge(button, columns, dataRow, rowIndex) {
-                var columnIndex = columns.findIndex(column => column.title === 'ID');
-                var taskId = dataRow[columnIndex];
-                console.log(`taskId: ${taskId}`);
-                if (checkUserSession()) {
-                    $(button).html('Configuring Challenge <div id="challenge-spinner" class="challenge-spinner"></div>');
-                    var userId = localStorage.getItem(prefix_local_store('user_id'));
-                    var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
-                    initializeDeveloperAccount(button, userId, sessionToken, taskId);
-                    // Position the modal above the 'Launch Challenge' button
-                    // positionModalAboveButton(button, dataRow);        
-                } else {
-                    positionModalAboveButton(button, "Register or login to start this challenge.");
-                }
-            }
+            }            
 
             function positionModalAboveButton(button, message) {
                 var rect = button.getBoundingClientRect();
