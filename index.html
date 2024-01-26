@@ -926,17 +926,14 @@
                                     showNextWizardStep(rowIndex, -1);
                                 });
                             }
-                            if (nextStepIndex == totalSteps) {
-                                $('.finish-btn').prop('disabled', false);
-                                $('.finish-btn').off('click').on('click', function() {
-                                    const stepOnFinishFn = wizardOnFinishFunctions[stepText];
-                                    if (stepOnFinishFn) {
-                                        if (!stepOnFinishFn()) {
-                                            return;
-                                        }
+                            $('.finish-btn').off('click').on('click', function() {
+                                const stepOnFinishFn = wizardOnFinishFunctions[stepText];
+                                if (stepOnFinishFn) {
+                                    if (!stepOnFinishFn()) {
+                                        return;
                                     }
-                                });
-                            }
+                                }
+                            });
                             if (nextStepIndex < totalSteps) {
                                 $('.next-btn').prop('disabled', false);
                                 $('.next-btn').off('click').on('click', function() {
@@ -1005,7 +1002,7 @@
                 // Create a container for the button and the status text
                 const buttonStatusContainer = $('<div>').addClass('button-status-container');
                 const showChallengeButton = $('<button>')
-                    .text("Setup Challenge")
+                    .text("Setup")
                     .addClass('show-challenge-btn')
                     .show();
                 showChallengeButton.on('click', function() {
@@ -1034,7 +1031,7 @@
                 <div id="setup-div" class="setup">
                     <div class="setup-step" id="Start" style="display: block;">
                         <h3>Setup Wizard.</h3>
-                        <p>Click on Setup Challenge to get started.</p>
+                        <p>Click on Setup button above to get started.</p>
                         <p>You will need your iPhone 13+ to complete the setup.</p>
                     </div>
 
@@ -1074,7 +1071,7 @@
                         <h3>Verify Installation.</h3>
                         <span id="StartChallengeCode" class="tag" style="font-size: 18px;"></span>
                         <p>Open the Bettr App. Type in the code above into the window and click the Submit button.</p>
-                        <p>Wait for the App to load in the device screen below. Click Finish.</p>
+                        <p>Wait for the Main Lobby screen to show up on the device screen below. Then click Finish to complete setup.</p>
                     </div>
                 </div>
 
