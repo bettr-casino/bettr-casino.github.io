@@ -556,6 +556,10 @@
             -moz-appearance: textfield; /* Firefox */
         }
 
+        #StartChallengeCode {
+            letter-spacing: 5px;
+        }
+
     </style>
 </head>
 <body>
@@ -706,7 +710,7 @@
                 });
 
             const wizardOnShowFunctions = {
-                "RegisterUser": function() {
+                "RegisterUser": function(stepKey, taskId, rowIndex) {
                     if (isUserLoggedIn()) {
                         $('#RegisterUserText').text('You are logged in. Click the Login button to register as a different user, else click Next.');
                         $('#RegisterUserAction').text('Login');
@@ -717,6 +721,10 @@
                         $('#RegisterUserAction').text('Login');
                         $('#RegisterUserTitle').text('Login.');
                     }
+                },
+                "StartChallenge": function(stepKey, taskId, rowIndex) {
+                    const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
+                    $('#StartChallengeCode').text(hashKey);
                 }            
             }
 
@@ -745,7 +753,7 @@
             }
 
             const wizardOnClickFunctions = {
-                "RegisterUser": function(evt) {
+                "RegisterUser": function(evt, stepKey, taskId, rowIndex) {
                     evt.preventDefault();  // Prevents the default link action
                     if (isUserRegistered()) {
                         showLoginPanel(evt.target, "center");
@@ -756,7 +764,7 @@
                         showRegisterPanel(evt.target, "center");
                     }
                 },
-                "GenerateChallengeCode": function(evt) {
+                "GenerateChallengeCode": function(evt, stepKey, taskId, rowIndex) {
                     evt.preventDefault();  // Prevents the default link action                    
                 }
             }
@@ -904,11 +912,11 @@
                             localStorage.setItem(stepKey, `${nextStepIndex}`);
                             const stepOnShowFn = wizardOnShowFunctions[stepText];
                             if (stepOnShowFn) {
-                                stepOnShowFn();
+                                stepOnShowFn(stepKey, taskId, rowIndex);
                             }
                             const stepOnClickFn = wizardOnClickFunctions[stepText];
                             if (stepOnClickFn) {
-                                $(`#${stepText}Action`).off('click').on('click', stepOnClickFn);
+                                $(`#${stepText}Action`).off('click').on('click', function(evt) { stepOnClickFn(evt, stepKey, taskId, rowIndex); });
                             }
                             $(`#${stepText}`).show();
                             $('.setup-step-button').prop('disabled', true);
@@ -1058,13 +1066,15 @@
 
                     <div class="setup-step" id="InstallBettrApp" style="display: none;">
                         <h3>Install Bettr Beta Testing App.</h3>
-                        <p>The Bettr Beta Testing App is managed by TestFlight. Install the App onto your iPhone 13+ using the link above. Click Next after installation.</p>
+                        <p>The Bettr Beta Testing App is managed by TestFlight. Install the Bettr App onto your iPhone 13+ using the link above. Click Next after installation.</p>
                         <a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Install Bettr Beta Testing App</a>
                     </div>
 
                     <div class="setup-step" id="StartChallenge" style="display: none;">
-                        <h3><a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Verify Installation</a>!</h3>
-                        <p>Open the Bettr Beta Testing App on your iPhone to get started. Click on Finish to dismiss the Setup Wizard.</p>
+                        <h3>Verify Installation.</h3>
+                        <span id="StartChallengeCode" class="tag" style="font-size: 18px;"></span>
+                        <p>Open the Bettr App. Type in the code above into the window and click the Submit button.</p>
+                        <p>Wait for the App to load in the device screen below. Click Finish.</p>
                     </div>
                 </div>
 
@@ -1113,6 +1123,14 @@
                 // Trigger click on the first button to show iPhone 13 by default
                 $('#toggle-iphone13').click();
 
+            }
+
+            function copyToClipboard(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    console.log('Text copied to clipboard');
+                }).catch(err => {
+                    console.error('Failed to copy text to clipboard', err);
+                });
             }
 
             function fillHashKey(hash_key) {
