@@ -710,10 +710,12 @@
                     if (isUserLoggedIn()) {
                         $('#RegisterUserText').text('You are logged in. Click the Login button to register as a different user, else click Next.');
                         $('#RegisterUserAction').text('Login');
+                        $('#RegisterUserTitle').text('Login.');
                         return;
                     } 
                     if (isUserRegistered()) {
                         $('#RegisterUserAction').text('Login');
+                        $('#RegisterUserTitle').text('Login.');
                     }
                 }            
             }
@@ -721,12 +723,12 @@
             const wizardAfterShowFunctions = {
                 "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
                     $(`#generate-challenge-code-spinner`).show();
-                    var generateChallengeCodeA = $('#GenerateChallengeCodeAction');
+                    var generateChallengeCodeTitle = $('#GenerateChallengeCodeTitle');
                     initializeDeveloperAccount(taskId, function(response, error) {
                         $(`#generate-challenge-code-spinner`).hide();
                         if (error) {
                             console.log(error);
-                            showModalPanel(generateChallengeCodeA, 'Code Generation error. Support email: support@bettr.casino.', 'center');
+                            showModalPanel(generateChallengeCodeTitle, 'Code Generation error. Support email: support@bettr.casino.', 'center');
                         } else {
                             // Access the properties from the parsed body
                             var hashKey = response.task_hash_key;
@@ -1029,12 +1031,13 @@
                     </div>
 
                     <div class="setup-step" id="RegisterUser" style="display: none;">
-                        <h3><a id="RegisterUserAction" href="#">Register</a>.</h3>
+                        <h3 id="RegisterUserTitle">Register.</h3>
                         <p id="RegisterUserText">We do not store email ids. Read our <a href="https://bettr.casino/privacy.html">Privacy</a> policy.</p>
+                        <button id="RegisterUserAction" class="header-btn">Register</button>
                     </div>
 
                     <div class="setup-step" id="GenerateChallengeCode" style="display: none;">
-                        <h3><a id="GenerateChallengeCodeAction" href="#">Generate Challenge Code</a>.</h3>
+                        <h3 id="GenerateChallengeCodeTitle">Generate Challenge Code.</h3>
                         <p>Generating Code <span id="generate-challenge-code-spinner" class="spinner2" style="display: none;"></span></p>
                         <div class="code-container">
                             <input type="text" inputmode="text" pattern="[0-9a-z]*" maxlength="1" />
@@ -1048,17 +1051,19 @@
                     </div>
 
                     <div class="setup-step" id="DownloadTestFlightApp" style="display: none;">
-                        <h3><a href="https://apps.apple.com/us/app/testflight/id899247664/" target="_blank">Install Apple TestFlight</a>.</h3>
-                        <p>Install the TestFlight App from the AppStore. TestFlight is managed by Apple. Click Next after installation.</p>
+                        <h3>Install Apple TestFlight.</h3>
+                        <p>Install the TestFlight App from the AppStore onto your iPhone 13+. TestFlight is managed by Apple. Click Next after installation.</p>
+                        <a href="https://apps.apple.com/us/app/testflight/id899247664/" target="_blank">Install Apple TestFlight</a>
                     </div>
 
                     <div class="setup-step" id="InstallBettrApp" style="display: none;">
-                        <h3><a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Install Bettr Beta Testing App</a>.</h3>
-                        <p>The Bettr Beta Testing App is managed by TestFlight. Install using the link above. Click Next after installation.</p>
+                        <h3>Install Bettr Beta Testing App.</h3>
+                        <p>The Bettr Beta Testing App is managed by TestFlight. Install the App onto your iPhone 13+ using the link above. Click Next after installation.</p>
+                        <a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Install Bettr Beta Testing App</a>
                     </div>
 
                     <div class="setup-step" id="StartChallenge" style="display: none;">
-                        <h3><a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Nice work Bro</a>!</h3>
+                        <h3><a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Verify Installation</a>!</h3>
                         <p>Open the Bettr Beta Testing App on your iPhone to get started. Click on Finish to dismiss the Setup Wizard.</p>
                     </div>
                 </div>
