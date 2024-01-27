@@ -726,7 +726,8 @@
             const wizardOnShowFunctions = {
                 "RegisterUser": function(stepKey, taskId, rowIndex) {
                     if (isUserLoggedIn()) {
-                        $('#RegisterUserText').text('You are logged in. Click the Login button to register as a different user, else click Next.');
+                        $('#RegisterUserText').text('You are logged in. Click Next.');
+                        $('#RegisterUserAction').hide();
                         $('#RegisterUserAction').text('Login');
                         $('#RegisterUserTitle').text('Login.');
                         $('.next-btn').prop('disabled', false);
