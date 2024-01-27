@@ -831,6 +831,11 @@
             }
 
             function openTab(evt, tabName) {
+                // check if tab is already active
+                if ($(`#${tabName}`).is(':visible')) {
+                    return;
+                }
+
                 // Declare all variables
                 var i, tabcontent, tablinks;
 
@@ -1029,7 +1034,7 @@
 
                 var tabsHTML = `
                     <div class="tabs">
-                        <button id="SetupTabButton" class="tab-button active" onclick="openTab(event, 'Setup')">Setup</button>
+                        <button id="SetupTabButton" class="tab-button active">Setup</button>
                         <button id="TestTabButton" class="tab-button" onclick="openTab(event, 'Test')" style="display:none" disabled>Test</button>
                         <button id="SubmitTabButton" class="tab-button" onclick="openTab(event, 'Submit')" style="display:none" disabled>Submit</button>
                     </div>
@@ -1046,6 +1051,10 @@
 
                 // Append the tabs HTML to the detailsForm
                 detailsForm.append(tabsHTML);
+
+                $('.tab-button').off('click').on('click', function() {
+                    openTab(event, event.target.id.replace('Button', ''));
+                });
 
                 $setupTab = $('#SetupTab')
 
@@ -1491,7 +1500,7 @@
             }
 
             // Function to show the verification modal
-            function showVerificationModal(email, modalType) {
+            function showVerificationPanel(email, modalType) {
                 // Get the register modal
                 var parentModal = $(`#${modalType}-modal`);
                 parentModal.hide();
@@ -1566,7 +1575,7 @@
                         $(`#${modalType}-spinner`).hide();
                         $(`#${modalType}-error`).hide();
                         // Call showVerificationModal on success
-                        showVerificationModal(email, modalType);
+                        showVerificationPanel(email, modalType);
                     },
                     error: function(xhr, status, error) {
                         // Clear the timeout
