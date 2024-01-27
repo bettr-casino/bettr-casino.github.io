@@ -556,7 +556,7 @@
             -moz-appearance: textfield; /* Firefox */
         }
 
-        #StartChallengeCode {
+        #StartAppCode {
             letter-spacing: 5px;
         }
 
@@ -723,9 +723,9 @@
                         $('#RegisterUserTitle').text('Login.');
                     }
                 },
-                "StartChallenge": function(stepKey, taskId, rowIndex) {
+                "StartApp": function(stepKey, taskId, rowIndex) {
                     const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
-                    $('#StartChallengeCode').text(hashKey);
+                    $('#StartAppCode').text(hashKey);
                 }            
             }
 
@@ -1077,9 +1077,9 @@
                         <a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Install Bettr Beta Testing App</a>
                     </div>
 
-                    <div class="setup-step" id="StartChallenge" style="display: none;">
+                    <div class="setup-step" id="StartApp" style="display: none;">
                         <h3>Verify Setup on your iPhone 13+.</h3>
-                        <span id="StartChallengeCode" class="tag" style="font-size: 18px;"></span>
+                        <span id="StartAppCode" class="tag" style="font-size: 18px;"></span>
                         <p>Launch the App on the iPhone 13+ device. Enter the code above. Click OK.</p>
                         <p>Wait until the Main Lobby is displayed on the iPhone 13+ device. Click Next.</p>
                     </div>
