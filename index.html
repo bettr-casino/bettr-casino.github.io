@@ -563,13 +563,27 @@
 
         .tab-button {
             background-color: #D6D6FC;
+            color: white;
             float: left;
             border: none;
+            border-radius: 5px;
             outline: none;
             cursor: pointer;
-            padding: 14px 16px;
-            transition: 0.3s;
-            font-size: 17px;
+            padding: 10px 20px;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+            font-size: 16px;
+        }
+
+        /* To remove the margin from the last tab button */
+        .tab-button:last-child {
+            margin-right: 0;
+        }
+
+        .tab-button.disabled {
+            background-color: #d3d3f8; /* Pale color for disabled state */
+            cursor: default; /* Default cursor for disabled state */
+            pointer-events: none; /* Disable click events for disabled state */
         }
 
         .tab-button:not(:disabled):hover {
@@ -1019,7 +1033,7 @@
                         <button class="tab-button" onclick="openTab(event, 'Test')" disabled>Test</button>
                         <button class="tab-button" onclick="openTab(event, 'Submit')" disabled>Submit</button>
                     </div>
-                    <div id="Setup" class="tab-content">
+                    <div id="Setup" class="tab-content" style="display:block;">
                         <!-- Your existing Setup content here -->
                     </div>
                     <div id="Test" class="tab-content" style="display:none;">
@@ -1033,7 +1047,7 @@
                 // Append the tabs HTML to the detailsForm
                 detailsForm.append(tabsHTML);
 
-                detailsForm.show();
+                $setupTab = $('#Setup')
 
                 // Start the table
                 const detailsTable = $('<table>').addClass('details-table');
@@ -1060,7 +1074,7 @@
                 });
 
                 // Append the table to the form
-                detailsTable.appendTo(detailsForm);
+                $setupTab.append(detailsTable);
 
                 // Create a container for the button and the status text
                 const buttonStatusContainer = $('<div>').addClass('button-status-container');
@@ -1088,14 +1102,14 @@
                 });
                 const statusText = $('<p>').text('').addClass('status-text'); // Add your status text here
                 buttonStatusContainer.append(showChallengeButton, startChallengeButton, statusText);
-                detailsForm.append(buttonStatusContainer);
+                $setupTab.append(buttonStatusContainer);
 
                 const showChallengeEditorForm = $('<div>', {
                     id: 'show-challenge-editor-form',
                     class: 'section3',
                     css: 'display: none;'
                 });
-                detailsForm.append(showChallengeEditorForm);
+                $setupTab.append(showChallengeEditorForm);
 
                 var setupDiv = `
                 <div id="setup-div" class="setup">
@@ -1183,8 +1197,6 @@
                     <div id="iphone15" class="iphone"></div>
                 </div>`
 
-                $('#Setup').append(setupDiv);
-
                 $('.setup-step-button').prop('disabled', true);
 
                 $('.toggle-button').click(function() {
@@ -1198,11 +1210,13 @@
                     $('#' + containerId + ' .iphone').show();
                 });
 
-                // Show the form
-                detailsForm.show();
+                $setupTab.append(setupDiv);
 
                 // Trigger click on the first button to show iPhone 13 by default
                 $('#toggle-iphone13').click();
+
+                // Show the form
+                detailsForm.show();
 
             }
 
