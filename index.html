@@ -1199,6 +1199,8 @@
 
                 $('.setup-step-button').prop('disabled', true);
 
+                $setupTab.append(setupDiv);
+
                 $('.toggle-button').click(function() {
                     // Remove 'active' class from all buttons and hide all iPhones
                     $('.toggle-button').removeClass('active');
@@ -1210,13 +1212,11 @@
                     $('#' + containerId + ' .iphone').show();
                 });
 
-                $setupTab.append(setupDiv);
+                // Show the form
+                detailsForm.show();
 
                 // Trigger click on the first button to show iPhone 13 by default
                 $('#toggle-iphone13').click();
-
-                // Show the form
-                detailsForm.show();
 
             }
 
