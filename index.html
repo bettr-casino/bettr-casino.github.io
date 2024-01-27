@@ -880,34 +880,6 @@
                 }
             }
 
-            // Event listener for email input on register modal
-            $("#register-modal input[name='email']").on('input', function() {
-                toggleVerificationButton("#register-modal input[name='email']", "#register_button");
-            });
-
-            // Event listener for email input on login modal
-            $("#login-modal input[name='email']").on('input', function() {
-                toggleVerificationButton("#login-modal input[name='email']", "#login_button");
-            });
-
-            // Initialize verification buttons as disabled
-            $('#register_button').prop('disabled', true);
-            $('#login_button').prop('disabled', true); 
-            
-            $('#register-modal-input').off('keydown').on('keydown', function(event) {
-                if (event.keyCode === 13) { // 13 is the key code for Enter
-                    event.preventDefault();
-                    generateVerificationCode("register");
-                }
-            });
-
-            $('#login-modal-input').off('keydown').on('keydown', function(event) {
-                if (event.keyCode === 13) {
-                    event.preventDefault();
-                    $('#login_button').click(); // Programmatically click the login button
-                }
-            });
-
             function setupTables(data) {
 
                 // Assuming the first row contains headers
@@ -1338,6 +1310,26 @@
                     "position": "absolute", // Ensure the modal is positioned absolutely
                     "display": "block"
                 });
+
+                // Event listener for email input on register modal
+                $("#register-modal input[name='email']").on('input', function() {
+                    toggleVerificationButton("#register-modal input[name='email']", "#register_button");
+                });
+
+                // Initialize verification buttons as disabled
+                $('#register_button').prop('disabled', true);
+
+                $('#register-modal-input').off('keydown').on('keydown', function(event) {
+                    if (event.keyCode === 13) { // 13 is the key code for Enter
+                        event.preventDefault();
+                        generateVerificationCode(evtTgt, "register");
+                    }
+                });
+
+                // Bind the showVerificationModal to the click event of the button
+                $('#register_button').click(function() {
+                    generateVerificationCode(evtTgt, "register");
+                });                
             }
 
             function showLoginPanel(evtTgt, panelPosition = "left") {
@@ -1368,6 +1360,24 @@
                     "left": left, // Adjust for horizontal scroll
                     "position": "absolute", // Ensure the modal is positioned absolutely
                     "display": "block"
+                });
+
+                // Event listener for email input on login modal
+                $("#login-modal input[name='email']").on('input', function() {
+                    toggleVerificationButton("#login-modal input[name='email']", "#login_button");
+                });
+
+                $('#login_button').prop('disabled', true);                 
+
+                $('#login-modal-input').off('keydown').on('keydown', function(event) {
+                    if (event.keyCode === 13) { // 13 is the key code for Enter
+                        event.preventDefault();
+                        generateVerificationCode(evtTgt, "login");
+                    }
+                });
+
+                $('#login_button').click(function() {
+                    generateVerificationCode(evtTgt, "login");
                 });
             }
 
@@ -1500,14 +1510,40 @@
             }
 
             // Function to show the verification modal
-            function showVerificationPanel(email, modalType) {
+            function showVerificationPanel(evtTgt, email, modalType, panelPosition = "center") {
                 // Get the register modal
                 var parentModal = $(`#${modalType}-modal`);
                 parentModal.hide();
 
-                $('#verification-modal').show();
+                var $verificationModal = $('#verification-modal');
+                $verificationModal.show();
 
-                var modal = document.getElementById('verification-modal');
+                var targetPosition = $(evtTgt).offset(); // Using offset() to consider the document's top and left
+                var targetHeight = $(evtTgt).outerHeight(); // Height of the clicked element
+                var targetWidth = $(evtTgt).outerWidth(); // Width of the clicked element
+
+                var top = targetPosition.top + targetHeight;
+                var left = 0;
+
+                switch (panelPosition) {
+                    case "center":
+                        left = targetPosition.left + targetWidth / 2 - ($verificationModal.innerWidth() / 2);
+                        break;
+                    case "left":
+                        left = targetPosition.left - $verificationModal.innerWidth();
+                        break;
+                    case "right":
+                        left = targetPosition.left + $verificationModal.innerWidth();
+                        break;
+                }
+                
+                $verificationModal.css({
+                    "top": top, // Position above evtTgt
+                    "left": left, // Adjust for horizontal scroll
+                    "position": "absolute", // Ensure the modal is positioned absolutely
+                    "display": "block"
+                });
+
                 var modalHeader = $("#verification-modal .verification-modal-content h2");
                 var modalBackButton = $("#verification_back");
                 modalHeader.text(modalType === "register" ? "Register" : "Login");
@@ -1521,15 +1557,6 @@
                 // Get the button that opens the login or register modal
                 var btn = document.getElementById(`${modalType}-btn`);
                 var rect = btn.getBoundingClientRect();
-
-                // Calculate the modal position
-                var topPosition = rect.top + window.scrollY;
-                var rightPosition = 20;
-
-                // Adjust modal position and display it
-                modal.style.display = 'block';
-                modal.style.top = `${topPosition}px`;
-                modal.style.right = `${rightPosition}px`;
 
                 $('#verification_button').click(function() {
                     var otp = $("#verification-form input[name='verification_code']").val();
@@ -1546,7 +1573,7 @@
 
             }
 
-            function generateVerificationCode(modalType) {
+            function generateVerificationCode(evtTgt, modalType) {
                 var email = $(`#${modalType}-modal input[name='email']`).val();
                 // Show spinner
                 $(`#${modalType}-spinner`).show();
@@ -1575,7 +1602,7 @@
                         $(`#${modalType}-spinner`).hide();
                         $(`#${modalType}-error`).hide();
                         // Call showVerificationModal on success
-                        showVerificationPanel(email, modalType);
+                        showVerificationPanel(evtTgt, email, modalType);
                     },
                     error: function(xhr, status, error) {
                         // Clear the timeout
@@ -1764,16 +1791,6 @@
             function wrapErrorMessage(message) {
                 return '<span style="color: #f79a9a;">' + message + '</span>';
             }
-
-            // Bind the showVerificationModal to the click event of the button
-            $('#register_button').click(function() {
-                generateVerificationCode("register");
-
-            });
-
-            $('#login_button').click(function() {
-                generateVerificationCode("login");
-            });
 
             // Event handlers for closing the modals
             $(".close-btn").click(function() {
