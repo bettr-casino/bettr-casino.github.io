@@ -429,10 +429,15 @@
         }
 
         .scene-hierarchy-container {
-            display: flex; /* Align items in a row */
+            display: none; /* Align items in a row */
             justify-content: center; /* Center items horizontally */
             margin-top: 20px; /* Margin at the top */
             margin-bottom: 20px; /* Spacing before the iPhone displays */
+        }
+
+        #scene-hierarchy {
+            width: 506px;
+            height: 234px;
         }
 
         /* Container for the iPhone buttons */
@@ -1102,6 +1107,7 @@
                 </div>
 
                 <div class="scene-hierarchy-container">
+                    <div id="scene-hierarchy" class="scene-hierarchy"></div>
                 </div>
 
                 <div class="iphone-buttons-container">
