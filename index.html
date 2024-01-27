@@ -555,6 +555,39 @@
             letter-spacing: 5px;
         }
 
+        .tabs {
+            overflow: hidden;
+            background: #ffff;
+            font-family: Arial, sans-serif;
+        }
+
+        .tab-button {
+            background-color: #D6D6FC;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+
+        .tab-button:not(:disabled):hover {
+            background-color: #8484f8;
+        }
+
+        .tab-button.active {
+            background-color: #9a9af7;
+        }
+
+        /* Tab content */
+        .tab-content {
+            display: none;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+
     </style>
 </head>
 <body>
@@ -980,6 +1013,28 @@
                 // Clear existing content
                 detailsForm.empty();
 
+                var tabsHTML = `
+                    <div class="tabs">
+                        <button class="tab-button active" onclick="openTab(event, 'Setup')">Setup</button>
+                        <button class="tab-button" onclick="openTab(event, 'Test')" disabled>Test</button>
+                        <button class="tab-button" onclick="openTab(event, 'Submit')" disabled>Submit</button>
+                    </div>
+                    <div id="Setup" class="tab-content">
+                        <!-- Your existing Setup content here -->
+                    </div>
+                    <div id="Test" class="tab-content" style="display:none;">
+                        <!-- Content for Test -->
+                    </div>
+                    <div id="Submit" class="tab-content" style="display:none;">
+                        <!-- Content for Submit -->
+                    </div>
+                `;
+
+                // Append the tabs HTML to the detailsForm
+                detailsForm.append(tabsHTML);
+
+                detailsForm.show();
+
                 // Start the table
                 const detailsTable = $('<table>').addClass('details-table');
 
@@ -1128,7 +1183,7 @@
                     <div id="iphone15" class="iphone"></div>
                 </div>`
 
-                detailsForm.append(setupDiv);
+                $('#Setup').append(setupDiv);
 
                 $('.setup-step-button').prop('disabled', true);
 
