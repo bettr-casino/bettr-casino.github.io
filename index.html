@@ -715,6 +715,7 @@
                         $('#RegisterUserText').text('You are logged in. Click the Login button to register as a different user, else click Next.');
                         $('#RegisterUserAction').text('Login');
                         $('#RegisterUserTitle').text('Login.');
+                        $('.next-btn').prop('disabled', false);
                         return;
                     } 
                     if (isUserRegistered()) {
@@ -729,6 +730,11 @@
             }
 
             const wizardAfterShowFunctions = {
+                "RegisterUser": function(evt, stepKey, taskId, rowIndex) {
+                    if (!isUserLoggedIn()) {
+                        $('.next-btn').prop('disabled', true);
+                    }
+                },
                 "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
                     $(`#generate-challenge-code-spinner`).show();
                     var generateChallengeCodeTitle = $('#GenerateChallengeCodeTitle');
