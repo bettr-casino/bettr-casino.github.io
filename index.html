@@ -814,6 +814,13 @@
                 $('#Finish').show(); 
                 $('.show-challenge-btn').hide();
                 $('.start-challenge-btn').show();
+
+                $('#TestTabButton').show();
+                $('#SubmitTabButton').show();
+
+                $('#TestTabButton').removeAttr("disabled");
+                $('#SubmitTabButton').removeAttr("disabled");
+
                 return true;
             }
 
@@ -821,6 +828,27 @@
             function isValidEmail(email) {
                 var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 return regex.test(email);
+            }
+
+            function openTab(evt, tabName) {
+                // Declare all variables
+                var i, tabcontent, tablinks;
+
+                // Get all elements with class="tab-content" and hide them
+                tabcontent = document.getElementsByClassName("tab-content");
+                for (i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].style.display = "none";
+                }
+
+                // Get all elements with class="tab-button" and remove the class "active"
+                tablinks = document.getElementsByClassName("tab-button");
+                for (i = 0; i < tablinks.length; i++) {
+                    tablinks[i].className = tablinks[i].className.replace(" active", "");
+                }
+
+                // Show the current tab, and add an "active" class to the button that opened the tab
+                document.getElementById(tabName).style.display = "block";
+                evt.currentTarget.className += " active";
             }
 
             function updateSignInButtons() {
@@ -1001,17 +1029,17 @@
 
                 var tabsHTML = `
                     <div class="tabs">
-                        <button class="tab-button active" onclick="openTab(event, 'Setup')">Setup</button>
-                        <button class="tab-button" onclick="openTab(event, 'Test')" disabled>Test</button>
-                        <button class="tab-button" onclick="openTab(event, 'Submit')" disabled>Submit</button>
+                        <button id="SetupTabButton" class="tab-button active" onclick="openTab(event, 'Setup')">Setup</button>
+                        <button id="TestTabButton" class="tab-button" onclick="openTab(event, 'Test')" style="display:none" disabled>Test</button>
+                        <button id="SubmitTabButton" class="tab-button" onclick="openTab(event, 'Submit')" style="display:none" disabled>Submit</button>
                     </div>
-                    <div id="Setup" class="tab-content" style="display:block;">
+                    <div id="SetupTab" class="tab-content" style="display:block;">
                         <!-- Your existing Setup content here -->
                     </div>
-                    <div id="Test" class="tab-content" style="display:none;">
+                    <div id="TestTab" class="tab-content" style="display:none;">
                         <!-- Content for Test -->
                     </div>
-                    <div id="Submit" class="tab-content" style="display:none;">
+                    <div id="SubmitTab" class="tab-content" style="display:none;">
                         <!-- Content for Submit -->
                     </div>
                 `;
@@ -1019,7 +1047,7 @@
                 // Append the tabs HTML to the detailsForm
                 detailsForm.append(tabsHTML);
 
-                $setupTab = $('#Setup')
+                $setupTab = $('#SetupTab')
 
                 // Start the table
                 const detailsTable = $('<table>').addClass('details-table');
