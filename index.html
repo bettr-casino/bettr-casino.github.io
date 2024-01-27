@@ -127,34 +127,6 @@
             position: relative;
         }
 
-        .show-challenge-btn, .start-challenge-btn {
-            background-color: #9a9af7; /* Same as highlighted row color */
-            color: white; /* Text color */
-            padding: 10px 10px; /* Padding for size */
-            border: none; /* No border */
-            border-radius: 5px; /* Rounded corners */
-            font-size: 16px; /* Font size */
-            cursor: pointer; /* Pointer cursor on hover */
-            display: block; /* Block level element */
-            margin: 10px; /* Center align */
-            text-align: left; /* Center text */
-
-            align-items: left;
-            justify-content: left;
-            position: relative;
-        }
-
-        .show-challenge-btn:hover, .start-challenge-btn:hover {
-            background-color: #8484f8; /* Slightly lighter color on hover */
-        }
-
-        .show-challenge-btn:disabled, .start-challenge-btn:disabled {
-            background-color: #cccccc; /* Light gray background for disabled state */
-            color: #666666; /* Darker gray text */
-            cursor: not-allowed; /* Change cursor to indicate non-clickable */
-            border: 1px solid #bbbbbb; /* Border color for disabled state */
-        }
-
         .challenge-spinner {
             border: 3px solid rgba(0, 0, 0, 0.1);
             border-radius: 50%;
@@ -1076,46 +1048,11 @@
                 // Append the table to the form
                 $setupTab.append(detailsTable);
 
-                // Create a container for the button and the status text
-                const buttonStatusContainer = $('<div>').addClass('button-status-container');
-                const showChallengeButton = $('<button>')
-                    .text("Setup Challenge")
-                    .addClass('show-challenge-btn')
-                    .show();
-                showChallengeButton.on('click', function() {
-                    $(".setup-step-button").prop("disabled", true);
-                    $(".setup").show();
-                    // Scroll to the top of the button
-                    $('html, body').animate({
-                        scrollTop: showChallengeButton.offset().top
-                    }, 500, function() {
-                        $(showChallengeButton).prop("disabled", true);
-                    });
-                    callback(rowIndex);
-                });
-                const startChallengeButton = $('<button>')
-                    .text("Start Challenge")
-                    .addClass('start-challenge-btn')
-                    .hide();
-                    startChallengeButton.on('click', function() {
-                    
-                });
-                const statusText = $('<p>').text('').addClass('status-text'); // Add your status text here
-                buttonStatusContainer.append(showChallengeButton, startChallengeButton, statusText);
-                $setupTab.append(buttonStatusContainer);
-
-                const showChallengeEditorForm = $('<div>', {
-                    id: 'show-challenge-editor-form',
-                    class: 'section3',
-                    css: 'display: none;'
-                });
-                $setupTab.append(showChallengeEditorForm);
-
                 var setupDiv = `
                 <div id="setup-div" class="setup">
                     <div class="setup-step" id="Start" style="display: block;">
                         <h3>Setup Wizard.</h3>
-                        <p>Click on Setup button above to get started.</p>
+                        <p>Click on Next button above to get started.</p>
                         <p>You will need your iPhone 13+ to complete the setup.</p>
                     </div>
 
@@ -1197,9 +1134,13 @@
                     <div id="iphone15" class="iphone"></div>
                 </div>`
 
-                $('.setup-step-button').prop('disabled', true);
-
                 $setupTab.append(setupDiv);
+
+                $('.setup-step-button').prop('disabled', true);
+                
+                $('.next-btn').prop('disabled', false).off('click').on('click', function() {
+                    callback(rowIndex);
+                });
 
                 $('.toggle-button').click(function() {
                     // Remove 'active' class from all buttons and hide all iPhones
@@ -1217,7 +1158,7 @@
 
                 // Trigger click on the first button to show iPhone 13 by default
                 $('#toggle-iphone13').click();
-
+                
             }
 
             function copyToClipboard(text) {
