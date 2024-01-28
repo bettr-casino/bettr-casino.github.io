@@ -529,49 +529,48 @@
 
         .tabs {
             overflow: hidden;
-            background: #ffff;
-            font-family: Arial, sans-serif;
+            background: #002246; /* Background color for the tab bar */
+            padding: 0 10px; /* Padding on the sides of the tab bar */
         }
 
         .tab-button {
-            background-color: #D6D6FC;
-            color: white;
+            background-color: #fff;
+            color: #333;
             float: left;
             border: none;
-            border-radius: 5px;
             outline: none;
             cursor: pointer;
             padding: 10px 20px;
-            margin-right: 10px;
-            transition: background-color 0.3s ease;
-            font-size: 16px;
-        }
-
-        /* To remove the margin from the last tab button */
-        .tab-button:last-child {
-            margin-right: 0;
-        }
-
-        .tab-button.disabled {
-            background-color: #d3d3f8; /* Pale color for disabled state */
-            cursor: default; /* Default cursor for disabled state */
-            pointer-events: none; /* Disable click events for disabled state */
+            transition: background-color 0.3s;
+            border-radius: 0; /* Remove the border-radius for a more 'tab-like' appearance */
+            margin-bottom: -1px; /* Overlap the content below */
+            position: relative; /* Needed for z-index */
+            z-index: 1; /* Place the tabs above the content border */
         }
 
         .tab-button:not(:disabled):hover {
-            background-color: #8484f8;
+            background-color: #ddd;
         }
 
         .tab-button.active {
-            background-color: #9a9af7;
+            background-color: #9a9af7; /* Set the background color for the active tab */
+            color: white; /* Set the text color for the active tab to white */
+            border-bottom: 2px solid #9a9af7; /* Match the border color with the active tab's background */
+            /* Remove the right border for active tab if desired */
+            border-right: none;
         }
 
-        /* Tab content */
         .tab-content {
-            display: none;
-            padding: 6px 12px;
-            border: 1px solid #ccc;
-            border-top: none;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #fff;
+        }
+
+        /* Clearfix for floated tab buttons */
+        .tabs:after {
+            content: "";
+            display: table;
+            clear: both;
         }
 
     </style>
@@ -776,12 +775,12 @@
             const wizardOnClickFunctions = {
                 "RegisterUser": function(evt, stepKey, taskId, rowIndex) {
                     evt.preventDefault();  // Prevents the default link action
+                    authObserverManager.subscribe(function() {
+                        wizardOnShowFunctions["RegisterUser"]();
+                    });
                     if (isUserRegistered()) {
                         showLoginPanel(evt.target, "center");
                     } else {
-                        authObserverManager.subscribe(function() {
-                            wizardOnShowFunctions["RegisterUser"]();
-                        });
                         showRegisterPanel(evt.target, "center");
                     }
                 },
@@ -1333,6 +1332,8 @@
                 $('#register_button').click(function() {
                     generateVerificationCode(evtTgt, "register");
                 });                
+
+                toggleVerificationButton("#register-modal input[name='email']", "#register_button");
             }
 
             function showLoginPanel(evtTgt, panelPosition = "left") {
@@ -1382,6 +1383,8 @@
                 $('#login_button').click(function() {
                     generateVerificationCode(evtTgt, "login");
                 });
+
+                toggleVerificationButton("#login-modal input[name='email']", "#login_button");
             }
 
             // Close modal when the close button is clicked
@@ -1795,6 +1798,17 @@
                 return '<span style="color: #f79a9a;">' + message + '</span>';
             }
 
+            function findKeysWithPrefix(prefix) {
+                const keysWithPrefix = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith(prefix)) {
+                        keysWithPrefix.push(key);
+                    }
+                }
+                return keysWithPrefix;
+            }
+
             // Event handlers for closing the modals
             $(".close-btn").click(function() {
                 $(this).closest(".modal").hide();
@@ -1803,8 +1817,8 @@
             // Logout button click event
             $('#logout-btn').click(function() {
                 // Clear local storage
-                localStorage.removeItem(prefix_local_store('user_id'));
                 localStorage.removeItem(prefix_local_store('session_token'));
+                findKeysWithPrefix(prefix_local_store('TASK_ID__')).forEach(key => localStorage.removeItem(key));
 
                 // Hide Logout button and show Register and Login buttons
                 $('#login-btn').show();
