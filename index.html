@@ -783,7 +783,8 @@
                 },
                 "VerifyInstall": function(stepKey, taskId, rowIndex) {
                     $('.finish-btn').prop('disabled', true);
-                    fetchHierarchyAndImage(taskId, function(err) {
+                    const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
+                    fetchHierarchyAndImage(hashKey, function(err) {
                         if (err) {
                             console.error('Error:', err);
                         } else {
