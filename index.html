@@ -740,6 +740,15 @@
                 "StartApp": function(stepKey, taskId, rowIndex) {
                     const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
                     $('#StartAppCode').text(hashKey);
+                },
+                "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
+                    $('.next-btn').prop('disabled', true);
+                },
+                "VerifyInstall": function(stepKey, taskId, rowIndex) {
+                    $('.finish-btn').prop('disabled', true);
+                    const localStorageKey = prefix_local_store(`TASK_ID__${taskId}__screenshot_request_time`);
+                    const currentUtcTimestamp = Date.now();
+                    localStorage.setItem(localStorageKey, currentUtcTimestamp);
                 }            
             }
 
@@ -771,6 +780,16 @@
                             }
                         }
                     })
+                },
+                "VerifyInstall": function(stepKey, taskId, rowIndex) {
+                    $('.finish-btn').prop('disabled', true);
+                    fetchHierarchyAndImage(taskId, function(err) {
+                        if (err) {
+                            console.error('Error:', err);
+                        } else {
+                            $('.finish-btn').prop('disabled', false);
+                        }
+                    });
                 }
             }
 
@@ -1809,6 +1828,58 @@
                     }
                 }
                 return keysWithPrefix;
+            }
+
+            function fetchHierarchyAndImage(taskId, callback) {
+                const hierarchyUrl = `https://bettr-casino-assets.s3.us-west-2.amazonaws.com/developers/${taskId}/scene_state/hierarchy.json`;
+                const imageUrl = `https://bettr-casino-assets.s3.us-west-2.amazonaws.com/developers/${taskId}/scene_state/image.png`;
+                const localStorageKey = prefix_local_store(`TASK_ID__${taskId}__screenshot_request_time`);
+
+                function fetchJson(url, jsonCallback) {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('GET', url, true);
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4) {
+                            if (xhr.status === 200) {
+                                try {
+                                    const data = JSON.parse(xhr.responseText);
+                                    jsonCallback(null, data);
+                                } catch (error) {
+                                    jsonCallback(error);
+                                }
+                            } else {
+                                jsonCallback(new Error('Failed to fetch data'));
+                            }
+                        }
+                    };
+                    xhr.send();
+                }
+
+                fetchJson(hierarchyUrl, function(err, hierarchyData) {
+                    if (err) {
+                        callback(err);
+                        return;
+                    }
+
+                    const createdAtTimestamp = hierarchyData.CreatedAtTimestamp;
+                    const localStorageTimestamp = parseInt(localStorage.getItem(localStorageKey), 10);
+
+                    if (createdAtTimestamp > localStorageTimestamp) {
+                        const imgElement = document.createElement('img');
+                        imgElement.src = imageUrl;
+                        imgElement.onload = function() {
+                            document.getElementById('iphone13').appendChild(imgElement);
+                            callback(null);
+                        };
+                        imgElement.onerror = function() {
+                            callback(new Error('Failed to load image'));
+                        };
+                    } else {
+                        setTimeout(function() {
+                            fetchHierarchyAndImage(taskId, callback);
+                        }, 5000);
+                    }
+                });
             }
 
             // Event handlers for closing the modals
