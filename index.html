@@ -1151,7 +1151,7 @@
 
                     <div class="setup-step" id="Finish" style="display: none;">
                         <h3>Bro!</h3>
-                        <p>"Launch your journey, the Test tab open you must."</p>
+                        <p>"To face your challenge, the Test tab open you must."</p>
                     </div>
                 </div>
 
@@ -1873,9 +1873,7 @@
                                 callback(new Error('Failed to load image'));
                             });
                         } else {
-                            setTimeout(function() {
-                                fetchHierarchyAndImage(taskId, delayInMs, callback);
-                            }, delayInMs);
+                            fetchHierarchyAndImage(taskId, delayInMs, callback);
                         }
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
