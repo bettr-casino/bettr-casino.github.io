@@ -750,6 +750,7 @@
                     }
                 },
                 "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
+                    $('.next-btn').prop('disabled', true);               
                     $(`#generate-challenge-code-spinner`).show();
                     var generateChallengeCodeTitle = $('#GenerateChallengeCodeTitle');
                     initializeDeveloperAccount(taskId, function(response, error) {
@@ -763,6 +764,7 @@
                             if (hashKey && hashKey.length == 6) {
                                 fillHashKey(hashKey);
                                 localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
+                                $('.next-btn').prop('disabled', false);
                             } else {
                                 console.log(`incorrect hash_key (length != 6) in response body=${JSON.stringify(response)}`);
                                 showModalPanel(generateChallengeCodeA, 'Code Generation error. Go Back and retry. Support email: support@bettr.casino.', 'center');
