@@ -784,7 +784,7 @@
                 },
                 "VerifyInstall": function(stepKey, taskId, rowIndex) {
                     $('.finish-btn').prop('disabled', true);
-                    $('#iphone13').empty();
+                    activeIPhoneContainer().empty();
                     const localStorageKey = prefix_local_store(`TASK_ID__${taskId}__screenshot_request_time`);
                     const currentUtcTimestamp = Math.floor(Date.now() / 1000);
                     localStorage.setItem(localStorageKey, currentUtcTimestamp);
@@ -853,6 +853,13 @@
                 $('#SubmitTabButton').removeAttr("disabled");
 
                 return true;
+            }
+
+            function activeIPhoneContainer() {
+                if (!$('#toggle-iphone13').prop('disabled')) return $('#iphone13');
+                if (!$('#toggle-iphone14').prop('disabled')) return $('#iphone14');
+                if (!$('#toggle-iphone15').prop('disabled')) return $('#iphone15');
+                return null;
             }
 
             // Function to validate email using simple regex
@@ -1859,7 +1866,7 @@
                             const imgElement = $('<img>', {
                                 src: imageUrl
                             }).on('load', function() {
-                                $('#iphone13').empty().append(imgElement);
+                                activeIPhoneContainer().empty().append(imgElement);
                                 callback(null);
                             }).on('error', function() {
                                 alert("error image");
