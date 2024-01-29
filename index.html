@@ -750,13 +750,7 @@
                 },
                 "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
                     $('.next-btn').prop('disabled', true);
-                },
-                "VerifyInstall": function(stepKey, taskId, rowIndex) {
-                    $('.finish-btn').prop('disabled', true);
-                    const localStorageKey = prefix_local_store(`TASK_ID__${taskId}__screenshot_request_time`);
-                    const currentUtcTimestamp = Date.now();
-                    localStorage.setItem(localStorageKey, currentUtcTimestamp);
-                }            
+                }
             }
 
             const wizardAfterShowFunctions = {
@@ -790,6 +784,7 @@
                 },
                 "VerifyInstall": function(stepKey, taskId, rowIndex) {
                     $('.finish-btn').prop('disabled', true);
+                    $('#iphone13').empty();
                     const localStorageKey = prefix_local_store(`TASK_ID__${taskId}__screenshot_request_time`);
                     const currentUtcTimestamp = Math.floor(Date.now() / 1000);
                     localStorage.setItem(localStorageKey, currentUtcTimestamp);
@@ -803,7 +798,7 @@
                     }
                     setTimeout(function() {
                             fetchHierarchyAndImage(taskId, delayInMs, callback);
-                        }, 5000);
+                        }, delayInMs);
 
                 }
             }
@@ -1864,7 +1859,6 @@
                             const imgElement = $('<img>', {
                                 src: imageUrl
                             }).on('load', function() {
-                                alert("load image");
                                 $('#iphone13').empty().append(imgElement);
                                 callback(null);
                             }).on('error', function() {
