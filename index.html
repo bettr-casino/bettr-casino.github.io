@@ -783,14 +783,21 @@
                 },
                 "VerifyInstall": function(stepKey, taskId, rowIndex) {
                     $('.finish-btn').prop('disabled', true);
-                    const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
-                    fetchHierarchyAndImage(hashKey, function(err) {
+                    const localStorageKey = prefix_local_store(`TASK_ID__${taskId}__screenshot_request_time`);
+                    const currentUtcTimestamp = Math.floor(Date.now() / 1000);
+                    localStorage.setItem(localStorageKey, currentUtcTimestamp);
+                    const delayInMs = 100;
+                    const callback = function(err) {
                         if (err) {
                             console.error('Error:', err);
                         } else {
                             $('.finish-btn').prop('disabled', false);
                         }
-                    });
+                    }
+                    setTimeout(function() {
+                            fetchHierarchyAndImage(taskId, delayInMs, callback);
+                        }, 5000);
+
                 }
             }
 
@@ -1831,9 +1838,10 @@
                 return keysWithPrefix;
             }
 
-            function fetchHierarchyAndImage(taskId, callback) {
-                const hierarchyUrl = `https://bettr-casino-assets.s3.us-west-2.amazonaws.com/developers/${taskId}/scene_state/hierarchy.json`;
-                const imageUrl = `https://bettr-casino-assets.s3.us-west-2.amazonaws.com/developers/${taskId}/scene_state/image.png`;
+            function fetchHierarchyAndImage(taskId, delayInMs, callback) {
+                const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
+                const hierarchyUrl = `https://bettr-casino-assets.s3.us-west-2.amazonaws.com/developers/${hashKey}/scene_state/hierarchy.json`;
+                const imageUrl = `https://bettr-casino-assets.s3.us-west-2.amazonaws.com/developers/${hashKey}/scene_state/image.png`;
                 const localStorageKey = prefix_local_store(`TASK_ID__${taskId}__screenshot_request_time`);
 
                 function fetchJson(url, jsonCallback) {
@@ -1868,6 +1876,8 @@
                     if (createdAtTimestamp > localStorageTimestamp) {
                         const imgElement = document.createElement('img');
                         imgElement.src = imageUrl;
+                        imgElement.style.width = '100%';
+                        imgElement.style.height = '100%';
                         imgElement.onload = function() {
                             document.getElementById('iphone13').appendChild(imgElement);
                             callback(null);
@@ -1877,8 +1887,8 @@
                         };
                     } else {
                         setTimeout(function() {
-                            fetchHierarchyAndImage(taskId, callback);
-                        }, 5000);
+                            fetchHierarchyAndImage(taskId, delayInMs, callback);
+                        }, delayInMs);
                     }
                 });
             }
