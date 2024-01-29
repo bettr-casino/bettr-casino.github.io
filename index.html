@@ -364,6 +364,13 @@
             display: none; /* Initially hidden */
         }
 
+        .iphone img {
+            width: 100%;
+            height: auto;
+            object-fit: contain; /* Or 'cover' if that's the desired effect */
+            border-radius: 25px; /* Match the container's border-radius */
+        }
+
         /* Individual iPhone sizes */
         #iphone13 {
             width: 506px;
@@ -786,7 +793,7 @@
                     const localStorageKey = prefix_local_store(`TASK_ID__${taskId}__screenshot_request_time`);
                     const currentUtcTimestamp = Math.floor(Date.now() / 1000);
                     localStorage.setItem(localStorageKey, currentUtcTimestamp);
-                    const delayInMs = 100;
+                    const delayInMs = 1000;
                     const callback = function(err) {
                         if (err) {
                             console.error('Error:', err);
@@ -1843,52 +1850,35 @@
                 const hierarchyUrl = `https://bettr-casino-assets.s3.us-west-2.amazonaws.com/developers/${hashKey}/scene_state/hierarchy.json`;
                 const imageUrl = `https://bettr-casino-assets.s3.us-west-2.amazonaws.com/developers/${hashKey}/scene_state/image.png`;
                 const localStorageKey = prefix_local_store(`TASK_ID__${taskId}__screenshot_request_time`);
+                
+                $.ajax({
+                    url: hierarchyUrl,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(hierarchyData) {
+                        const createdAtTimestamp = hierarchyData.CreatedAtTimestamp;
+                        const localStorageTimestamp = parseInt(localStorage.getItem(localStorageKey), 10);
 
-                function fetchJson(url, jsonCallback) {
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('GET', url, true);
-                    xhr.onreadystatechange = function() {
-                        if (xhr.readyState === 4) {
-                            if (xhr.status === 200) {
-                                try {
-                                    const data = JSON.parse(xhr.responseText);
-                                    jsonCallback(null, data);
-                                } catch (error) {
-                                    jsonCallback(error);
-                                }
-                            } else {
-                                jsonCallback(new Error('Failed to fetch data'));
-                            }
+                        if (createdAtTimestamp > localStorageTimestamp) {
+                            console.log(`imageUrl:${imageUrl}`);
+                            const imgElement = $('<img>', {
+                                src: imageUrl
+                            }).on('load', function() {
+                                alert("load image");
+                                $('#iphone13').empty().append(imgElement);
+                                callback(null);
+                            }).on('error', function() {
+                                alert("error image");
+                                callback(new Error('Failed to load image'));
+                            });
+                        } else {
+                            setTimeout(function() {
+                                fetchHierarchyAndImage(taskId, delayInMs, callback);
+                            }, delayInMs);
                         }
-                    };
-                    xhr.send();
-                }
-
-                fetchJson(hierarchyUrl, function(err, hierarchyData) {
-                    if (err) {
-                        callback(err);
-                        return;
-                    }
-
-                    const createdAtTimestamp = hierarchyData.CreatedAtTimestamp;
-                    const localStorageTimestamp = parseInt(localStorage.getItem(localStorageKey), 10);
-
-                    if (createdAtTimestamp > localStorageTimestamp) {
-                        const imgElement = document.createElement('img');
-                        imgElement.src = imageUrl;
-                        imgElement.style.width = '100%';
-                        imgElement.style.height = '100%';
-                        imgElement.onload = function() {
-                            document.getElementById('iphone13').appendChild(imgElement);
-                            callback(null);
-                        };
-                        imgElement.onerror = function() {
-                            callback(new Error('Failed to load image'));
-                        };
-                    } else {
-                        setTimeout(function() {
-                            fetchHierarchyAndImage(taskId, delayInMs, callback);
-                        }, delayInMs);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        callback(new Error('Failed to fetch hierarchy data: ' + textStatus));
                     }
                 });
             }
