@@ -333,6 +333,17 @@
             position: absolute;
         }
 
+        .spinner3 {
+            border: 5px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 5px solid #0732f3;
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            animation: spin 2s linear infinite;
+            position: absolute;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -757,9 +768,9 @@
                         $('#RegisterUserTitle').text('Login.');
                     }
                 },
-                "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
+                "StartApp": function(stepKey, taskId, rowIndex) {
                     $('.next-btn').prop('disabled', true);
-                    $('#GenerateChallengeCodeText').text("-----");
+                    $('#GenerateChallengeCodeText').text("______");
                 }
             }
 
@@ -769,7 +780,7 @@
                         $('.next-btn').prop('disabled', true);
                     }
                 },
-                "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
+                "StartApp": function(stepKey, taskId, rowIndex) {
                     $('.next-btn').prop('disabled', true);               
                     $(`#generate-challenge-code-spinner`).show();
                     var generateChallengeCodeTitle = $('#GenerateChallengeCodeTitle');
@@ -793,7 +804,7 @@
                         }
                     })
                 },
-                "VerifyInstall": function(stepKey, taskId, rowIndex) {
+                "VerifyApp": function(stepKey, taskId, rowIndex) {
                     $('.finish-btn').prop('disabled', true);
                     activeIPhoneContainer().empty();
                     const localStorageKey = prefix_local_store(`TASK_ID__${taskId}__screenshot_request_time`);
@@ -826,8 +837,20 @@
                         showRegisterPanel(evt.target, "center");
                     }
                 },
-                "GenerateChallengeCode": function(evt, stepKey, taskId, rowIndex) {
+                "StartApp": function(evt, stepKey, taskId, rowIndex) {
                     evt.preventDefault();  // Prevents the default link action                    
+                }
+            }
+
+            const wizardOnBackFunctions = {
+                "StartApp": function(stepKey, taskId, rowIndex) {
+                    if (isUserLoggedIn()) {
+                        $('.setup-step').hide();
+                        $('#Start').show();
+                        localStorage.removeItem(stepKey);
+                        return false;
+                    }                    
+                    return true;
                 }
             }
 
@@ -840,12 +863,10 @@
                     showModalPanel(registerUserA, 'Complete this step to continue.', 'center');
                     return false;
                 },
-                "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
+                "StartApp": function(stepKey, taskId, rowIndex) {
                     if (isTaskHashKeyGenerated(taskId)) {
                         return true;
                     }
-                    var registerUserA = $('#RegisterUserAction');
-                    showModalPanel(registerUserA, 'Complete this step to continue.', 'center');
                     return false;
                 }
             }
@@ -1011,6 +1032,12 @@
                             if (nextStepIndex > 1) {
                                 $('.back-btn').prop('disabled', false);
                                 $('.back-btn').off('click').on('click', function() {
+                                    const stepOnBackFn = wizardOnBackFunctions[stepText];
+                                    if (stepOnBackFn) {
+                                        if (!stepOnBackFn(stepKey, taskId, rowIndex)) {
+                                            return;
+                                        }
+                                    }
                                     showNextWizardStep(rowIndex, -1);
                                 });
                             }
@@ -1119,19 +1146,13 @@
                     <div class="setup-step" id="Start" style="display: block;">
                         <h3>Setup Wizard.</h3>
                         <p>Click on Next button above to get started.</p>
-                        <p>You will need your iPhone 13+ to complete the setup.</p>
+                        <p>You will need an iPhone 13+ device to complete the setup.</p>
                     </div>
 
                     <div class="setup-step" id="RegisterUser" style="display: none;">
                         <h3 id="RegisterUserTitle">Register.</h3>
                         <p id="RegisterUserText">We do not store email ids. Read our <a href="https://bettr.casino/privacy.html">Privacy</a> policy.</p>
                         <button id="RegisterUserAction" class="header-btn">Register</button>
-                    </div>
-
-                    <div class="setup-step" id="GenerateChallengeCode" style="display: none;">
-                        <h3 id="GenerateChallengeCodeTitle">Generate Challenge Code.</h3>
-                        <p>Wait until the Bettr Challenge Code Screen loads on the App. Type in the challenge code below. Press Continue.</p>
-                        <span id="GenerateChallengeCodeText" class="tag code" style="font-size: 18px;">-----</span><span id="generate-challenge-code-spinner" class="spinner2" style="display: none;"></span>
                     </div>
 
                     <div class="setup-step" id="DownloadTestFlightApp" style="display: none;">
@@ -1141,20 +1162,24 @@
                     </div>
 
                     <div class="setup-step" id="InstallBettrApp" style="display: none;">
-                        <h3>Install the Bettr App.</h3>
+                        <h3>Install the Bettr App via TestFlight.</h3>
                         <p>The Bettr is managed by TestFlight. Install the Bettr App onto your iPhone 13+ using the link above. Click Next after installation.</p>
                         <a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Install Bettr Beta Testing App</a>
                     </div>
 
                     <div class="setup-step" id="StartApp" style="display: none;">
-                        <h3>Install App.</h3>
-                        <a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Install TestFlight Bettr App</a>
-                        <p>Launch the App.</p>
-                        <p>Wait until the Bettr Challenge Code Screen loads.</p>
-                        <button id="RegisterUserAction" class="header-btn">Install Complete</button>
+                        <h3>Install the Bettr App.</h3>
+                        <a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Install and Launch the Bettr App via TestFlight.</a>                                                
+                        <p>Type in the Bettr Challenge Code.<span id="generate-challenge-code-spinner" class="spinner3" style="display: none;"></span></p>
+                        <p><span id="GenerateChallengeCodeText" class="tag code" style="font-size: 18px;"></span></p>
                     </div>
 
-                    <div class="setup-step" id="VerifyInstall" style="display: none;">
+                    <div class="setup-step" id="GenerateChallengeCode" style="display: none;">
+                        <h3 id="GenerateChallengeCodeTitle">Generate Challenge Code.</h3>
+                        <p>Type in the challenge code below. Press Continue.</p>
+                    </div>
+
+                    <div class="setup-step" id="VerifyApp" style="display: none;">
                         <h3>Verify the Setup.</h3>
                         <p>Long press the screen on the iPhone 13+.</p>
                         <p> and  wait until the screen is mirrored below.</p>
