@@ -147,7 +147,11 @@
             padding: 5px 10px;
             margin: 2px;
             border-radius: 5px;
-            font-size: 14px;
+            font-size: 16px;
+        }
+
+        .code {
+            letter-spacing: 5px;
         }
 
 
@@ -753,12 +757,9 @@
                         $('#RegisterUserTitle').text('Login.');
                     }
                 },
-                "StartApp": function(stepKey, taskId, rowIndex) {
-                    const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
-                    $('#StartAppCode').text(hashKey);
-                },
                 "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
                     $('.next-btn').prop('disabled', true);
+                    $('#GenerateChallengeCodeText').text("-----");
                 }
             }
 
@@ -781,7 +782,8 @@
                             // Access the properties from the parsed body
                             var hashKey = response.task_hash_key;
                             if (hashKey && hashKey.length == 6) {
-                                fillHashKey(hashKey);
+                                const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
+                                $('#GenerateChallengeCodeText').text(hashKey);
                                 localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
                                 $('.next-btn').prop('disabled', false);
                             } else {
@@ -1128,16 +1130,8 @@
 
                     <div class="setup-step" id="GenerateChallengeCode" style="display: none;">
                         <h3 id="GenerateChallengeCodeTitle">Generate Challenge Code.</h3>
-                        <p>Generating Code <span id="generate-challenge-code-spinner" class="spinner2" style="display: none;"></span></p>
-                        <div class="code-container">
-                            <input type="text" inputmode="text" pattern="[0-9a-z]*" maxlength="1" />
-                            <input type="text" inputmode="text" pattern="[0-9a-z]*" maxlength="1" />
-                            <input type="text" inputmode="text" pattern="[0-9a-z]*" maxlength="1" />
-                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
-                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
-                            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
-                        </div>
-                        <p>This six-character alphanumeric code will be used to test and submit this challenge. Click Next after code generation.</p>
+                        <p>Wait until the Bettr Challenge Code Screen loads on the App. Type in the challenge code below. Press Continue.</p>
+                        <span id="GenerateChallengeCodeText" class="tag code" style="font-size: 18px;">-----</span><span id="generate-challenge-code-spinner" class="spinner2" style="display: none;"></span>
                     </div>
 
                     <div class="setup-step" id="DownloadTestFlightApp" style="display: none;">
@@ -1155,9 +1149,7 @@
                     <div class="setup-step" id="StartApp" style="display: none;">
                         <h3>Install App.</h3>
                         <a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Install TestFlight Bettr App</a>
-                        <p>Launch the Bettr App on the iPhone 13+. Enter the challenge code below.</p>
-                        <span id="StartAppCode" class="tag" style="font-size: 18px;"></span>
-                        <p>Click Continue. Wait until the Main Lobby loads. Click Next.</p>
+                        <p>Launch the App. Click Next.</p>
                     </div>
 
                     <div class="setup-step" id="VerifyInstall" style="display: none;">
