@@ -729,6 +729,15 @@
                     setupTables(data);
                 });
 
+            const wizardShouldShowFunctions = {
+                "RegisterUser": function(stepKey, taskId, rowIndex) {
+                    if (isUserLoggedIn()) {                        
+                        return false;
+                    } 
+                    return true;
+                }
+            }
+
             const wizardOnShowFunctions = {
                 "RegisterUser": function(stepKey, taskId, rowIndex) {
                     if (isUserLoggedIn()) {
@@ -979,6 +988,14 @@
                             const stepText = setupRow[stepIndex];
                             $('.setup-step').hide();
                             localStorage.setItem(stepKey, `${nextStepIndex}`);
+                            const stepShouldShowFn = wizardShouldShowFunctions[stepText];
+                            if (stepShouldShowFn) {
+                                if (!stepShouldShowFn(stepKey, taskId, rowIndex)) {
+                                    // skip further processing for this step
+                                    showNextWizardStep(rowIndex, 1);
+                                    return;
+                                }
+                            }
                             const stepOnShowFn = wizardOnShowFunctions[stepText];
                             if (stepOnShowFn) {
                                 stepOnShowFn(stepKey, taskId, rowIndex);
