@@ -344,6 +344,17 @@
             position: absolute;
         }
 
+        .spinner4 {
+            border: 5px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 5px solid #0732f3;
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            animation: spin 2s linear infinite;
+            position: absolute;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -782,10 +793,10 @@
                 },
                 "StartApp": function(stepKey, taskId, rowIndex) {
                     $('.next-btn').prop('disabled', true);               
-                    $(`#generate-challenge-code-spinner`).show();
+                    $(`#start-app-spinner`).show();
                     var generateChallengeCodeTitle = $('#GenerateChallengeCodeTitle');
                     initializeDeveloperAccount(taskId, function(response, error) {
-                        $(`#generate-challenge-code-spinner`).hide();
+                        $(`#start-app-spinner`).hide();
                         if (error) {
                             console.log(error);
                             showModalPanel(generateChallengeCodeTitle, 'Code Generation error. Support email: support@bettr.casino.', 'center');
@@ -806,6 +817,7 @@
                 },
                 "VerifyApp": function(stepKey, taskId, rowIndex) {
                     $('.finish-btn').prop('disabled', true);
+                    $(`#verify-app-spinner`).show();
                     activeIPhoneContainer().empty();
                     const localStorageKey = prefix_local_store(`TASK_ID__${taskId}__screenshot_request_time`);
                     const currentUtcTimestamp = Math.floor(Date.now() / 1000);
@@ -1170,7 +1182,7 @@
                     <div class="setup-step" id="StartApp" style="display: none;">
                         <h3>Install the Bettr App.</h3>
                         <a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Install and Launch the Bettr App via TestFlight.</a>                                                
-                        <p>Type in the Bettr Challenge Code.<span id="generate-challenge-code-spinner" class="spinner3" style="display: none;"></span></p>
+                        <p>Type in the Bettr Challenge Code.<span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
                         <p><span id="GenerateChallengeCodeText" class="tag code" style="font-size: 18px;"></span></p>
                     </div>
 
@@ -1180,10 +1192,9 @@
                     </div>
 
                     <div class="setup-step" id="VerifyApp" style="display: none;">
-                        <h3>Verify the Setup.</h3>
-                        <p>Long press the screen on the iPhone 13+.</p>
-                        <p> and  wait until the screen is mirrored below.</p>
-                        <p>...zzz.... Click Finish.</p>
+                        <h3>Verify the Install.</h3>
+                        <p>Running verify. <span id="verify-app-spinner" class="spinner2" style="display: none;"></span></p>
+                        <p id="VerifyAppResult">Wait until the verify completes.</p>
                     </div>
 
                     <div class="setup-step" id="Finish" style="display: none;">
