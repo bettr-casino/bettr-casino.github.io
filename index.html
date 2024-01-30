@@ -804,7 +804,6 @@
                             // Access the properties from the parsed body
                             var hashKey = response.task_hash_key;
                             if (hashKey && hashKey.length == 6) {
-                                const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
                                 $('#GenerateChallengeCodeText').text(hashKey);
                                 localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
                                 $('.next-btn').prop('disabled', false);
