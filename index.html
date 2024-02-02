@@ -828,12 +828,14 @@
                             $('#VerifyAppResult').empty().append($(`<span style="color: red;">${err.message}</span>`));
                             $(`#verify-app-spinner`).hide();
                         } else {
+                            $('#VerifyAppInfo').empty().text("Verify complete.")
+                            $('#VerifyAppResult').empty().append($(`<span>Click Finish.</span>`));
                             $('.finish-btn').prop('disabled', false);
                             $(`#verify-app-spinner`).hide();
                             $('#countdownTimer').hide()
                         }
                     }
-                    initiateVerifyAppCountdown();
+                    initiateVerifyAppCountdown(59);
                     verifyAppInstall(taskId, callback);
                 }
             }
@@ -1194,7 +1196,7 @@
 
                     <div class="setup-step" id="VerifyApp" style="display: none;">
                         <h3>Verify the Install.</h3>
-                        <p>Running verify. <input type="text" id="countdownTimer" value="30" readonly style="width: 30px; text-align: center;"/><span id="verify-app-spinner" class="spinner2" style="display: none;"></span></p>
+                        <p id="VerifyAppInfo">Running verify. <input type="text" id="countdownTimer" readonly style="width: 30px; text-align: center;"/><span id="verify-app-spinner" class="spinner2" style="display: none;"></span></p>
                         <p id="VerifyAppResult">Wait until the verify completes.</p>
                     </div>
 
@@ -1897,7 +1899,7 @@
             }
 
             function startCountdown(duration, display) {
-                var timer = duration, minutes, seconds;
+                var timer = duration, seconds;
                 var countdownInterval = setInterval(function () {
                     seconds = parseInt(timer % 60, 10);
 
@@ -1911,17 +1913,16 @@
                 }, 1000);
             }
 
-            function initiateVerifyAppCountdown() {
-                var thirtySeconds = 30,
+            function initiateVerifyAppCountdown(duration) {
                 display = $('#countdownTimer');
-                startCountdown(thirtySeconds, display);
+                startCountdown(duration, display);
             }
 
             function verifyAppInstall(taskId, callback) {
                 const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
                 const objectKey = `developers/${hashKey}/scene_state/image.png`;
                 let retries = 0;
-                const maxRetries = 10; // Adjust based on the desired frequency of retries within the 30-second window
+                const maxRetries = 20; // Adjust based on the desired frequency of retries within the 30-second window
                 const retryInterval = 3000; // Retry every 3 seconds
 
                 function attemptFetch() {
