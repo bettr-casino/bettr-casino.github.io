@@ -1896,35 +1896,31 @@
 
             function fetchHierarchyAndImage(taskId, delayInMs, callback) {
                 const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
-                const hierarchyUrl = `https://bettr-casino-assets.s3.us-west-2.amazonaws.com/developers/${hashKey}/scene_state/hierarchy.json`;
-                const imageUrl = `https://bettr-casino-assets.s3.us-west-2.amazonaws.com/developers/${hashKey}/scene_state/image.png`;
-                const localStorageKey = prefix_local_store(`TASK_ID__${taskId}__screenshot_request_time`);
+                const objectKey = `developers/${hashKey}/scene_state/image.png`;
                 
                 $.ajax({
-                    url: hierarchyUrl,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(hierarchyData) {
-                        const createdAtTimestamp = hierarchyData.CreatedAtTimestamp;
-                        const localStorageTimestamp = parseInt(localStorage.getItem(localStorageKey), 10);
-
-                        if (createdAtTimestamp > localStorageTimestamp) {
-                            console.log(`imageUrl:${imageUrl}`);
-                            const imgElement = $('<img>', {
-                                src: imageUrl
-                            }).on('load', function() {
-                                activeIPhoneContainer().empty().append(imgElement);
-                                callback(null);
-                            }).on('error', function() {
-                                alert("error image");
-                                callback(new Error('Failed to load image'));
-                            });
+                    url: 'https://acqgvpocrqiy6t6v7wfdhku2ae0bmfka.lambda-url.us-west-2.on.aws/',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        "object_key": objectKey
+                    }),
+                    success: function(response) {
+                        console.log("Response received: ", JSON.stringify(response));
+                        if (response.file_data) {
+                            // Assuming response.file_data is the base64 encoded string of the image
+                            const imgData = atob(response.file_data); // Decode base64
+                            const imgElement = $('<img>').attr('src', 'data:image/png;base64,' + response.file_data);
+                            activeIPhoneContainer().empty().append(imgElement);
+                            callback(null);
                         } else {
-                            fetchHierarchyAndImage(taskId, delayInMs, callback);
+                            console.error("Image data not found in response");
+                            callback(new Error('Image data not found'));
                         }
                     },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        callback(new Error('Failed to fetch hierarchy data: ' + textStatus));
+                    error: function(xhr, status, error) {
+                        console.error("Error in invoking Lambda:", error);
+                        callback(null, error);
                     }
                 });
             }
