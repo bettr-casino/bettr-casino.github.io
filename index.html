@@ -782,6 +782,12 @@
                     $(`.GenerateChallengeCodeInfoStep1`).show();
                     $(`.GenerateChallengeCodeInfoStep2`).hide();
                 },
+                "StartUnity": function(stepKey, taskId, rowIndex) {
+                    $('.next-btn').prop('disabled', true);
+                    $('#GenerateChallengeUnityPackageText').text("______");
+                    $(`.GenerateChallengeUnityPackageInfoStep1`).show();
+                    $(`.GenerateChallengeUnityPackageInfoStep2`).hide();
+                },
             }
 
             const wizardAfterShowFunctions = {
@@ -795,14 +801,14 @@
                     $('.back-btn').prop('disabled', true);
                     $('.next-btn').prop('disabled', true);               
                     $(`#start-app-spinner`).show();
-                    var generateChallengeCodeTitle = $('#GenerateChallengeCodeTitle');
+                    var generateChallengeCodeText = $('#GenerateChallengeCodeText');
                     initializeDeveloperAccount(taskId, function(response, error) {
                         $(`#start-app-spinner`).hide();
                         $(`.GenerateChallengeCodeInfoStep1`).hide();
                         $(`.GenerateChallengeCodeInfoStep2`).show();
                         if (error) {
                             console.log(error);
-                            showModalPanel(generateChallengeCodeTitle, 'Code Generation error. Support email: support@bettr.casino.', 'center');
+                            showModalPanel(generateChallengeCodeText, 'Code Generation error. Support email: support@bettr.casino.', 'center');
                         } else {
                             // Access the properties from the parsed body
                             var hashKey = response.task_hash_key;
@@ -812,7 +818,7 @@
                                 $('.next-btn').prop('disabled', false);
                             } else {
                                 console.log(`incorrect hash_key (length != 6) in response body=${JSON.stringify(response)}`);
-                                showModalPanel(generateChallengeCodeA, 'Code Generation error. Go Back and retry. Support email: support@bettr.casino.', 'center');
+                                showModalPanel(generateChallengeCodeText, 'Code Generation error. Go Back and retry. Support email: support@bettr.casino.', 'center');
                             }
                         }
                     })
@@ -820,7 +826,7 @@
                 "VerifyApp": function(stepKey, taskId, rowIndex) {
                     $('#VerifyAppResult').empty().append('Wait until the verify completes.');
                     $('.back-btn').prop('disabled', true);
-                    $('.next-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', false); // FIME: reset to true after testing
                     $(`#verify-app-spinner`).show();
                     activeIPhoneContainer().empty();
                     const localStorageKey = prefix_local_store(`TASK_ID__${taskId}__screenshot_request_time`);
@@ -843,7 +849,33 @@
                     }
                     initiateVerifyAppCountdown(59);
                     verifyAppInstall(taskId, callback);
-                }
+                },
+                "StartUnity": function(stepKey, taskId, rowIndex) {
+                    $('.back-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', true);               
+                    $(`#start-unity-spinner`).show();
+                    var generateChallengeCodeTitle = $('#GenerateChallengePackageText');
+                    initializeDeveloperAccount(taskId, function(response, error) {
+                        $(`#start-app-spinner`).hide();
+                        $(`.GenerateChallengeCodeInfoStep1`).hide();
+                        $(`.GenerateChallengeCodeInfoStep2`).show();
+                        if (error) {
+                            console.log(error);
+                            showModalPanel(generateChallengeCodeTitle, 'Code Generation error. Support email: support@bettr.casino.', 'center');
+                        } else {
+                            // Access the properties from the parsed body
+                            var hashKey = response.task_hash_key;
+                            if (hashKey && hashKey.length == 6) {
+                                $('#GenerateChallengeCodeText').text(hashKey);
+                                localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
+                                $('.next-btn').prop('disabled', false);
+                            } else {
+                                console.log(`incorrect hash_key (length != 6) in response body=${JSON.stringify(response)}`);
+                                showModalPanel(generateChallengeCodeA, 'Code Generation error. Go Back and retry. Support email: support@bettr.casino.', 'center');
+                            }
+                        }
+                    })
+                },
             }
 
             const wizardOnClickFunctions = {
@@ -859,6 +891,9 @@
                     }
                 },
                 "StartApp": function(evt, stepKey, taskId, rowIndex) {
+                    evt.preventDefault();  // Prevents the default link action                    
+                },
+                "StartUnity": function(evt, stepKey, taskId, rowIndex) {
                     evt.preventDefault();  // Prevents the default link action                    
                 }
             }
@@ -1179,7 +1214,7 @@
                     </div>
 
                     <div class="setup-step" id="StartApp" style="display: none;">
-                        <h3>Install <span id="ChallengeId">Challenge</span> on the BettrApp.</h3>
+                        <h3>Install the <span id="ChallengeId">BettrApp Challenge</span> on iPhone 13+.</h3>
                         <p class="GenerateChallengeCodeInfoStep1">Generating Challenge Code ... <span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
                         <p><span id="GenerateChallengeCodeText" class="tag code" style="font-size: 18px;"></span></p>
                         <p class="GenerateChallengeCodeInfoStep2" style="display: none;">Launch the Bettr App on the iPhone 13+ device.</p>
@@ -1187,13 +1222,21 @@
                     </div>
 
                     <div class="setup-step" id="VerifyApp" style="display: none;">
-                        <h3>Verifying App Installation.</h3>
+                        <h3>Verifying App Installation on iPhone 13+.</h3>
                         <p id="VerifyAppInfo">Running verify. <input type="text" id="countdownTimer" readonly style="width: 30px; text-align: center;"/><span id="verify-app-spinner" class="spinner2" style="display: none;"></span></p>
                         <p id="VerifyAppResult">Wait until the verify completes.</p>
                     </div>
 
-                    <div class="setup-step" id="InstallUnityPackage" style="display: none;">
-                        <h3>Install Unity Package.</h3>
+                    <div class="setup-step" id="InstallUnity" style="display: none;">
+                        <h3>Install Unity.</h3>
+                        <p>Click on the link below to install Unity 2022.3.16f1 via the Unity Hub.</p>
+                        <p><a href="unityhub://2022.3.16f1/d2c21f0ef2f1" target="_blank">unityhub://2022.3.16f1/d2c21f0ef2f1</a></p>
+                    </div>
+
+                    <div class="setup-step" id="StartUnity" style="display: none;">
+                        <h3>Install <span id="ChallengeId">Challenge</span> Unity Package.</h3>
+                        <p class="GenerateChallengeUnityPackageInfoStep1">Generating Unity Package ... <span id="start-unity-spinner" class="spinner2" style="display: none;"></span></p>
+                        <p><span id="GenerateChallengeUnityPackageText" class="tag code" style="font-size: 18px;"></span></p>
                     </div>
 
                     <div class="setup-step" id="Finish" style="display: none;">
