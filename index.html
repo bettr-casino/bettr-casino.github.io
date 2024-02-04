@@ -1937,7 +1937,7 @@
                                 if (retries < maxRetries) {
                                     setTimeout(attemptFetch, retryInterval);
                                 } else {
-                                    const errorMessage = "Verify failed after 30 seconds.";
+                                    const errorMessage = "Verify failed after 60 seconds.";
                                     callback(new Error(errorMessage));
                                 }
                             } else {
