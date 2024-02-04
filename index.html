@@ -786,11 +786,13 @@
 
             const wizardAfterShowFunctions = {
                 "RegisterUser": function(evt, stepKey, taskId, rowIndex) {
+                    $('.next-btn').prop('disabled', false);
                     if (!isUserLoggedIn()) {
                         $('.next-btn').prop('disabled', true);
                     }
                 },
                 "StartApp": function(stepKey, taskId, rowIndex) {
+                    $('.back-btn').prop('disabled', true);
                     $('.next-btn').prop('disabled', true);               
                     $(`#start-app-spinner`).show();
                     var generateChallengeCodeTitle = $('#GenerateChallengeCodeTitle');
@@ -817,6 +819,7 @@
                 },
                 "VerifyApp": function(stepKey, taskId, rowIndex) {
                     $('#VerifyAppResult').empty().append('Wait until the verify completes.');
+                    $('.back-btn').prop('disabled', true);
                     $('.next-btn').prop('disabled', true);
                     $(`#verify-app-spinner`).show();
                     activeIPhoneContainer().empty();
@@ -828,6 +831,7 @@
                             console.error('Error:', err);
                             $('#VerifyAppResult').empty().append($(`<span style="color: red;">${err.message}</span>`));
                             $(`#verify-app-spinner`).hide();
+                            $('.back-btn').prop('disabled', false);
                             $('.next-btn').prop('disabled', true);
                         } else {
                             $('#VerifyAppInfo').empty().text("Verify complete.")
@@ -1161,11 +1165,11 @@
                 var setupDiv = `
                 <div id="setup-div" class="setup">
                     <div class="setup-step" id="Start" style="display: block;">
-                        <h3>Install Bettr App on iPhone13+.</h3>
+                        <h3>Install BettrApp on iPhone13+.</h3>
                         <p>Open a browser tab on your iPhone 13+ device.</p>
                         <p>Type in the link below in your browser web address.</p>
                         <a href="https://testflight.apple.com/join/6japRuf7" target="_blank">testflight.apple.com/join/6japRuf7</a>                                                
-                        <p>Follow the instructions on the web page to install the Bettr App on your iPhone 13+.</p>
+                        <p>Follow the instructions on the web page to install the BettrApp on your iPhone 13+.</p>
                     </div>
 
                     <div class="setup-step" id="RegisterUser" style="display: none;">
@@ -1175,7 +1179,7 @@
                     </div>
 
                     <div class="setup-step" id="StartApp" style="display: none;">
-                        <h3>Install <span id="ChallengeId">Challenge</span> on the Bettr App.</h3>
+                        <h3>Install <span id="ChallengeId">Challenge</span> on the BettrApp.</h3>
                         <p class="GenerateChallengeCodeInfoStep1">Generating Challenge Code ... <span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
                         <p><span id="GenerateChallengeCodeText" class="tag code" style="font-size: 18px;"></span></p>
                         <p class="GenerateChallengeCodeInfoStep2" style="display: none;">Launch the Bettr App on the iPhone 13+ device.</p>
