@@ -817,7 +817,7 @@
                 },
                 "VerifyApp": function(stepKey, taskId, rowIndex) {
                     $('#VerifyAppResult').empty().append('Wait until the verify completes.');
-                    $('.finish-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', true);
                     $(`#verify-app-spinner`).show();
                     activeIPhoneContainer().empty();
                     const localStorageKey = prefix_local_store(`TASK_ID__${taskId}__screenshot_request_time`);
@@ -828,12 +828,13 @@
                             console.error('Error:', err);
                             $('#VerifyAppResult').empty().append($(`<span style="color: red;">${err.message}</span>`));
                             $(`#verify-app-spinner`).hide();
+                            $('.next-btn').prop('disabled', true);
                         } else {
                             $('#VerifyAppInfo').empty().text("Verify complete.")
-                            $('#VerifyAppResult').empty().append($(`<span>Click Finish.</span>`));
-                            $('.finish-btn').prop('disabled', false);
+                            $('#VerifyAppResult').empty().append($(`<span>Click Next.</span>`));
                             $(`#verify-app-spinner`).hide();
                             $('#countdownTimer').hide()
+                            $('.next-btn').prop('disabled', false);
                         }
                     }
                     initiateVerifyAppCountdown(59);
@@ -1182,9 +1183,13 @@
                     </div>
 
                     <div class="setup-step" id="VerifyApp" style="display: none;">
-                        <h3>Verifying Installation.</h3>
+                        <h3>Verifying App Installation.</h3>
                         <p id="VerifyAppInfo">Running verify. <input type="text" id="countdownTimer" readonly style="width: 30px; text-align: center;"/><span id="verify-app-spinner" class="spinner2" style="display: none;"></span></p>
                         <p id="VerifyAppResult">Wait until the verify completes.</p>
+                    </div>
+
+                    <div class="setup-step" id="InstallUnityPackage" style="display: none;">
+                        <h3>Install Unity Package.</h3>
                     </div>
 
                     <div class="setup-step" id="Finish" style="display: none;">
