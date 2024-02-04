@@ -757,10 +757,7 @@
 
             const wizardShouldShowFunctions = {
                 "RegisterUser": function(stepKey, taskId, rowIndex) {
-                    if (isUserLoggedIn()) {                        
-                        return false;
-                    } 
-                    return true;
+                    return !isUserLoggedIn();
                 }
             }
 
@@ -782,7 +779,9 @@
                 "StartApp": function(stepKey, taskId, rowIndex) {
                     $('.next-btn').prop('disabled', true);
                     $('#GenerateChallengeCodeText').text("______");
-                }
+                    $(`.GenerateChallengeCodeInfoStep1`).show();
+                    $(`.GenerateChallengeCodeInfoStep2`).hide();
+                },
             }
 
             const wizardAfterShowFunctions = {
@@ -792,12 +791,13 @@
                     }
                 },
                 "StartApp": function(stepKey, taskId, rowIndex) {
-                    $('#VerifyAppResult').empty().append('Wait until the verify completes.');
                     $('.next-btn').prop('disabled', true);               
                     $(`#start-app-spinner`).show();
                     var generateChallengeCodeTitle = $('#GenerateChallengeCodeTitle');
                     initializeDeveloperAccount(taskId, function(response, error) {
                         $(`#start-app-spinner`).hide();
+                        $(`.GenerateChallengeCodeInfoStep1`).hide();
+                        $(`.GenerateChallengeCodeInfoStep2`).show();
                         if (error) {
                             console.log(error);
                             showModalPanel(generateChallengeCodeTitle, 'Code Generation error. Support email: support@bettr.casino.', 'center');
@@ -816,6 +816,7 @@
                     })
                 },
                 "VerifyApp": function(stepKey, taskId, rowIndex) {
+                    $('#VerifyAppResult').empty().append('Wait until the verify completes.');
                     $('.finish-btn').prop('disabled', true);
                     $(`#verify-app-spinner`).show();
                     activeIPhoneContainer().empty();
@@ -1159,9 +1160,11 @@
                 var setupDiv = `
                 <div id="setup-div" class="setup">
                     <div class="setup-step" id="Start" style="display: block;">
-                        <h3>Setup Wizard.</h3>
-                        <p>Click on Next button above to get started.</p>
-                        <p>You will need an iPhone 13+ device to complete the setup.</p>
+                        <h3>Install Bettr App on iPhone13+.</h3>
+                        <p>Open a browser tab on your iPhone 13+ device.</p>
+                        <p>Type in the link below in your browser web address.</p>
+                        <a href="https://testflight.apple.com/join/6japRuf7" target="_blank">testflight.apple.com/join/6japRuf7</a>                                                
+                        <p>Follow the instructions on the web page to install the Bettr App on your iPhone 13+.</p>
                     </div>
 
                     <div class="setup-step" id="RegisterUser" style="display: none;">
@@ -1170,32 +1173,16 @@
                         <button id="RegisterUserAction" class="header-btn">Register</button>
                     </div>
 
-                    <div class="setup-step" id="DownloadTestFlightApp" style="display: none;">
-                        <h3>Install TestFlight.</h3>
-                        <p>Install the TestFlight App from the AppStore onto your iPhone 13+. TestFlight is managed by Apple. Click Next after installation.</p>
-                        <a href="https://apps.apple.com/us/app/testflight/id899247664/" target="_blank">Install Apple TestFlight</a>
-                    </div>
-
-                    <div class="setup-step" id="InstallBettrApp" style="display: none;">
-                        <h3>Install the Bettr App via TestFlight.</h3>
-                        <p>The Bettr is managed by TestFlight. Install the Bettr App onto your iPhone 13+ using the link above. Click Next after installation.</p>
-                        <a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Install Bettr Beta Testing App</a>
-                    </div>
-
                     <div class="setup-step" id="StartApp" style="display: none;">
-                        <h3>Install the Bettr App.</h3>
-                        <a href="https://testflight.apple.com/join/6japRuf7" target="_blank">Install and Launch the Bettr App via TestFlight.</a>                                                
-                        <p>Type in the Bettr Challenge Code and press on Continue.<span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
+                        <h3>Complete Install.</h3>
+                        <p class="GenerateChallengeCodeInfoStep1">Generating Challenge Code ... <span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
                         <p><span id="GenerateChallengeCodeText" class="tag code" style="font-size: 18px;"></span></p>
-                    </div>
-
-                    <div class="setup-step" id="GenerateChallengeCode" style="display: none;">
-                        <h3 id="GenerateChallengeCodeTitle">Generate Challenge Code.</h3>
-                        <p>Type in the challenge code below. Press Continue.</p>
+                        <p class="GenerateChallengeCodeInfoStep2" style="display: none;">Launch the Bettr App on the iPhone 13+ device.</p>
+                        <p class="GenerateChallengeCodeInfoStep2" style="display: none;">Type in the Bettr Challenge Code above in the App and press Continue.<span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
                     </div>
 
                     <div class="setup-step" id="VerifyApp" style="display: none;">
-                        <h3>Verify the Install.</h3>
+                        <h3>Verifying Installation.</h3>
                         <p id="VerifyAppInfo">Running verify. <input type="text" id="countdownTimer" readonly style="width: 30px; text-align: center;"/><span id="verify-app-spinner" class="spinner2" style="display: none;"></span></p>
                         <p id="VerifyAppResult">Wait until the verify completes.</p>
                     </div>
