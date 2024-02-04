@@ -788,6 +788,11 @@
                     $(`.GenerateChallengeUnityPackageInfoStep1`).show();
                     $(`.GenerateChallengeUnityPackageInfoStep2`).hide();
                 },
+                "VerifyApp": function(stepKey, taskId, rowIndex) {
+                    $('.back-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', true);
+                    $('.finish-btn').prop('disabled', true);
+                }
             }
 
             const wizardAfterShowFunctions = {
@@ -826,7 +831,8 @@
                 "VerifyApp": function(stepKey, taskId, rowIndex) {
                     $('#VerifyAppResult').empty().append('Wait until the verify completes.');
                     $('.back-btn').prop('disabled', true);
-                    $('.next-btn').prop('disabled', false); // FIME: reset to true after testing
+                    $('.next-btn').prop('disabled', true);
+                    $('.finish-btn').prop('disabled', true);
                     $(`#verify-app-spinner`).show();
                     activeIPhoneContainer().empty();
                     const localStorageKey = prefix_local_store(`TASK_ID__${taskId}__screenshot_request_time`);
@@ -839,12 +845,14 @@
                             $(`#verify-app-spinner`).hide();
                             $('.back-btn').prop('disabled', false);
                             $('.next-btn').prop('disabled', true);
+                            $('.finish-btn').prop('disabled', true);
                         } else {
                             $('#VerifyAppInfo').empty().text("Verify complete.")
                             $('#VerifyAppResult').empty().append($(`<span>Click Next.</span>`));
                             $(`#verify-app-spinner`).hide();
                             $('#countdownTimer').hide()
-                            $('.next-btn').prop('disabled', false);
+                            $('.next-btn').prop('disabled', true);
+                            $('.finish-btn').prop('disabled', false);
                         }
                     }
                     initiateVerifyAppCountdown(59);
@@ -1097,27 +1105,21 @@
                                     showNextWizardStep(rowIndex, -1);
                                 });
                             }
-                            if (nextStepIndex == totalSteps)
-                            {
-                                $('.finish-btn').prop('disabled', false);
-                                $('.finish-btn').off('click').on('click', function() {
-                                    if (wizardOnFinishFunction()) {
+                            $('.finish-btn').prop('disabled', false);
+                            $('.finish-btn').off('click').on('click', function() {
+                                if (wizardOnFinishFunction()) {
+                                    return;
+                                }
+                            });
+                            $('.next-btn').off('click').on('click', function() {
+                                const stepOnNextFn = wizardOnNextFunctions[stepText];
+                                if (stepOnNextFn) {
+                                    if (!stepOnNextFn(stepKey, taskId, rowIndex)) {
                                         return;
                                     }
-                                });
-                            }
-                            if (nextStepIndex < totalSteps) {
-                                $('.next-btn').prop('disabled', false);
-                                $('.next-btn').off('click').on('click', function() {
-                                    const stepOnNextFn = wizardOnNextFunctions[stepText];
-                                    if (stepOnNextFn) {
-                                        if (!stepOnNextFn(stepKey, taskId, rowIndex)) {
-                                            return;
-                                        }
-                                    }
-                                    showNextWizardStep(rowIndex, 1);
-                                });
-                            }
+                                }
+                                showNextWizardStep(rowIndex, 1);
+                            });
                             const stepAfterShowFn = wizardAfterShowFunctions[stepText];
                             if (stepAfterShowFn) {
                                 stepAfterShowFn(stepKey, taskId, rowIndex);
