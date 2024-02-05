@@ -966,7 +966,7 @@
             function wizardOnFinishFunction(taskId, rowIndex) {
                 $('.setup-step-button').hide(); 
                 $('.setup-step').hide(); 
-                $('#Finish').show(); 
+                $('#StartChallenge').show(); 
                 $('.show-challenge-btn').hide();
                 $('.start-challenge-btn').show();
 
@@ -978,8 +978,8 @@
 
                 const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
 
-                $("#FinishChallengeCode .tag.code").text(hashKey);
-                $('#FinishChallengeCode').show();
+                $("#StartChallengeCode .tag.code").text(hashKey);
+                $('#StartChallengeCode').show();
 
                 const objectKey = `developers/${hashKey}/scene_state/hierarchy.json`;
                 const $sceneHierarchyContainer = $('.scene-hierarchy-container');
@@ -1260,10 +1260,9 @@
                         <p><a href="unityhub://2022.3.16f1/d2c21f0ef2f1" target="_blank">unityhub://2022.3.16f1/d2c21f0ef2f1</a></p>
                     </div>
 
-                    <div class="setup-step" id="Finish" style="display: none;">
-                        <h3>Setup Complete</h3>
-                        <button class="setup-step-button">Begin</button>
-                        <p id="FinishChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
+                    <div class="setup-step" id="StartChallenge" style="display: none;">
+                        <h3>Start Challenge.</h3>
+                        <p id="StartChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
                     </div>
                 </div>
 
