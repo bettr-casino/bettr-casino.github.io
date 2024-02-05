@@ -398,17 +398,17 @@
         }
 
         /* Individual iPhone sizes */
-        #iphone13 {
+        .iphone13 {
             width: 506px;
             height: 234px;
         }
 
-        #iphone14 {
+        .iphone14 {
             width: 520px;
             height: 240px;
         }
 
-        #iphone15 {
+        .iphone15 {
             width: 530px;
             height: 245px;
         }
@@ -416,17 +416,17 @@
         /* Styles for iPhones with Retina displays */
         @media only screen and (max-width: 430px) {
 
-            #iphone13 {
+            .iphone13 {
                 width: 354.2px; /* 506px * 0.7 */
                 height: 163.8px; /* 234px * 0.7 */
             }
 
-            #iphone14 {
+            .iphone14 {
                 width: 364px; /* 520px * 0.7 */
                 height: 168px; /* 240px * 0.7 */
             }
 
-            #iphone15 {
+            .iphone15 {
                 width: 371px; /* 530px * 0.7 */
                 height: 171.5px; /* 245px * 0.7 */
             }
@@ -440,7 +440,7 @@
             margin-bottom: 20px; /* Spacing before the iPhone displays */
         }
 
-        #scene-hierarchy {
+        .scene-hierarchy {
             width: 506px;
             height: 234px;
         }
@@ -989,33 +989,7 @@
             function isValidEmail(email) {
                 var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 return regex.test(email);
-            }
-
-            function openTab(evt, tabName) {
-                // check if tab is already active
-                if ($(`#${tabName}`).is(':visible')) {
-                    return;
-                }
-
-                // Declare all variables
-                var i, tabcontent, tablinks;
-
-                // Get all elements with class="tab-content" and hide them
-                tabcontent = document.getElementsByClassName("tab-content");
-                for (i = 0; i < tabcontent.length; i++) {
-                    tabcontent[i].style.display = "none";
-                }
-
-                // Get all elements with class="tab-button" and remove the class "active"
-                tablinks = document.getElementsByClassName("tab-button");
-                for (i = 0; i < tablinks.length; i++) {
-                    tablinks[i].className = tablinks[i].className.replace(" active", "");
-                }
-
-                // Show the current tab, and add an "active" class to the button that opened the tab
-                document.getElementById(tabName).style.display = "block";
-                evt.currentTarget.className += " active";
-            }
+            }            
 
             function updateSignInButtons() {
                 validateSessionToken(function(err, response) {
@@ -1166,17 +1140,13 @@
 
             }
 
+
             function populateDetailsForm(columns, dataRow, rowIndex, callback) {
                 const detailsForm = $('#details-form');
                 // Clear existing content
                 detailsForm.empty();
 
                 var tabsHTML = `
-                    <div class="tabs">
-                        <button id="SetupTabButton" class="tab-button active">Setup</button>
-                        <button id="TestTabButton" class="tab-button" onclick="openTab(event, 'Test')" disabled>Test</button>
-                        <button id="SubmitTabButton" class="tab-button" onclick="openTab(event, 'Submit')" disabled>Submit</button>
-                    </div>
                     <div id="SetupTab" class="tab-content" style="display:block;">
                         <!-- Your existing Setup content here -->
                     </div>
@@ -1190,10 +1160,6 @@
 
                 // Append the tabs HTML to the detailsForm
                 detailsForm.append(tabsHTML);
-
-                $('.tab-button').off('click').on('click', function() {
-                    openTab(event, event.target.id.replace('Button', ''));
-                });
 
                 $setupTab = $('#SetupTab')
 
@@ -1270,8 +1236,8 @@
                     </div>
 
                     <div class="setup-step" id="Finish" style="display: none;">
-                        <h3>Bro!</h3>
-                        <p>"To face your challenge, the Test tab open you must."</p>
+                        <h3>Setup Complete</h3>
+                        <button class="setup-step-button">Begin</button>
                         <p id="FinishChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
                     </div>
                 </div>
@@ -1293,15 +1259,15 @@
                 </div>
 
                 <div id="iphone13-container">
-                    <div id="iphone13" class="iphone"></div>
+                    <div id="iphone13" class="iphone iphone13"></div>
                 </div>
                 
                 <div id="iphone14-container">
-                    <div id="iphone14" class="iphone"></div>
+                    <div id="iphone14" class="iphone iphone14"></div>
                 </div>
                 
                 <div id="iphone15-container">
-                    <div id="iphone15" class="iphone"></div>
+                    <div id="iphone15" class="iphone iphone15"></div>
                 </div>`
 
                 $setupTab.append(setupDiv);
