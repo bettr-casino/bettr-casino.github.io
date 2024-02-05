@@ -438,11 +438,17 @@
             justify-content: center; /* Center items horizontally */
             margin-top: 20px; /* Margin at the top */
             margin-bottom: 20px; /* Spacing before the iPhone displays */
+            overflow: hidden; /* Ensure that no content spills outside */
         }
 
         .scene-hierarchy {
-            width: 506px;
-            height: 234px;
+            width: 100%; /* Or adjust based on your layout needs */
+            height: 234px; /* Or adjust based on your layout needs */
+            overflow-y: auto; /* Enable vertical scrolling */
+            padding: 10px; /* Optional: Adds some space inside the container */
+            border: 1px solid #ddd; /* Optional: Adds a border around the container */
+            border-radius: 5px; /* Optional: Rounds the corners of the container */
+            background-color: #f9f9f9; /* Optional: Sets a background color */
         }
 
         /* Container for the iPhone buttons */
@@ -974,6 +980,25 @@
 
                 $("#FinishChallengeCode .tag.code").text(hashKey);
                 $('#FinishChallengeCode').show();
+
+                const objectKey = `developers/${hashKey}/scene_state/hierarchy.json`;
+                const $sceneHierarchyContainer = $('.scene-hierarchy-container');
+                const $sceneHierarchy = $('.scene-hierarchy-container .scene-hierarchy');
+
+                getState(objectKey, function(response, status, error) {
+                    if (error == null) {
+                        if (response.file_data) {
+                            var jsonData = atob(response.file_data);
+                            const jsonObject = JSON.parse(jsonData);
+                            jsonData = JSON.stringify(jsonObject, null, 2); // Indent with 2 spaces
+                            console.log('jsonData:', jsonData);
+                            $sceneHierarchy.empty().append($("<pre>").text(jsonData));
+                            $sceneHierarchyContainer.show();
+                        }
+                    } else {
+                        console.error("Error in invoking Lambda:", error);
+                    }
+                });
 
                 return true;
             }
