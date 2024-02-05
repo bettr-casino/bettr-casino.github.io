@@ -684,7 +684,6 @@
 
     <div class="header-buttons section1">
         <h1>Bettr Casino: Open Source Game Development Platform</h1>
-        <button id="challenges-button" class="header-btn" style="display: none;">My Challenges</button>
         <button id="register-btn" class="header-btn" style="display: none;">Register</button>
         <button id="login-btn" class="header-btn" style="display: none;">Login</button>
         <button id="logout-btn" class="header-btn" style="display: none;">Logout</button>
@@ -777,6 +776,12 @@
                         $('#RegisterUserTitle').text('Login.');
                     }
                 },
+                "VerifySetup": function(stepKey, taskId, rowIndex) {
+                    $('.back-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', true);
+                    $('.finish-btn').prop('disabled', true);
+                    $(`#verify-setup-spinner`).show();
+                },
                 "StartApp": function(stepKey, taskId, rowIndex) {
                     $('.next-btn').prop('disabled', true);
                     $('.finish-btn').prop('disabled', true);
@@ -800,13 +805,49 @@
                         $('.next-btn').prop('disabled', true);
                     }
                 },
+                "VerifySetup": function(stepKey, taskId, rowIndex) {
+                    $('.back-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', true);
+                    $('.finish-btn').prop('disabled', true);
+                    $('#VerifySetupChallengeCode').hide();
+                    var taskState = "VERIFY_SETUP"
+                    var verifySetupInfo = $('#VerifySetupInfo');
+                    initiateVerifySetupCountdown(59);
+                    initializeDeveloperAccount(taskId, taskState, function(response, error) {
+                        if (error) {
+                            $(`#verify-setup-spinner`).hide();
+                            $('.next-btn').prop('disabled', false);
+                            $('#VerifySetupInfo').empty().text("Setup incomplete. Click Next.")
+                        } else {
+                            var hashKey = response.task_hash_key;
+                            if (hashKey && hashKey.length == 6) {
+                                localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
+                                verifyAppInstall(taskId, 0, function(err) {
+                                    $(`#verify-setup-spinner`).hide();
+                                    if (err) {
+                                        console.error('VerifySetup verifyAppInstall Error:', err);
+                                        $('.next-btn').prop('disabled', false);
+                                        $('#VerifySetupInfo').empty().text("Setup incomplete. Click Next.");
+                                    } else {
+                                        $('.finish-btn').prop('disabled', false);
+                                        $('#setupCountdownTimer').hide()
+                                        $('#VerifySetupInfo').empty().text("Setup verified. Click Finish.");
+                                        $("#VerifySetupChallengeCode .tag.code").text(hashKey);
+                                        $('#VerifySetupChallengeCode').show();
+                                    }
+                                })                
+                            }
+                        }
+                    })
+                },
                 "StartApp": function(stepKey, taskId, rowIndex) {
                     $('.back-btn').prop('disabled', true);
                     $('.next-btn').prop('disabled', true); 
                     $('.finish-btn').prop('disabled', true);              
                     $(`#start-app-spinner`).show();
                     var generateChallengeCodeText = $('#GenerateChallengeCodeText');
-                    initializeDeveloperAccount(taskId, function(response, error) {
+                    var taskState = "GENERATE_CODE"
+                    initializeDeveloperAccount(taskId, taskState, function(response, error) {
                         $(`#start-app-spinner`).hide();
                         if (error) {
                             console.log(error);
@@ -817,7 +858,7 @@
                             if (hashKey && hashKey.length == 6) {
                                 $('#GenerateChallengeCodeText').text(hashKey);
                                 localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
-                                verifyAppInstall(taskId, function(err) {
+                                verifyAppInstall(taskId, 0, function(err) {
                                     $(`.GenerateChallengeCodeInfoStep1`).hide();
                                     if (err) {
                                         console.error('StartApp verifyAppInstall Error:', err);
@@ -841,6 +882,9 @@
                     $('.next-btn').prop('disabled', true);
                     $('.finish-btn').prop('disabled', true);
                     $(`#verify-app-spinner`).show();
+                    const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
+                    $("#VerifyAppChallengeCode .tag.code").text(hashKey);
+                    $("#VerifyAppChallengeCode").show();
                     activeIPhoneContainer().empty();
                     const localStorageKey = prefix_local_store(`TASK_ID__${taskId}__screenshot_request_time`);
                     const currentUtcTimestamp = Math.floor(Date.now() / 1000);
@@ -854,8 +898,8 @@
                             $('.next-btn').prop('disabled', true);
                             $('.finish-btn').prop('disabled', true);
                         } else {
-                            $('#VerifyAppInfo').empty().text("Verify complete.")
-                            $('#VerifyAppResult').empty().append($(`<span>Click Next.</span>`));
+                            $('#VerifyAppInfo').empty().text("Verify complete. Click Finish.")
+                            $('#VerifyAppResult').empty();
                             $(`#verify-app-spinner`).hide();
                             $('#countdownTimer').hide()
                             $('.next-btn').prop('disabled', true);
@@ -863,7 +907,7 @@
                         }
                     }
                     initiateVerifyAppCountdown(59);
-                    verifyAppInstall(taskId, callback);
+                    verifyAppInstall(taskId, 20, callback);
                 }
             }
 
@@ -913,7 +957,7 @@
                 }
             }
 
-            function wizardOnFinishFunction() {
+            function wizardOnFinishFunction(taskId, rowIndex) {
                 $('.setup-step-button').hide(); 
                 $('.setup-step').hide(); 
                 $('#Finish').show(); 
@@ -925,6 +969,11 @@
 
                 $('#TestTabButton').removeAttr("disabled");
                 $('#SubmitTabButton').removeAttr("disabled");
+
+                const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
+
+                $("#FinishChallengeCode .tag.code").text(hashKey);
+                $('#FinishChallengeCode').show();
 
                 return true;
             }
@@ -969,17 +1018,18 @@
             }
 
             function updateSignInButtons() {
-                var userId = localStorage.getItem(prefix_local_store('user_id'));
-                if (userId)
-                {
-                    $('#register-btn').hide();
-                }
-                else
-                {
-                    $('#register-btn').show();
-                }
-                // Call the validateSessionToken function
-                refreshSessionToken();
+                validateSessionToken(function(err, response) {
+                    if (err) {
+                        console.error('Error:', err);
+                        $('#register-btn').show();
+                        $('#login-btn').show();
+                        $('#logout-btn').hide();
+                    } else {
+                        $('#register-btn').hide();
+                        $('#login-btn').hide();
+                        $('#logout-btn').show();
+                    }
+                });
             }
 
             // Function to enable/disable verification button based on email validity
@@ -1071,21 +1121,18 @@
                             }
                             $(`#${stepText}`).show();
                             $('.setup-step-button').prop('disabled', true);
-                            if (nextStepIndex > 1) {
-                                $('.back-btn').prop('disabled', false);
-                                $('.back-btn').off('click').on('click', function() {
-                                    const stepOnBackFn = wizardOnBackFunctions[stepText];
-                                    if (stepOnBackFn) {
-                                        if (!stepOnBackFn(stepKey, taskId, rowIndex)) {
-                                            return;
-                                        }
+                            $('.back-btn').off('click').on('click', function() {
+                                const stepOnBackFn = wizardOnBackFunctions[stepText];
+                                if (stepOnBackFn) {
+                                    if (!stepOnBackFn(stepKey, taskId, rowIndex)) {
+                                        return;
                                     }
-                                    showNextWizardStep(rowIndex, -1);
-                                });
-                            }
+                                }
+                                showNextWizardStep(rowIndex, -1);
+                            });
                             $('.finish-btn').prop('disabled', false);
                             $('.finish-btn').off('click').on('click', function() {
-                                if (wizardOnFinishFunction()) {
+                                if (wizardOnFinishFunction(taskId, rowIndex)) {
                                     return;
                                 }
                             });
@@ -1179,13 +1226,6 @@
 
                 var setupDiv = `
                 <div id="setup-div" class="setup">
-                    <div class="setup-step" id="Start" style="display: block;">
-                        <h3>Install BettrApp on iPhone13+.</h3>
-                        <p>Open a browser tab on your iPhone 13+ device.</p>
-                        <p>Type in the link below in your browser web address.</p>
-                        <a href="https://testflight.apple.com/join/6japRuf7" target="_blank">testflight.apple.com/join/6japRuf7</a>                                                
-                        <p>Follow the instructions on the web page to install the BettrApp on your iPhone 13+.</p>
-                    </div>
 
                     <div class="setup-step" id="RegisterUser" style="display: none;">
                         <h3 id="RegisterUserTitle">Register.</h3>
@@ -1193,9 +1233,23 @@
                         <button id="RegisterUserAction" class="header-btn">Register</button>
                     </div>
 
+                    <div class="setup-step" id="StartSetup" style="display: none;">
+                        <h3>Install BettrApp on iPhone13+.</h3>
+                        <p>Open a browser tab on your iPhone 13+ device.</p>
+                        <p>Type in the link below in your browser web address.</p>
+                        <a href="https://testflight.apple.com/join/6japRuf7" target="_blank">testflight.apple.com/join/6japRuf7</a>                                                
+                        <p>Follow the instructions on the web page to install the BettrApp on your iPhone 13+.</p>
+                    </div>
+
+                    <div class="setup-step" id="VerifySetup" style="display: none;">
+                        <h3>Verifying Setup.</h3>
+                        <p id="VerifySetupInfo">Running verify. <input type="text" id="setupCountdownTimer" readonly style="width: 30px; text-align: center;"/><span id="verify-setup-spinner" class="spinner2" style="display: none;"></span></p>
+                        <p id="VerifySetupChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
+                    </div>
+
                     <div class="setup-step" id="StartApp" style="display: none;">
                         <h3>Configure the <span id="ChallengeId">BettrApp Challenge</span> on iPhone 13+.</h3>
-                        <p class="GenerateChallengeCodeInfoStep1">Verifying Configuration ... <span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
+                        <p class="GenerateChallengeCodeInfoStep1">Generating Challenge Code ... <span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
                         <p><span id="GenerateChallengeCodeText" class="tag code" style="font-size: 18px;"></span></p>
                         <p class="GenerateChallengeCodeInfoStep2" style="display: none;">Launch the Bettr App on the iPhone 13+ device.</p>
                         <p class="GenerateChallengeCodeInfoStep2" style="display: none;">Type in the Bettr Challenge Code above in the App and press Continue.<span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
@@ -1206,6 +1260,7 @@
                         <h3>Verifying App Installation on iPhone 13+.</h3>
                         <p id="VerifyAppInfo">Running verify. <input type="text" id="countdownTimer" readonly style="width: 30px; text-align: center;"/><span id="verify-app-spinner" class="spinner2" style="display: none;"></span></p>
                         <p id="VerifyAppResult">Wait until the verify completes.</p>
+                        <p id="VerifyAppChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
                     </div>
 
                     <div class="setup-step" id="InstallUnity" style="display: none;">
@@ -1217,6 +1272,7 @@
                     <div class="setup-step" id="Finish" style="display: none;">
                         <h3>Bro!</h3>
                         <p>"To face your challenge, the Test tab open you must."</p>
+                        <p id="FinishChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
                     </div>
                 </div>
 
@@ -1272,6 +1328,8 @@
 
                 // Trigger click on the first button to show iPhone 13 by default
                 $('#toggle-iphone13').click();
+
+                callback(rowIndex);
                 
             }
 
@@ -1604,7 +1662,6 @@
                             $('#register-btn').hide();
                             $('#login-btn').hide();
                             $('#logout-btn').show();
-                            showUserChallenges(true);
                             authObserverManager.notify({});
                         }
                     },
@@ -1723,8 +1780,8 @@
                 });
             }
 
-            // Function to validate the session token
-            function refreshSessionToken() {
+            // Function to refresh the session token
+            function validateSessionToken(callback) {
                 var userId = localStorage.getItem(prefix_local_store('user_id'));
                 var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
 
@@ -1732,73 +1789,40 @@
                 {
                     $('#login-btn').show();
                     $('#logout-btn').hide();
-                    showUserChallenges(false);
                     return;
                 }
 
                 if (userId && sessionToken) {
                     $.ajax({
-                        url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/refresh',
-                        type: 'PATCH',
+                        url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/validate',
+                        type: 'POST',
                         contentType: 'application/json',
                         headers: { 'Token': sessionToken },
                         data: JSON.stringify({ "session_token": sessionToken }),
                         success: function(response) {
                             console.log(response);
-
-                            if (response.is_banned) {
-                                // Clear local storage and show error if not verified or banned
-                                localStorage.removeItem(prefix_local_store('session_token'));
-                                $('#login-btn').show();
-                                $('#logout-btn').hide();
-                                showUserChallenges(false);
-                                showModal('Your account has an issue. If this persists, email support@bettr.casino.');
-                                return;
-                            }
-
                             var user = response.user;
-
-                            if (user.id !== userId) {
-                                // Clear local storage if user ID doesn't match
-                                localStorage.removeItem(prefix_local_store('session_token'));
-                                $('#login-btn').show();
-                                $('#logout-btn').hide();
-                                showUserChallenges(false);
-                                showModal('Your will need to relogin. If this persists, email support@bettr.casino.');
-                                return;
-                            }
-
-                            if (!user.session_token) {
-                                // Clear local storage if user ID doesn't match
-                                localStorage.removeItem(prefix_local_store('session_token'));
-                                $('#login-btn').show();
-                                $('#logout-btn').hide();
-                                showUserChallenges(false);
-                                showModal('Your will need to relogin. If this persists, email support@bettr.casino.');
-                                return;
-                            }
-
-                            // Update local storage with new session token and hide buttons
-                            localStorage.setItem(prefix_local_store('session_token'), user.session_token);
                             $('#login-btn').hide();
                             $('#logout-btn').show();
-                            showUserChallenges(true);
+                            callback(null, response);
                         },
                         error: function(xhr, status, error) {
                             // Handle error (optional)
                             console.error(error);
+                            alert(error);
                             localStorage.removeItem(prefix_local_store('session_token'));
                             $('#login-btn').show();
                             $('#logout-btn').hide();
-                            showUserChallenges(false);
+                            callback(error, null);
                         }
                     });
                 }
             }
 
-            function initializeDeveloperAccount(taskId, callback) {
-                userId = localStorage.getItem(prefix_local_store('user_id'));
-                sessionToken = localStorage.getItem(prefix_local_store('session_token'));
+            function initializeDeveloperAccount(taskId, taskState, callback) {
+                var userId = localStorage.getItem(prefix_local_store('user_id'));
+                var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
+                console.log('userId=', userId, 'sessionToken=', sessionToken);
                 $.ajax({
                     url: 'https://zgtla52nt3w5vyh6jhh6e4js6y0qbgji.lambda-url.us-west-2.on.aws/',
                     type: 'POST',
@@ -1807,7 +1831,7 @@
                         "user_id": userId,
                         "session_token": sessionToken,
                         "task_id": taskId,
-                        "task_state": "GENERATE_CODE"
+                        "task_state": taskState
                     }),
                     success: function(response) {
                         console.log("Response received: ", JSON.stringify(response));
@@ -1818,14 +1842,6 @@
                         callback(null, error);
                     }
                 });
-            }
-
-            function showUserChallenges(show) {
-                if (show) {
-                    $('#challenges-button').show();
-                } else {
-                    $('#challenges-button').hide();
-                }
             }
 
             function wrapSuccessMessage(message) {
@@ -1927,16 +1943,20 @@
                 }, 1000);
             }
 
+            function initiateVerifySetupCountdown(duration) {
+                display = $('#setupCountdownTimer');
+                startCountdown(duration, display);
+            }
+
             function initiateVerifyAppCountdown(duration) {
                 display = $('#countdownTimer');
                 startCountdown(duration, display);
             }
 
-            function verifyAppInstall(taskId, callback) {
+            function verifyAppInstall(taskId, maxRetries, callback) {
                 const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
                 const objectKey = `developers/${hashKey}/scene_state/image.png`;
                 let retries = 0;
-                const maxRetries = 20; // Adjust based on the desired frequency of retries within the 30-second window
                 const retryInterval = 3000; // Retry every 3 seconds
 
                 function attemptFetch() {
@@ -1964,7 +1984,7 @@
                                 if (retries < maxRetries) {
                                     setTimeout(attemptFetch, retryInterval);
                                 } else {
-                                    const errorMessage = "Verify failed after 60 seconds.";
+                                    const errorMessage = "Verify failed.";
                                     callback(new Error(errorMessage));
                                 }
                             } else {
@@ -1993,7 +2013,6 @@
                 $('#login-btn').show();
                 $('#register-btn').show();
                 $('#logout-btn').hide();
-                showUserChallenges(false);
             });
 
             updateSignInButtons();
