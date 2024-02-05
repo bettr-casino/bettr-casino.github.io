@@ -1926,15 +1926,8 @@
                 const retryInterval = 3000; // Retry every 3 seconds
 
                 function attemptFetch() {
-                    $.ajax({
-                        url: 'https://acqgvpocrqiy6t6v7wfdhku2ae0bmfka.lambda-url.us-west-2.on.aws/',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({
-                            "object_key": objectKey
-                        }),
-                        success: function(response) {
-                            console.log("Response received: ", JSON.stringify(response));
+                    getState(objectKey, function(response, status, error) {
+                        if (error == null) {
                             if (response.file_data) {
                                 const imgElement = $('<img>').attr('src', 'data:image/png;base64,' + response.file_data);
                                 activeIPhoneContainer().empty().append(imgElement);
@@ -1943,13 +1936,13 @@
                                 console.error("Image data not found in response");
                                 callback(new Error('Image data not found'));
                             }
-                        },
-                        error: function(xhr, status, error) {
-                            if (xhr.status === 404) {
+                        } else {
+                            if (status === 404) {
                                 retries++;
                                 if (retries < maxRetries) {
                                     setTimeout(attemptFetch, retryInterval);
                                 } else {
+                                    console.error(`getState error=${error}`);
                                     const errorMessage = "Verify failed.";
                                     callback(new Error(errorMessage));
                                 }
@@ -1958,10 +1951,29 @@
                                 callback(null, error);
                             }
                         }
-                    });
+                    });                
                 }
 
                 attemptFetch();
+            }
+
+            function getState(objectKey, callback) {
+                $.ajax({
+                    url: 'https://acqgvpocrqiy6t6v7wfdhku2ae0bmfka.lambda-url.us-west-2.on.aws/',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        "object_key": objectKey
+                    }),
+                    success: function(response) {
+                        console.log(`Response received: objectKey=${objectKey} response=${JSON.stringify(response)}`);
+                        callback(response, 200, null);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(`Response received: xhr.status=${xhr.status} objectKey=${objectKey} response=${JSON.stringify(error)}`);
+                        callback(null, status, error);
+                    }
+                });
             }
 
             // Event handlers for closing the modals
