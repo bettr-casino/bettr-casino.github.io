@@ -612,6 +612,14 @@
             clear: both;
         }
 
+        #SetupWizardRequirements {
+            display: flex; /* Use Flexbox */
+            flex-direction: column; /* Stack children vertically */
+            align-items: center; /* Center children horizontally */
+            justify-content: center; /* Center children vertically if there's height specified */
+            gap: 10px; /* Optional: adds some space between the tags */
+        }
+
     </style>
 </head>
 <body>
@@ -1194,48 +1202,17 @@
                 // Start the table
                 const detailsTable = $('<table>').addClass('details-table');
 
-                // Iterate over columns and add rows to the table
-                columns.forEach((column, index) => {
-                    const columnName = column.title;  // Assuming column object has a 'title' property
-                    const columnValue = dataRow[index];
-
-                    // Check if the column is 'Tags' and process accordingly
-                    if (columnName === 'Tags' || columnName === 'Skill Sets' || columnName == 'Setup Requirements') {
-                        const tags = columnValue.split(',').map(tag => tag.trim());
-                        const tagsContainer = $('<td>');
-                        tags.forEach(tag => {
-                            $('<span>').addClass('tag').text(tag).appendTo(tagsContainer);
-                        });
-                        const row = $('<tr>').append($('<td>').text(columnName)).append(tagsContainer);
-                        detailsTable.append(row);
-                    } else if (columnName === 'Difficulty') {
-                        // Color-coded tags for Difficulty
-                        const difficultySpan = $('<span>').addClass('tag').text(columnValue);
-                        switch (columnValue.toUpperCase()) {
-                            case 'EASY':
-                                difficultySpan.css('background-color', 'green');
-                                break;
-                            case 'MEDIUM':
-                                difficultySpan.css('background-color', 'yellow');
-                                break;
-                            case 'HARD':
-                                difficultySpan.css('background-color', 'red');
-                                break;
-                        }
-                        const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').append(difficultySpan));
-                        detailsTable.append(row);
-                    } else {
-                        const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').text(columnValue));
-                        detailsTable.append(row);
-                    }
-
-                });
-
-                // Append the table to the form
+                    // Append the table to the form
                 $setupTab.append(detailsTable);
 
                 var setupDiv = `
                 <div id="setup-div" class="setup">
+
+                    <div class="setup-step" id="SetupWizard" style="display: block;">
+                        <h3>Setup Wizard.</h3>
+                        <p id="SetupWizardRequirements"></p>
+                        <p>Click Next to get started.</p>
+                    </div>
 
                     <div class="setup-step" id="RegisterUser" style="display: none;">
                         <h3 id="RegisterUserTitle">Register.</h3>
@@ -1304,16 +1281,62 @@
                 <div id="iphone13-container">
                     <div id="iphone13" class="iphone iphone13"></div>
                 </div>
-                
+
                 <div id="iphone14-container">
                     <div id="iphone14" class="iphone iphone14"></div>
                 </div>
-                
+
                 <div id="iphone15-container">
                     <div id="iphone15" class="iphone iphone15"></div>
                 </div>`
 
                 $setupTab.append(setupDiv);
+
+                // Iterate over columns and add rows to the table
+                columns.forEach((column, index) => {
+                    const columnName = column.title;  // Assuming column object has a 'title' property
+                    const columnValue = dataRow[index];
+
+                    // Check if the column is 'Tags' and process accordingly
+                    
+                    if (columnName === 'System Requirements') {
+                        // Split the 'System Requirements' value into tags and display as text
+                        const tags = columnValue.split(',').map(tag => tag.trim());
+                        const $requirements = $('#SetupWizardRequirements');
+                        $requirements.empty().text('To complete this setup, you will need: ')
+                        tags.forEach(tag => {
+                            $('<span>').addClass('tag').text(tag).appendTo($requirements);
+                        });
+                    } else if (columnName === 'Tags' || columnName === 'Skill Sets' || columnName == 'Setup Requirements') {
+                        const tags = columnValue.split(',').map(tag => tag.trim());
+                        const tagsContainer = $('<td>');
+                        tags.forEach(tag => {
+                            $('<span>').addClass('tag').text(tag).appendTo(tagsContainer);
+                        });
+                        const row = $('<tr>').append($('<td>').text(columnName)).append(tagsContainer);
+                        detailsTable.append(row);
+                    } else if (columnName === 'Difficulty') {
+                        // Color-coded tags for Difficulty
+                        const difficultySpan = $('<span>').addClass('tag').text(columnValue);
+                        switch (columnValue.toUpperCase()) {
+                            case 'EASY':
+                                difficultySpan.css('background-color', 'green');
+                                break;
+                            case 'MEDIUM':
+                                difficultySpan.css('background-color', 'yellow');
+                                break;
+                            case 'HARD':
+                                difficultySpan.css('background-color', 'red');
+                                break;
+                        }
+                        const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').append(difficultySpan));
+                        detailsTable.append(row);
+                    } else {
+                        const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').text(columnValue));
+                        detailsTable.append(row);
+                    }
+
+                });
 
                 $('.setup-step-button').prop('disabled', true);
                 
@@ -1337,8 +1360,6 @@
 
                 // Trigger click on the first button to show iPhone 13 by default
                 $('#toggle-iphone13').click();
-
-                callback(rowIndex);
                 
             }
 
