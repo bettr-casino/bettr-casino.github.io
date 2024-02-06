@@ -1054,15 +1054,18 @@
                 const summaryStartIndex = headers.indexOf("Section");
                 const detailsStartIndex = headers.indexOf("Section", summaryStartIndex + 1);
                 const setupStartIndex = headers.indexOf("Section", detailsStartIndex + 1);
-                const internalStartIndex = headers.indexOf("Section", setupStartIndex + 1);
+                const testStartIndex = headers.indexOf("Section", setupStartIndex + 1);
+                const internalStartIndex = headers.indexOf("Section", testStartIndex + 1);
     
                 // Create column definitions for Summary and Internal tables
                 const summaryColumns = headers.slice(summaryStartIndex + 1, detailsStartIndex)
                     .map(header => ({ title: header }));
                 const detailsColumns = headers.slice(detailsStartIndex + 1, setupStartIndex)
                     .map(header => ({ title: header }));
-                const setupColumns = headers.slice(setupStartIndex + 1, internalStartIndex)
+                const setupColumns = headers.slice(setupStartIndex + 1, testStartIndex)
                     .map(header => ({ title: header }));
+                const testColumns = headers.slice(testStartIndex + 1, internalStartIndex)
+                .map(header => ({ title: header }));
     
                 // // Initialize the Summary DataTable
                 const summaryTable = $('#summary-table').DataTable({
@@ -1092,7 +1095,7 @@
                     const stepKey = `${prefix}TaskID__${taskId}__SetupIndex`;
 
                     function showNextWizardStep(rowIndex, offset) {
-                        const setupRowData = rows.map(row => row.slice(setupStartIndex + 1, internalStartIndex)); // Extract Setup columns
+                        const setupRowData = rows.map(row => row.slice(setupStartIndex + 1, testStartIndex)); // Extract Setup columns
                         const setupRow = setupRowData[rowIndex];
                         const totalSteps = setupRow[0];
                         const completedSetupIndex = parseInt(localStorage.getItem(stepKey), 10) || 0;
