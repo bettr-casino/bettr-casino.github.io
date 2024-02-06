@@ -1208,6 +1208,22 @@
                         });
                         const row = $('<tr>').append($('<td>').text(columnName)).append(tagsContainer);
                         detailsTable.append(row);
+                    } else if (columnName === 'Difficulty') {
+                        // Color-coded tags for Difficulty
+                        const difficultySpan = $('<span>').addClass('tag').text(columnValue);
+                        switch (columnValue.toUpperCase()) {
+                            case 'EASY':
+                                difficultySpan.css('background-color', 'green');
+                                break;
+                            case 'MEDIUM':
+                                difficultySpan.css('background-color', 'yellow');
+                                break;
+                            case 'HARD':
+                                difficultySpan.css('background-color', 'red');
+                                break;
+                        }
+                        const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').append(difficultySpan));
+                        detailsTable.append(row);
                     } else {
                         const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').text(columnValue));
                         detailsTable.append(row);
