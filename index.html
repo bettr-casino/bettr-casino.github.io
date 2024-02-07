@@ -819,6 +819,12 @@
                     $('.next-btn').prop('disabled', false);
                     $('.finish-btn').prop('disabled', true);
                 },
+                "VerifyUnitySetup": function(stepKey, taskId, rowIndex) {
+                    $('.back-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', true);
+                    $('.finish-btn').prop('disabled', true);
+                    $(`#verify-setup-spinner`).show();
+                },
             }
 
             const wizardAfterShowFunctions = {
@@ -934,6 +940,14 @@
                     }
                     initiateVerifyAppCountdown(59);
                     verifyAppInstall(taskId, 20, callback);
+                },
+                "VerifyUnitySetup": function(stepKey, taskId, rowIndex) {
+                    $('.back-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', true);
+                    $('.finish-btn').prop('disabled', true);
+                    $('#VerifyUnitySetupChallengeCode').hide();
+                    var verifySetupInfo = $('#VerifyUnitySetupInfo');
+                    initiateVerifyUnitySetupCountdown(59);                    
                 }
             }
 
@@ -1240,7 +1254,7 @@
                     </div>
 
                     <div class="setup-step" id="VerifySetup" style="display: none;">
-                        <h3>Verifying Setup.</h3>
+                        <h3>Verifying Bettr App Setup.</h3>
                         <p id="VerifySetupInfo">Running verify. <input type="text" id="setupCountdownTimer" readonly style="width: 30px; text-align: center;"/><span id="verify-setup-spinner" class="spinner2" style="display: none;"></span></p>
                         <p id="VerifySetupChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
                     </div>
@@ -1263,9 +1277,15 @@
 
                     <div class="setup-step" id="SetupUnity" style="display: none;">
                         <h3>Setup Wizard.</h3>
-                        <p>Install the Bettr Challenge Pack on a compatible macOS or Windows machine.</p>
+                        <p>Install Bettr Unity on a compatible macOS or Windows machine.</p>
                         <p><span class="tag">macOS Mojave</span> <span class="tag">macOS BigSur</span> <span class="tag">Windows 10</span> <span class="tag">Windows 11</span></p>
                         <p>Click Next to get started.</p>
+                    </div>
+
+                    <div class="setup-step" id="VerifyUnitySetup" style="display: none;">
+                        <h3>Verifying Bettr Unity Setup.</h3>
+                        <p id="VerifyUnitySetupInfo">Running verify. <input type="text" id="unitySetupCountdownTimer" readonly style="width: 30px; text-align: center;"/><span id="verify-unity-setup-spinner" class="spinner2" style="display: none;"></span></p>
+                        <p id="VerifyUnitySetupChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
                     </div>
 
                     <div class="setup-step" id="InstallUnity" style="display: none;">
@@ -2032,6 +2052,11 @@
 
             function initiateVerifySetupCountdown(duration) {
                 display = $('#setupCountdownTimer');
+                startCountdown(duration, display);
+            }
+
+            function initiateVerifyUnitySetupCountdown(duration) {
+                display = $('#unitySetupCountdownTimer');
                 startCountdown(duration, display);
             }
 
