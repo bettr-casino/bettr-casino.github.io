@@ -823,7 +823,7 @@
                     $('.back-btn').prop('disabled', true);
                     $('.next-btn').prop('disabled', true);
                     $('.finish-btn').prop('disabled', true);
-                    $(`#verify-setup-spinner`).show();
+                    $(`#verify-unity-setup-spinner`).show();
                 },
             }
 
@@ -852,7 +852,8 @@
                             var hashKey = response.task_hash_key;
                             if (hashKey && hashKey.length == 6) {
                                 localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
-                                verifyAppInstall(taskId, 0, function(err) {
+                                const objectKey = `developers/${hashKey}/scene_state/image.png`;
+                                verifyAppInstall(objectKey, 0, function(err) {
                                     $(`#verify-setup-spinner`).hide();
                                     if (err) {
                                         console.error('VerifySetup verifyAppInstall Error:', err);
@@ -890,7 +891,8 @@
                             if (hashKey && hashKey.length == 6) {
                                 $('#GenerateChallengeCodeText').text(hashKey);
                                 localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
-                                verifyAppInstall(taskId, 0, function(err) {
+                                const objectKey = `developers/${hashKey}/scene_state/image.png`;
+                                verifyAppInstall(objectKey, 0, function(err) {
                                     $(`.GenerateChallengeCodeInfoStep1`).hide();
                                     if (err) {
                                         console.error('StartApp verifyAppInstall Error:', err);
@@ -940,19 +942,44 @@
                         }
                     }
                     initiateVerifyAppCountdown(59);
-                    verifyAppInstall(taskId, 20, callback);
+                    const objectKey = `developers/${hashKey}/scene_state/image.png`;
+                    verifyAppInstall(objectKey, 20, callback);
                 },
                 "VerifyUnitySetup": function(stepKey, taskId, rowIndex) {
                     $('.back-btn').prop('disabled', true);
                     $('.next-btn').prop('disabled', true);
                     $('.finish-btn').prop('disabled', true);
                     $('#VerifyUnitySetupChallengeCode').hide();
+                    var taskState = "VERIFY_SETUP"
                     var verifySetupInfo = $('#VerifyUnitySetupInfo');
                     initiateVerifyUnitySetupCountdown(59); 
-                    $(`#verify-unity-setup-spinner`).hide();
-                    $('.next-btn').prop('disabled', false);
-                    $('#unitySetupCountdownTimer').hide()
-                    $('#VerifyUnitySetupInfo').empty().text("Setup incomplete. Click Next.")                   
+                    initializeDeveloperAccount(taskId, taskState, function(response, error) {
+                        if (error) {
+                            $(`#verify-setup-spinner`).hide();
+                            $('.next-btn').prop('disabled', false);
+                            $('#VerifySetupInfo').empty().text("Setup incomplete. Click Next.")
+                        } else {
+                            var hashKey = response.task_hash_key;
+                            if (hashKey && hashKey.length == 6) {
+                                localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
+                                const objectKey = `developers/${hashKey}/unity_state/image.png`;
+                                verifyAppInstall(objectKey, 0, function(response, err) {
+                                    console.log(`response:${response} err=${err}`);
+                                    $(`#verify-unity-setup-spinner`).hide();
+                                    if (err) {
+                                        console.error('VerifyUnitySetup Error:', err);
+                                        $('.next-btn').prop('disabled', false);
+                                        $('#VerifyUnitySetupInfo').empty().text("Bettr Unity Setup is not complete. Click Next.");
+                                    } else {
+                                        $('.next-btn').prop('disabled', false);
+                                        $('#unitySetupCountdownTimer').hide()
+                                        $('#VerifyUnitySetupInfo').empty().text("Bettr Unity Setup is complete. Click Next.");
+                                        $("#VerifyUnitySetupChallengeCode .tag.code").text(hashKey);  
+                                    }
+                                })                
+                            }
+                        }
+                    })
                 }
             }
 
@@ -1265,7 +1292,7 @@
                     </div>
 
                     <div class="setup-step" id="StartApp" style="display: none;">
-                        <h3>Configure the <span id="ChallengeId">BettrApp Challenge</span> on iPhone 13+.</h3>
+                        <h3>Configure <span id="ChallengeId">BettrApp Challenge</span>.</h3>
                         <p class="GenerateChallengeCodeInfoStep1">Generating Challenge Code ... <span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
                         <p><span id="GenerateChallengeCodeText" class="tag code" style="font-size: 18px;"></span></p>
                         <p class="GenerateChallengeCodeInfoStep2" style="display: none;">Launch the Bettr App on the iPhone 13+ device.</p>
@@ -1274,7 +1301,7 @@
                     </div>
 
                     <div class="setup-step" id="VerifyApp" style="display: none;">
-                        <h3>Verifying App Installation on iPhone 13+.</h3>
+                        <h3>Verifying Bettr App Installation.</h3>
                         <p id="VerifyAppInfo">Running verify. <input type="text" id="countdownTimer" readonly style="width: 30px; text-align: center;"/><span id="verify-app-spinner" class="spinner2" style="display: none;"></span></p>
                         <p id="VerifyAppResult">Wait until the verify completes.</p>
                         <p id="VerifyAppChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
@@ -1291,6 +1318,22 @@
                         <h3>Verifying Bettr Unity Setup.</h3>
                         <p id="VerifyUnitySetupInfo">Running verify. <input type="text" id="unitySetupCountdownTimer" readonly style="width: 30px; text-align: center;"/><span id="verify-unity-setup-spinner" class="spinner2" style="display: none;"></span></p>
                         <p id="VerifyUnitySetupChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
+                    </div>
+
+                    <div class="setup-step" id="StartUnityApp" style="display: none;">
+                        <h3>Configure <span id="UnityChallengeId">Bettr Unity Challenge</span>.</h3>
+                        <p class="UnityGenerateChallengeCodeInfoStep1">Generating Challenge Code ... <span id="start-unity-app-spinner" class="spinner2" style="display: none;"></span></p>
+                        <p><span id="UnityGenerateChallengeCodeText" class="tag code" style="font-size: 18px;"></span></p>
+                        <p class="UnityGenerateChallengeCodeInfoStep2" style="display: none;">Open Bettr Unity Project on your Mac or Windows.</p>
+                        <p class="UnityGenerateChallengeCodeInfoStep2" style="display: none;">Type in the Bettr Challenge Code above in the App and press Continue.<span id="start-unity-app-spinner" class="spinner2" style="display: none;"></span></p>
+                        <p class="UnityGenerateChallengeCodeInfoStep3" style="display: none;">Verify complete. <span>Click Finish.</span></p>
+                    </div>
+
+                    <div class="setup-step" id="VerifyUnityApp" style="display: none;">
+                        <h3>Verifying Bettr Unity Installation.</h3>
+                        <p id="VerifyUnityAppInfo">Running verify. <input type="text" id="unityAppc=CountdownTimer" readonly style="width: 30px; text-align: center;"/><span id="verify-unity-app-spinner" class="spinner2" style="display: none;"></span></p>
+                        <p id="VerifyUnityAppResult">Wait until the verify completes.</p>
+                        <p id="VerifyUnityAppChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
                     </div>
 
                     <div class="setup-step" id="InstallUnity" style="display: none;">
@@ -2070,9 +2113,7 @@
                 startCountdown(duration, display);
             }
 
-            function verifyAppInstall(taskId, maxRetries, callback) {
-                const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
-                const objectKey = `developers/${hashKey}/scene_state/image.png`;
+            function verifyAppInstall(objectKey, maxRetries, callback) {
                 let retries = 0;
                 const retryInterval = 3000; // Retry every 3 seconds
 
