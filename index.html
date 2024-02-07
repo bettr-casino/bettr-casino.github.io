@@ -775,6 +775,11 @@
             }
 
             const wizardOnShowFunctions = {
+                "SetupIPhone": function(stepKey, taskId, rowIndex) {
+                    $('.back-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', false);
+                    $('.finish-btn').prop('disabled', true);
+                },
                 "RegisterUser": function(stepKey, taskId, rowIndex) {
                     $('.finish-btn').prop('disabled', true);
                     if (isUserLoggedIn()) {
@@ -1112,6 +1117,7 @@
                             var stepIndex = setupColumns.findIndex(column => column.title === `Step${nextStepIndex}`);
                             const stepText = setupRow[stepIndex];
                             $('.setup-step').hide();
+                            $('.setup-step-button').prop('disabled', true);
                             localStorage.setItem(stepKey, `${nextStepIndex}`);
                             const stepShouldShowFn = wizardShouldShowFunctions[stepText];
                             if (stepShouldShowFn) {
@@ -1130,7 +1136,6 @@
                                 $(`#${stepText}Action`).off('click').on('click', function(evt) { stepOnClickFn(evt, stepKey, taskId, rowIndex); });
                             }
                             $(`#${stepText}`).show();
-                            $('.setup-step-button').prop('disabled', true);
                             $('.back-btn').off('click').on('click', function() {
                                 const stepOnBackFn = wizardOnBackFunctions[stepText];
                                 if (stepOnBackFn) {
@@ -1140,7 +1145,6 @@
                                 }
                                 showNextWizardStep(rowIndex, -1);
                             });
-                            $('.finish-btn').prop('disabled', false);
                             $('.finish-btn').off('click').on('click', function() {
                                 if (wizardOnFinishFunction(taskId, rowIndex)) {
                                     return;
@@ -1208,9 +1212,9 @@
                 var setupDiv = `
                 <div id="setup-div" class="setup">
 
-                    <div class="setup-step" id="SetupWizard" style="display: block;">
+                    <div class="setup-step" id="SetupIPhone" style="display: none;">
                         <h3>Setup Wizard.</h3>
-                        <p id="SetupWizardRequirements"></p>
+                        <p>This part of the setup requires an iPhone 13+.</p>
                         <p>Click Next to get started.</p>
                     </div>
 
@@ -1397,6 +1401,8 @@
 
                 // Trigger click on the first button to show iPhone 13 by default
                 $('#toggle-iphone13').click();
+
+                callback(rowIndex);
                 
             }
 
