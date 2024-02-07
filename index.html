@@ -926,6 +926,7 @@
                             console.error('Error:', err);
                             $('#VerifyAppResult').empty().append($(`<span style="color: red;">${err.message}</span>`));
                             $(`#verify-app-spinner`).hide();
+                            $('#countdownTimer').hide()
                             $('.back-btn').prop('disabled', false);
                             $('.next-btn').prop('disabled', true);
                             $('.finish-btn').prop('disabled', true);
@@ -947,7 +948,11 @@
                     $('.finish-btn').prop('disabled', true);
                     $('#VerifyUnitySetupChallengeCode').hide();
                     var verifySetupInfo = $('#VerifyUnitySetupInfo');
-                    initiateVerifyUnitySetupCountdown(59);                    
+                    initiateVerifyUnitySetupCountdown(59); 
+                    $(`#verify-unity-setup-spinner`).hide();
+                    $('.next-btn').prop('disabled', false);
+                    $('#unitySetupCountdownTimer').hide()
+                    $('#VerifyUnitySetupInfo').empty().text("Setup incomplete. Click Next.")                   
                 }
             }
 
