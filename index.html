@@ -1339,6 +1339,35 @@
                         }
                         const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').append(difficultySpan));
                         detailsTable.append(row);
+                    } else if (columnName === 'Timer') {
+                        // Assuming columnValue is in fractional hours, convert to HH:MM:SS
+                        let totalHours = parseFloat(columnValue);
+                        let totalSeconds = Math.round(totalHours * 3600); // Convert hours to seconds
+
+                        let hours = Math.floor(totalSeconds / 3600);
+                        totalSeconds %= 3600;
+                        let minutes = Math.floor(totalSeconds / 60);
+                        let seconds = totalSeconds % 60;
+
+                        // Padding with '0' if necessary
+                        hours = String(hours).padStart(2, '0');
+                        minutes = String(minutes).padStart(2, '0');
+                        seconds = String(seconds).padStart(2, '0');
+
+                        // Constructing timer display with separate tags for hours, minutes, and seconds
+                        const $hoursSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(hours);
+                        const $minutesSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(minutes);
+                        const $secondsSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(seconds);
+
+                        const $timeContainer = $('<td>');
+                        $timeContainer.append($hoursSpan)
+                                    .append(document.createTextNode(':'))
+                                    .append($minutesSpan)
+                                    .append(document.createTextNode(':'))
+                                    .append($secondsSpan);
+
+                        const row = $('<tr>').append($('<td>').text(columnName)).append($timeContainer);
+                        detailsTable.append(row);
                     } else {
                         const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').text(columnValue));
                         detailsTable.append(row);
