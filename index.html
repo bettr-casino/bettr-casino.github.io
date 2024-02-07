@@ -813,7 +813,12 @@
                     $('.back-btn').prop('disabled', true);
                     $('.next-btn').prop('disabled', true);
                     $('.finish-btn').prop('disabled', true);
-                }
+                },
+                "SetupUnity": function(stepKey, taskId, rowIndex) {
+                    $('.back-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', false);
+                    $('.finish-btn').prop('disabled', true);
+                },
             }
 
             const wizardAfterShowFunctions = {
@@ -846,13 +851,15 @@
                                     if (err) {
                                         console.error('VerifySetup verifyAppInstall Error:', err);
                                         $('.next-btn').prop('disabled', false);
-                                        $('#VerifySetupInfo').empty().text("Setup incomplete. Click Next.");
+                                        $('#VerifySetupInfo').empty().text("Click Next.");
                                     } else {
-                                        $('.finish-btn').prop('disabled', false);
+                                        $('.next-btn').prop('disabled', false);
                                         $('#setupCountdownTimer').hide()
-                                        $('#VerifySetupInfo').empty().text("Setup verified. Click Finish.");
+                                        $('#VerifySetupInfo').empty().text("Bettr App Setup is complete. Click Next.");
                                         $("#VerifySetupChallengeCode .tag.code").text(hashKey);
-                                        $('#VerifySetupChallengeCode').show();
+                                        // $('#VerifySetupChallengeCode').show();
+                                        var nextStepIndex = 5;
+                                        localStorage.setItem(stepKey, `${nextStepIndex}`);
                                     }
                                 })                
                             }
@@ -903,7 +910,7 @@
                     $(`#verify-app-spinner`).show();
                     const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
                     $("#VerifyAppChallengeCode .tag.code").text(hashKey);
-                    $("#VerifyAppChallengeCode").show();
+                    // $("#VerifyAppChallengeCode").show();
                     activeIPhoneContainer().empty();
                     const localStorageKey = prefix_local_store(`TASK_ID__${taskId}__screenshot_request_time`);
                     const currentUtcTimestamp = Math.floor(Date.now() / 1000);
@@ -917,7 +924,7 @@
                             $('.next-btn').prop('disabled', true);
                             $('.finish-btn').prop('disabled', true);
                         } else {
-                            $('#VerifyAppInfo').empty().text("Verify complete. Click Finish.")
+                            $('#VerifyAppInfo').empty().text("Bettr App Installation verified. Click Next.")
                             $('#VerifyAppResult').empty();
                             $(`#verify-app-spinner`).hide();
                             $('#countdownTimer').hide()
@@ -1214,7 +1221,7 @@
 
                     <div class="setup-step" id="SetupIPhone" style="display: none;">
                         <h3>Setup Wizard.</h3>
-                        <p>This part of the setup requires an iPhone 13+.</p>
+                        <p>Install the BettrApp on an iPhone 13+.</p>
                         <p>Click Next to get started.</p>
                     </div>
 
@@ -1256,7 +1263,8 @@
 
                     <div class="setup-step" id="SetupUnity" style="display: none;">
                         <h3>Setup Wizard.</h3>
-                        <p>This part of the setup requires macOS 10.14+ (Intel) / 11.0 (Apple) or Windows 10 (64 bit) / 11 (64 bit).</p>
+                        <p>Install the Bettr Challenge Pack on a compatible macOS or Windows machine.</p>
+                        <p><span class="tag">macOS Mojave</span> <span class="tag">macOS BigSur</span> <span class="tag">Windows 10</span> <span class="tag">Windows 11</span></p>
                         <p>Click Next to get started.</p>
                     </div>
 
