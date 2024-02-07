@@ -1303,9 +1303,17 @@
                         // Split the 'System Requirements' value into tags and display as text
                         const tags = columnValue.split(',').map(tag => tag.trim());
                         const $requirements = $('#SetupWizardRequirements');
-                        $requirements.empty().text('To complete this setup, you will need: ')
+                        $requirements.empty().text('Setup requires:')
                         tags.forEach(tag => {
-                            $('<span>').addClass('tag').text(tag).appendTo($requirements);
+                            const orTags = tag.split('or').map(t => t.trim());
+                            const $tagContainer = $('<span>').addClass('tag-container');
+                            orTags.forEach((orTag, i) => {
+                                if (i > 0) {
+                                    $tagContainer.append(document.createTextNode(' OR '));
+                                }
+                                $tagContainer.append($('<span>').addClass('tag').text(orTag));
+                            });
+                            $requirements.append($tagContainer);
                         });
                     } else if (columnName === 'Tags' || columnName === 'Skill Sets' || columnName == 'Setup Requirements') {
                         const tags = columnValue.split(',').map(tag => tag.trim());
@@ -2038,6 +2046,50 @@
                         callback(null, status, error);
                     }
                 });
+            }
+
+            function parseExpression(expr, context) {
+                // Tokenize the expression, including curly braces
+                const tokens = expr.match(/\w+|AND|OR|\{|\}/g);
+
+                // Recursive function to evaluate the expression
+                function evaluate(tokens) {
+                    let stack = [];
+
+                    while (tokens.length > 0) {
+                        const token = tokens.shift();
+
+                        if (token === 'AND' || token === 'OR') {
+                            const right = stack.pop();
+                            const left = stack.pop();
+                            const result = (token === 'AND') ? (left && right) : (left || right);
+                            stack.push(result);
+                        } else if (token === '{') {
+                            // Handle curly brace as grouping
+                            let subExpr = [];
+                            let openBraces = 1;
+                            while (openBraces > 0) {
+                                const nextToken = tokens.shift();
+                                if (nextToken === '{') {
+                                    openBraces++;
+                                } else if (nextToken === '}') {
+                                    openBraces--;
+                                }
+                                if (openBraces > 0) {
+                                    subExpr.push(nextToken);
+                                }
+                            }
+                            stack.push(evaluate(subExpr));
+                        } else {
+                            // Assume token is a variable and evaluate its value
+                            stack.push(context[token]);
+                        }
+                    }
+
+                    return stack.pop();
+                }
+
+                return evaluate(tokens);
             }
 
             // Event handlers for closing the modals
