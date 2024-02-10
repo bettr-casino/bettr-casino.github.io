@@ -825,6 +825,16 @@
                     $('.finish-btn').prop('disabled', true);
                     $(`#verify-unity-setup-spinner`).show();
                 },
+                "InstallUnity": function(stepKey, taskId, rowIndex) {
+                    $('.back-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', true);
+                    $('.finish-btn').prop('disabled', true);
+                },
+                "StartUnityApp": function(stepKey, taskId, rowIndex) {
+                    $('.back-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', true);
+                    $('.finish-btn').prop('disabled', true);
+                }
             }
 
             const wizardAfterShowFunctions = {
@@ -980,6 +990,16 @@
                             }
                         }
                     })
+                },
+                "InstallUnity": function(stepKey, taskId, rowIndex) {
+                    $('.back-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', false);
+                    $('.finish-btn').prop('disabled', true);
+                },
+                "StartUnityApp": function(stepKey, taskId, rowIndex) {
+                    $('.back-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', false);
+                    $('.finish-btn').prop('disabled', true);
                 }
             }
 
@@ -1267,7 +1287,7 @@
 
                     <div class="setup-step" id="SetupIPhone" style="display: none;">
                         <h3>Setup Bettr App.</h3>
-                        <p>Install the BettrApp on an iPhone 13+.</p>
+                        <p>Setup the Bettr App on an iPhone 13+.</p>
                         <p>Click Next to get started.</p>
                     </div>
 
@@ -1308,38 +1328,36 @@
                     </div>
 
                     <div class="setup-step" id="SetupUnity" style="display: none;">
-                        <h3>Setup Bettr Unity Package.</h3>
-                        <p>Install Bettr Unity Package.</p>
-                        <p><span class="tag">macOS Mojave</span> <span class="tag">macOS BigSur</span> <span class="tag">Windows 10</span> <span class="tag">Windows 11</span></p>
+                        <h3>Setup the Bettr Unity Project.</h3>
+                        <p>Setup the Bettr Unity Project</p>
+                        <p><span class="tag">macOS</span> <span class="tag">Windows</span></p>
                         <p>Click Next to get started.</p>
                     </div>
 
                     <div class="setup-step" id="VerifyUnitySetup" style="display: none;">
-                        <h3>Verifying Bettr Unity Setup.</h3>
+                        <h3>Verifying the Bettr Unity Setup.</h3>
                         <p id="VerifyUnitySetupInfo">Running verify. <input type="text" id="unitySetupCountdownTimer" readonly style="width: 30px; text-align: center;"/><span id="verify-unity-setup-spinner" class="spinner2" style="display: none;"></span></p>
                         <p id="VerifyUnitySetupChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
                     </div>
 
+                    <div class="setup-step" id="InstallUnity" style="display: none;">
+                        <h3>Install <span id="UnityChallengeId">Unity 2022.3.16f1</span>.</h3>
+                        <p>Install Unity 2022.3.16f1 via the Unity Hub.</p>
+                        <p><a href="unityhub://2022.3.16f1/d2c21f0ef2f1" target="_blank">unityhub://2022.3.16f1/d2c21f0ef2f1</a></p>
+                    </div>
+
                     <div class="setup-step" id="StartUnityApp" style="display: none;">
-                        <h3>Configure <span id="UnityChallengeId">Bettr Unity</span>.</h3>
-                        <!--<p><span id="GenerateChallengeCodeText" class="tag code" style="font-size: 18px;"></span></p>-->
-                        <p class="UnityGenerateChallengeCodeInfoStep1">Generating Bettr Unity Challenge Package ... <span id="start-unity-app-spinner" class="spinner2" style="display: none;"></span></p>
-                        <p class="UnityGenerateChallengeCodeInfoStep2" style="display: none;">Open Bettr Unity Project on your Mac or Windows.</p>
-                        <p class="UnityGenerateChallengeCodeInfoStep2" style="display: none;">Type in the Bettr Challenge Code above in the App and press Continue.<span id="start-unity-app-spinner" class="spinner2" style="display: none;"></span></p>
-                        <p class="UnityGenerateChallengeCodeInfoStep3" style="display: none;">Verify complete. <span>Click Finish.</span></p>
+                        <h3>Configure the <span id="UnityChallengeId">Bettr Unity Project</span>.</h3>
+                        <p>Download and install the Project</p>
+                        <p><a href="https://github.com/bettr-casino/slots-game-plugins/archive/refs/heads/main.zip" target="_blank">https://github.com/bettr-casino/slots-game-plugins/archive/refs/heads/main.zip</a></p>
                     </div>
 
                     <div class="setup-step" id="VerifyUnityApp" style="display: none;">
                         <h3>Verifying Bettr Unity Installation.</h3>
+                        <p>Start the Bettr App in the Unity Editor.</p>
                         <p id="VerifyUnityAppInfo">Running verify. <input type="text" id="unityAppc=CountdownTimer" readonly style="width: 30px; text-align: center;"/><span id="verify-unity-app-spinner" class="spinner2" style="display: none;"></span></p>
                         <p id="VerifyUnityAppResult">Wait until the verify completes.</p>
                         <p id="VerifyUnityAppChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
-                    </div>
-
-                    <div class="setup-step" id="InstallUnity" style="display: none;">
-                        <h3>Install Unity.</h3>
-                        <p>Click on the link below to install Unity 2022.3.16f1 via the Unity Hub.</p>
-                        <p><a href="unityhub://2022.3.16f1/d2c21f0ef2f1" target="_blank">unityhub://2022.3.16f1/d2c21f0ef2f1</a></p>
                     </div>
 
                     <div class="setup-step" id="StartChallenge" style="display: none;">
@@ -1964,7 +1982,6 @@
                         error: function(xhr, status, error) {
                             // Handle error (optional)
                             console.error(error);
-                            alert(error);
                             localStorage.removeItem(prefix_local_store('session_token'));
                             $('#login-btn').show();
                             $('#logout-btn').hide();
