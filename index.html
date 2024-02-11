@@ -762,6 +762,19 @@
             const dataUrl = 'https://bettr-casino-tasks.s3.us-west-2.amazonaws.com/gsheets-task-list/allopentasks.json';
 
             const stepData = { "map": {}}
+
+            // Initialize all variables to null
+            var summaryColumns = null;
+            var detailsColumns = null;
+            var setupColumns = null;
+            var testColumns = null;
+            var internalColumns = null;
+
+            var summaryRows = null;
+            var detailsRows = null;
+            var setupRows = null;
+            var testRows = null;
+            var internalRows = null;
     
             // Fetch and process data
             fetch(dataUrl)
@@ -847,7 +860,7 @@
                     var verifySetupInfo = $('#VerifySetupInfo');
                     $('#setupCountdownTimer').show();
                     var countdownTimer = initiateVerifySetupCountdown(59);
-                    initializeDeveloperAccount(taskId, taskState, function(response, error) {
+                    initializeDeveloperAccount(taskId, taskState, rowIndex, function(response, error) {
                         if (error) {
                             console.log(error);
                             clearTimeout(countdownTimer);
@@ -878,6 +891,8 @@
                             } else {
                                 clearTimeout(countdownTimer);
                                 $('#verify-setup-spinner').hide();
+                                $('.next-btn').prop('disabled', false);
+                                $('#VerifySetupInfo').empty().text("Bettr App Setup is incomplete. Click Next.");
                             }
                         }
                     })
@@ -889,7 +904,8 @@
                     $(`#start-app-spinner`).show();
                     var generateChallengeCodeText = $('#GenerateChallengeCodeText');
                     var taskState = "GENERATE_CODE"
-                    initializeDeveloperAccount(taskId, taskState, function(response, error) {
+                    initializeDeveloperAccount(taskId, taskState, rowIndex, function(response, error) {
+                        $(`#start-app-spinner`).hide();
                         if (error) {
                             console.log(error);
                             showModalPanel(generateChallengeCodeText, 'Code Generation error. Support email: support@bettr.casino.', 'center');
@@ -918,7 +934,7 @@
                     var verifySetupInfo = $('#VerifyUnitySetupInfo');
                     $('#unitySetupCountdownTimer').show()
                     var countdownTimer = initiateVerifyUnitySetupCountdown(59); 
-                    initializeDeveloperAccount(taskId, taskState, function(response, error) {
+                    initializeDeveloperAccount(taskId, taskState, rowIndex, function(response, error) {
                         if (error) {
                             console.log(error);
                             clearTimeout(countdownTimer);
@@ -948,6 +964,8 @@
                             } else {
                                 clearTimeout(countdownTimer);
                                 $('#verify-unity-setup-spinner').hide();
+                                $('.next-btn').prop('disabled', false);
+                                $('#VerifyUnitySetupInfo').empty().text("Bettr Unity Setup is incomplete. Click Next.");
                             }
                         }
                     })
@@ -1085,20 +1103,29 @@
                 const setupStartIndex = headers.indexOf("Section", detailsStartIndex + 1);
                 const testStartIndex = headers.indexOf("Section", setupStartIndex + 1);
                 const internalStartIndex = headers.indexOf("Section", testStartIndex + 1);
+                const endIndex = headers.length;
     
                 // Create column definitions for Summary and Internal tables
-                const summaryColumns = headers.slice(summaryStartIndex + 1, detailsStartIndex)
+                summaryColumns = headers.slice(summaryStartIndex + 1, detailsStartIndex)
                     .map(header => ({ title: header }));
-                const detailsColumns = headers.slice(detailsStartIndex + 1, setupStartIndex)
+                detailsColumns = headers.slice(detailsStartIndex + 1, setupStartIndex)
                     .map(header => ({ title: header }));
-                const setupColumns = headers.slice(setupStartIndex + 1, testStartIndex)
+                setupColumns = headers.slice(setupStartIndex + 1, testStartIndex)
                     .map(header => ({ title: header }));
-                const testColumns = headers.slice(testStartIndex + 1, internalStartIndex)
+                testColumns = headers.slice(testStartIndex + 1, internalStartIndex)
                 .map(header => ({ title: header }));
+                internalColumns = headers.slice(internalStartIndex + 1, endIndex)
+                    .map(header => ({ title: header }));
+
+                summaryRows = rows.map(row => row.slice(summaryStartIndex + 1, detailsStartIndex));
+                detailsRows = rows.map(row => row.slice(detailsStartIndex + 1, setupStartIndex));
+                setupRows = rows.map(row => row.slice(setupStartIndex + 1, testStartIndex));
+                testRows = rows.map(row => row.slice(testStartIndex + 1, internalStartIndex));
+                internalRows = rows.map(row => row.slice(internalStartIndex + 1, endIndex));
     
                 // // Initialize the Summary DataTable
                 const summaryTable = $('#summary-table').DataTable({
-                    data: rows.map(row => row.slice(summaryStartIndex + 1, detailsStartIndex)), // Extract Summary columns
+                    data: summaryRows,
                     columns: summaryColumns,
                     pageLength: 5,  // Default number of rows per page
                     lengthMenu: [5, 10, 20, 50]
@@ -1117,8 +1144,7 @@
 
                     const table = $('#summary-table').DataTable();
                     const rowIndex = table.row(this).index(); // Gets the index of the clicked row
-                    const detailsRowData = rows.map(row => row.slice(detailsStartIndex + 1, setupStartIndex)); // Extract Details columns
-                    const detailsRow = detailsRowData[rowIndex];
+                    const detailsRow = detailsRows[rowIndex];
                     const taskIdIndex = detailsColumns.findIndex(column => column.title === 'ID');
                     const taskId = detailsRow[taskIdIndex];
                     const stepKey = `${prefix}TaskID__${taskId}__SetupIndex`;
@@ -1268,7 +1294,7 @@
 
                     <div class="setup-step" id="StartApp" style="display: none;">
                         <h3>Setup the Bettr App.</h3>
-                        <p class="GenerateChallengeCodeInfoStep1">Generating Challenge Code ... <span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
+                        <p class="GenerateChallengeCodeInfoStep1">Generating Challenge Code <span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
                         <p><span id="GenerateChallengeCodeText" class="tag code" style="font-size: 18px;"></span></p>
                         <p class="GenerateChallengeCodeInfoStep2" style="display: none;">Launch the Bettr App on the iPhone 13+ device.</p>
                         <p class="GenerateChallengeCodeInfoStep2" style="display: none;">Type in the Bettr Challenge Code above in the App and press Continue.</p>
@@ -1924,9 +1950,15 @@
                 }
             }
 
-            function initializeDeveloperAccount(taskId, taskState, callback) {
+            function initializeDeveloperAccount(taskId, taskState, rowIndex, callback) {
                 var userId = localStorage.getItem(prefix_local_store('user_id'));
                 var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
+                const unityPathIndex = internalColumns.findIndex(column => column.title === 'UnityPath');
+                var unityPath = internalRows[rowIndex][unityPathIndex];
+                const moduleIndex = internalColumns.findIndex(column => column.title === 'Module');
+                var module = internalRows[rowIndex][moduleIndex];
+                const variantIndex = internalColumns.findIndex(column => column.title === 'Variant');
+                var variant = internalRows[rowIndex][variantIndex];
                 console.log('userId=', userId, 'sessionToken=', sessionToken);
                 $.ajax({
                     url: 'https://zgtla52nt3w5vyh6jhh6e4js6y0qbgji.lambda-url.us-west-2.on.aws/',
@@ -1936,7 +1968,10 @@
                         "user_id": userId,
                         "session_token": sessionToken,
                         "task_id": taskId,
-                        "task_state": taskState
+                        "task_state": taskState,
+                        "unity_path": unityPath,
+                        "module_name": module,
+                        "variant_name": variant
                     }),
                     success: function(response) {
                         console.log("Response received: ", JSON.stringify(response));
