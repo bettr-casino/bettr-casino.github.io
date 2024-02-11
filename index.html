@@ -927,7 +927,7 @@
                             var hashKey = response.task_hash_key;
                             if (hashKey && hashKey.length == 6) {
                                 localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
-                                const objectKey = `developers/${hashKey}/unity_state/image.png`;
+                                const objectKey = `developers/${hashKey}/scene_state_desktop/image.png`;
                                 verifyAppInstall(objectKey, 0, function(response, err) {
                                     console.log(`response:${response} err=${err}`);
                                     clearTimeout(countdownTimer);
