@@ -1337,7 +1337,9 @@
 
                     // Check if the column is 'Tags' and process accordingly
                     
-                    if (columnName === 'System Requirements') {
+                    if (columnName === 'ID') {
+                        // hide
+                    } else if (columnName === 'System Requirements') {
                         // Split the 'System Requirements' value into tags and display as text
                         const tags = columnValue.split(',').map(tag => tag.trim());
                         const $requirements = $('#SetupWizardRequirements');
