@@ -849,6 +849,7 @@
                     var countdownTimer = initiateVerifySetupCountdown(59);
                     initializeDeveloperAccount(taskId, taskState, function(response, error) {
                         if (error) {
+                            console.log(error);
                             clearTimeout(countdownTimer);
                             $('#verify-setup-spinner').hide();
                             $('.next-btn').prop('disabled', false);
@@ -919,6 +920,7 @@
                     var countdownTimer = initiateVerifyUnitySetupCountdown(59); 
                     initializeDeveloperAccount(taskId, taskState, function(response, error) {
                         if (error) {
+                            console.log(error);
                             clearTimeout(countdownTimer);
                             $('#verify-unity-setup-spinner').hide();
                             $('.next-btn').prop('disabled', false);
@@ -1026,25 +1028,6 @@
 
                 $("#StartChallengeCode .tag.code").text(hashKey);
                 $('#StartChallengeCode').show();
-
-                const objectKey = `developers/${hashKey}/scene_state/hierarchy.json`;
-                const $sceneHierarchyContainer = $('.scene-hierarchy-container');
-                const $sceneHierarchy = $('.scene-hierarchy-container .scene-hierarchy');
-
-                getState(objectKey, function(response, status, error) {
-                    if (error == null) {
-                        if (response.file_data) {
-                            var jsonData = atob(response.file_data);
-                            const jsonObject = JSON.parse(jsonData);
-                            jsonData = JSON.stringify(jsonObject, null, 2); // Indent with 2 spaces
-                            console.log('jsonData:', jsonData);
-                            $sceneHierarchy.empty().append($("<pre>").text(jsonData));
-                            $sceneHierarchyContainer.show();
-                        }
-                    } else {
-                        console.error("Error in invoking Lambda:", error);
-                    }
-                });
 
                 return true;
             }
@@ -1258,9 +1241,8 @@
 
                     <div class="setup-step" id="SetupWizard" style="display: block;">
                         <h3>Setup Wizard.</h3>
-                        <p>In the next few steps, the setup wizard will setup the Bettr App and the Bettr Unity Project.</p>
-                        <p>The Bettr App requires an <span class="tag">iPhone 13+</span></p>
-                        <p>The Bettr Unity Project requires a <span class="tag">macOS</span> or <span class="tag">Windows</span></p>
+                        <p>Use this wizard to setup the Challenge.</p>
+                        <p>Requires an <span class="tag">iPhone 13+</span> and either <span class="tag">macOS</span> or <span class="tag">Windows</span></p>
                     </div>
 
                     <div class="setup-step" id="RegisterUser" style="display: none;">
@@ -1309,7 +1291,7 @@
                         <h3>Setup the Bettr Unity Project.</h3>
                         <p><a href="https://github.com/bettr-casino/slots-game-plugins/archive/refs/heads/main.zip" target="_blank">https://github.com/bettr-casino/slots-game-plugins/archive/refs/heads/main.zip</a></p>
                         <p><span class="tag">git clone git@github.com:bettr-casino/slots-game-plugins.git</span></p>
-                        <p>Open the Bettr Unity Project. Type in the Bettr Challenge Code <span id="StartUnityAppChallengeCodeText" class="tag code" style="font-size: 18px;"></span> and press Continue.</p>
+                        <p>Open the Bettr Unity Project. Select Play from Bettr Menu. Type in the Bettr Challenge Code <span id="StartUnityAppChallengeCodeText" class="tag code" style="font-size: 18px;"></span> and press Continue.</p>
                     </div>
 
                     <div class="setup-step" id="StartChallenge" style="display: none;">
@@ -2112,6 +2094,7 @@
             }
 
             function getState(objectKey, callback) {
+                console.debug(`getState: objectKey=${objectKey}`);
                 $.ajax({
                     url: 'https://acqgvpocrqiy6t6v7wfdhku2ae0bmfka.lambda-url.us-west-2.on.aws/',
                     type: 'POST',
