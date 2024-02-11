@@ -802,6 +802,7 @@
                     $('.next-btn').prop('disabled', true);
                     $('.finish-btn').prop('disabled', true);
                     $(`#verify-setup-spinner`).show();
+                    $('#setupCountdownTimer').text('60');
                 },
                 "StartApp": function(stepKey, taskId, rowIndex) {
                     $('.next-btn').prop('disabled', true);
@@ -820,6 +821,7 @@
                     $('.next-btn').prop('disabled', true);
                     $('.finish-btn').prop('disabled', true);
                     $(`#verify-unity-setup-spinner`).show();
+                    $('#unitySetupCountdownTimer').text('60');
                 },
                 "StartUnityApp": function(stepKey, taskId, rowIndex) {
                     $('.back-btn').prop('disabled', true);
@@ -843,10 +845,12 @@
                     $('#VerifySetupChallengeCode').hide();
                     var taskState = "VERIFY_SETUP"
                     var verifySetupInfo = $('#VerifySetupInfo');
-                    initiateVerifySetupCountdown(59);
+                    $('#setupCountdownTimer').show();
+                    var countdownTimer = initiateVerifySetupCountdown(59);
                     initializeDeveloperAccount(taskId, taskState, function(response, error) {
                         if (error) {
-                            $(`#verify-setup-spinner`).hide();
+                            clearTimeout(countdownTimer);
+                            $('#verify-setup-spinner').hide();
                             $('.next-btn').prop('disabled', false);
                             $('#VerifySetupInfo').empty().text("Bettr App Setup incomplete. Click Next.")
                         } else {
@@ -855,14 +859,14 @@
                                 localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
                                 const objectKey = `developers/${hashKey}/scene_state/image.png`;
                                 verifyAppInstall(objectKey, 0, function(err) {
-                                    $(`#verify-setup-spinner`).hide();
+                                    clearTimeout(countdownTimer);
+                                    $('#verify-setup-spinner').hide();
                                     if (err) {
                                         console.error('VerifySetup verifyAppInstall Error:', err);
                                         $('.next-btn').prop('disabled', false);
                                         $('#VerifySetupInfo').empty().text("Click Next.");
                                     } else {
                                         $('.next-btn').prop('disabled', false);
-                                        $('#setupCountdownTimer').hide()
                                         $('#VerifySetupInfo').empty().text("Bettr App Setup is complete. Click Next.");
                                         $("#VerifySetupChallengeCode .tag.code").text(hashKey);
                                         // $('#VerifySetupChallengeCode').show();
@@ -870,6 +874,9 @@
                                         localStorage.setItem(stepKey, `${nextStepIndex}`);
                                     }
                                 })                
+                            } else {
+                                clearTimeout(countdownTimer);
+                                $('#verify-setup-spinner').hide();
                             }
                         }
                     })
@@ -882,7 +889,6 @@
                     var generateChallengeCodeText = $('#GenerateChallengeCodeText');
                     var taskState = "GENERATE_CODE"
                     initializeDeveloperAccount(taskId, taskState, function(response, error) {
-                        $(`#start-app-spinner`).hide();
                         if (error) {
                             console.log(error);
                             showModalPanel(generateChallengeCodeText, 'Code Generation error. Support email: support@bettr.casino.', 'center');
@@ -909,10 +915,12 @@
                     $('.finish-btn').prop('disabled', true);
                     var taskState = "VERIFY_SETUP"
                     var verifySetupInfo = $('#VerifyUnitySetupInfo');
-                    initiateVerifyUnitySetupCountdown(59); 
+                    $('#unitySetupCountdownTimer').show()
+                    var countdownTimer = initiateVerifyUnitySetupCountdown(59); 
                     initializeDeveloperAccount(taskId, taskState, function(response, error) {
                         if (error) {
-                            $(`#verify-setup-spinner`).hide();
+                            clearTimeout(countdownTimer);
+                            $('#verify-unity-setup-spinner').hide();
                             $('.next-btn').prop('disabled', false);
                             $('#VerifySetupInfo').empty().text("Setup incomplete. Click Next.")
                         } else {
@@ -922,19 +930,22 @@
                                 const objectKey = `developers/${hashKey}/unity_state/image.png`;
                                 verifyAppInstall(objectKey, 0, function(response, err) {
                                     console.log(`response:${response} err=${err}`);
-                                    $(`#verify-unity-setup-spinner`).hide();
+                                    clearTimeout(countdownTimer);
+                                    $('#verify-unity-setup-spinner').hide();
                                     if (err) {
                                         console.error('VerifyUnitySetup Error:', err);
                                         $('.next-btn').prop('disabled', false);
                                         $('#VerifyUnitySetupInfo').empty().text("Bettr Unity Setup is incomplete. Click Next.");
                                     } else {
                                         $('.next-btn').prop('disabled', false);
-                                        $('#unitySetupCountdownTimer').hide()
                                         $('#VerifyUnitySetupInfo').empty().text("Bettr Unity Setup is complete. Click Next.");
                                         var nextStepIndex = stepData["map"]["StartUnityApp"];
                                         localStorage.setItem(stepKey, `${nextStepIndex}`);
                                     }
                                 })                
+                            } else {
+                                clearTimeout(countdownTimer);
+                                $('#verify-unity-setup-spinner').hide();
                             }
                         }
                     })
@@ -1260,7 +1271,8 @@
 
                     <div class="setup-step" id="VerifySetup" style="display: none;">
                         <h3>Verify the Bettr App.</h3>
-                        <p id="VerifySetupInfo">Running verify. <input type="text" id="setupCountdownTimer" readonly style="width: 30px; text-align: center;"/><span id="verify-setup-spinner" class="spinner2" style="display: none;"></span></p>
+                        <p id="VerifyRunningInfo">Running verify. <input type="text" id="setupCountdownTimer" readonly style="width: 30px; text-align: center;" value="60"/><span id="verify-setup-spinner" class="spinner2" style="display: none;"></span></p>
+                        <p id="VerifySetupInfo"></p>
                         <p id="VerifySetupChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
                     </div>
 
@@ -1282,7 +1294,8 @@
 
                     <div class="setup-step" id="VerifyUnitySetup" style="display: none;">
                         <h3>Verify the Bettr Unity Project.</h3>
-                        <p id="VerifyUnitySetupInfo">Running verify. <input type="text" id="unitySetupCountdownTimer" readonly style="width: 30px; text-align: center;"/><span id="verify-unity-setup-spinner" class="spinner2" style="display: none;"></span></p>
+                        <p id="VerifyUnityRunningInfo">Running verify. <input type="text" id="unitySetupCountdownTimer" readonly style="width: 30px; text-align: center;" value="60"/><span id="verify-unity-setup-spinner" class="spinner2" style="display: none;"></span></p>
+                        <p id="VerifyUnitySetupInfo"></p>
                     </div>
 
                     <div class="setup-step" id="SetupUnity" style="display: none;">
@@ -1294,8 +1307,8 @@
 
                     <div class="setup-step" id="StartUnityApp" style="display: none;">
                         <h3>Setup the Bettr Unity Project.</h3>
-                        <p>GitHub Archive: <a href="https://github.com/bettr-casino/slots-game-plugins/archive/refs/heads/main.zip" target="_blank">https://github.com/bettr-casino/slots-game-plugins/archive/refs/heads/main.zip</a></p>
-                        <p>Git clone: <span class="tag">git clone git@github.com:bettr-casino/slots-game-plugins.git</span></p>
+                        <p><a href="https://github.com/bettr-casino/slots-game-plugins/archive/refs/heads/main.zip" target="_blank">https://github.com/bettr-casino/slots-game-plugins/archive/refs/heads/main.zip</a></p>
+                        <p><span class="tag">git clone git@github.com:bettr-casino/slots-game-plugins.git</span></p>
                         <p>Open the Bettr Unity Project. Type in the Bettr Challenge Code <span id="StartUnityAppChallengeCodeText" class="tag code" style="font-size: 18px;"></span> and press Continue.</p>
                     </div>
 
@@ -1315,7 +1328,7 @@
                     <div id="scene-hierarchy" class="scene-hierarchy"></div>
                 </div>
 
-                <div class="iphone-buttons-container">
+                <div class="iphone-buttons-container"> 
                     <button id="toggle-iphone13" class="toggle-button">iPhone 13</button>
                     <button id="toggle-iphone14" class="toggle-button">iPhone 14</button>
                     <button id="toggle-iphone15" class="toggle-button">iPhone 15</button>
@@ -2049,16 +2062,17 @@
                         clearInterval(countdownInterval);
                     }
                 }, 1000);
+                return countdownInterval;
             }
 
             function initiateVerifySetupCountdown(duration) {
                 display = $('#setupCountdownTimer');
-                startCountdown(duration, display);
+                return startCountdown(duration, display);
             }
 
             function initiateVerifyUnitySetupCountdown(duration) {
                 display = $('#unitySetupCountdownTimer');
-                startCountdown(duration, display);
+                return startCountdown(duration, display);
             }
 
             function verifyAppInstall(objectKey, maxRetries, callback) {
