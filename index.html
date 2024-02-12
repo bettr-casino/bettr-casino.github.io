@@ -974,10 +974,21 @@
                     $('.back-btn').prop('disabled', true);
                     $('.next-btn').prop('disabled', false);
                     $('.finish-btn').prop('disabled', true);
-
+                    $(`#start-unity-app-spinner`).show();
                     const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
-                    $('#StartUnityAppChallengeCodeText').empty().text(hashKey);
-
+                    $('#CreateGitHubBranchText').empty().text(hashKey);
+                    initializeDeveloperProject(taskId, hashKey, function(response, error) {
+                        $(`#start-unity-app-spinner`).hide();
+                        if (error) {
+                            console.log(error);
+                            showModalPanel($('#CreateGitHubBranchText'), 'Project Generation error. Support email: support@bettr.casino.', 'center');
+                        } else {
+                            // Access the properties from the parsed body
+                            var zipUrl = response.zip_url;
+                            $('#CreateGitHubBranchZip').html(`<a href="' + ${zipUrl} + '" target="_blank">${zipUrl}</a>`);
+                            $('#CreateGitHubBranchGit').html(`<span class="tag">git clone -b ' + ${taskHashKey} + ' git@github.com:bettr-casino/slots-game-plugins.git</span>`);
+                        }
+                    });
                     var nextStepIndex = stepData["map"]["StartApp"];
                     localStorage.setItem(stepKey, `${nextStepIndex}`);
                 }
@@ -1315,9 +1326,10 @@
 
                     <div class="setup-step" id="StartUnityApp" style="display: none;">
                         <h3>Setup the Bettr Unity Project.</h3>
-                        <p><a href="https://github.com/bettr-casino/slots-game-plugins/archive/refs/heads/main.zip" target="_blank">https://github.com/bettr-casino/slots-game-plugins/archive/refs/heads/main.zip</a></p>
-                        <p><span class="tag">git clone git@github.com:bettr-casino/slots-game-plugins.git</span></p>
-                        <p>Open the Bettr Unity Project. Select Play from Bettr Menu. Type in the Bettr Challenge Code <span id="StartUnityAppChallengeCodeText" class="tag code" style="font-size: 18px;"></span> and press Continue.</p>
+                        <p>Creating GitHub Branch <span id="CreateGitHubBranchText" class="tag code" style="font-size: 18px;"></span><span id="start-unity-app-spinner" class="spinner2" style="display: none;"></span></p>
+                        <p id="CreateGitHubBranchZip"></p>
+                        <p id="CreateGitHubBranchGit"></p>
+                        <p>Open the Bettr Unity Project. Select Start from the Bettr Menu. Type in the Bettr Challenge Code <span id="StartUnityAppChallengeCodeText" class="tag code" style="font-size: 18px;"></span> and press Continue.</p>
                     </div>
 
                     <div class="setup-step" id="StartChallenge" style="display: none;">
@@ -1972,6 +1984,31 @@
                         "unity_path": unityPath,
                         "module_name": module,
                         "variant_name": variant
+                    }),
+                    success: function(response) {
+                        console.log("Response received: ", JSON.stringify(response));
+                        callback(response, null);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error in invoking Lambda:", error);
+                        callback(null, error);
+                    }
+                });
+            }
+
+            function initializeDeveloperProject(taskId, taskHashKey, callback) {
+                var userId = localStorage.getItem(prefix_local_store('user_id'));
+                var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
+                console.log('userId=', userId, 'sessionToken=', sessionToken);
+                $.ajax({
+                    url: 'https://czdog5nmjoycpd66iijtznxyse0sqhfd.lambda-url.us-west-2.on.aws/',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        "user_id": userId,
+                        "session_token": sessionToken,
+                        "task_id": taskId,
+                        "task_hash_key": taskHashKey
                     }),
                     success: function(response) {
                         console.log("Response received: ", JSON.stringify(response));
