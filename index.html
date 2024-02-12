@@ -620,6 +620,14 @@
             gap: 10px; /* Optional: adds some space between the tags */
         }
 
+        .disabled-link {
+            color: grey; /* Dimmed text color */
+            pointer-events: none; /* Disables the link functionality */
+            text-decoration: none; /* Optional: removes the underline from the link */
+            cursor: default; /* Optional: ensures the cursor doesn't change to the 'pointer' hand */
+            opacity: 0.5; /* Optional: makes the link appear more dimmed */
+        }
+
     </style>
 </head>
 <body>
@@ -974,9 +982,12 @@
                     $('.back-btn').prop('disabled', true);
                     $('.next-btn').prop('disabled', false);
                     $('.finish-btn').prop('disabled', true);
-                    $(`#start-unity-app-spinner`).show();
                     const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
-                    $('#CreateGitHubBranchText').empty().text(hashKey);
+                    const zipUrl = `https://github.com/bettr-casino/slots-game-plugins/archive/refs/heads/${hashKey}.zip`;
+                    $('#CreateGitHubBranchZip').empty().html(`<a href="${zipUrl}" target="_blank">${zipUrl}</a><span id="start-unity-app-spinner" class="spinner2" style="display: none;"></span>`);
+                    $(`#start-unity-app-spinner`).show();
+                    $('#CreateGitHubBranchZip a').addClass('disabled-link');
+                    $('#StartUnityAppChallengeCodeText').text(hashKey);
                     initializeDeveloperProject(taskId, hashKey, function(response, error) {
                         $(`#start-unity-app-spinner`).hide();
                         if (error) {
@@ -985,8 +996,8 @@
                         } else {
                             // Access the properties from the parsed body
                             var zipUrl = response.zip_url;
-                            $('#CreateGitHubBranchZip').html(`<a href="' + ${zipUrl} + '" target="_blank">${zipUrl}</a>`);
-                            $('#CreateGitHubBranchGit').html(`<span class="tag">git clone -b ' + ${taskHashKey} + ' git@github.com:bettr-casino/slots-game-plugins.git</span>`);
+                            $(`#start-unity-app-spinner`).hide();
+                            $('#CreateGitHubBranchZip a').removeClass('disabled-link');
                         }
                     });
                     var nextStepIndex = stepData["map"]["StartApp"];
@@ -1319,17 +1330,16 @@
 
                     <div class="setup-step" id="SetupUnity" style="display: none;">
                         <h3>Install the Bettr Unity Project.</h3>
-                        <p>The Bettr Unity Project requires Unity 2022.3.16f1.</p>
-                        <p>Unity Hub Install link: <a href="unityhub://2022.3.16f1/d2c21f0ef2f1" target="_blank">unityhub://2022.3.16f1/d2c21f0ef2f1</a></p>
+                        <p>Install via Unity Hub: <a href="unityhub://2022.3.16f1/d2c21f0ef2f1" target="_blank">unityhub://2022.3.16f1/d2c21f0ef2f1</a></p>
                         <p><span class="tag">macOS</span> <span class="tag">Windows</span></p>
                     </div>
 
                     <div class="setup-step" id="StartUnityApp" style="display: none;">
                         <h3>Setup the Bettr Unity Project.</h3>
-                        <p>Creating GitHub Branch <span id="CreateGitHubBranchText" class="tag code" style="font-size: 18px;"></span><span id="start-unity-app-spinner" class="spinner2" style="display: none;"></span></p>
                         <p id="CreateGitHubBranchZip"></p>
-                        <p id="CreateGitHubBranchGit"></p>
-                        <p>Open the Bettr Unity Project. Select Start from the Bettr Menu. Type in the Bettr Challenge Code <span id="StartUnityAppChallengeCodeText" class="tag code" style="font-size: 18px;"></span> and press Continue.</p>
+                        <p>Install the Project Archive. Open in Unity.</p>
+                        <p>Enter Play mode via the Unity Menu Bar.</p>
+                        <p>Type in this code <span id="StartUnityAppChallengeCodeText" class="tag code" style="font-size: 18px;"></span>. Press Continue.</p>
                     </div>
 
                     <div class="setup-step" id="StartChallenge" style="display: none;">
