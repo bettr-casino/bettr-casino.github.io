@@ -822,11 +822,21 @@
                     $('.back-btn').prop('disabled', true);
                     $('.next-btn').prop('disabled', false);
                     $('.finish-btn').prop('disabled', true);
+
+                    $('.iphone-buttons-container').show();
+                    $('.device-containers').show();
+                    $('#toggle-iphone13').show();
+                    $('#toggle-iphone13').click();
                 },
                 "SetupWizardUnity": function(stepKey, taskId, rowIndex) {
                     $('.back-btn').prop('disabled', true);
                     $('.next-btn').prop('disabled', false);
                     $('.finish-btn').prop('disabled', true);
+
+                    $('.iphone-buttons-container').show();
+                    $('.device-containers').show();
+                    $('#toggle-unity-editor').show();
+                    $('#toggle-unity-editor').click();
                 },
                 "FinishWizard": function(stepKey, taskId, rowIndex) {
                     $('.back-btn').prop('disabled', true);
@@ -1439,25 +1449,25 @@
                 </div>
 
                 <div class="iphone-buttons-container">
-                    <button id="toggle-unity-editor" class="toggle-button">Unity Editor</button>
-                    <button id="toggle-iphone13" class="toggle-button">iPhone 13</button>
+                    <button id="toggle-unity-editor" class="toggle-button" style="display:none">Unity Editor</button>
+                    <button id="toggle-iphone13" class="toggle-button" style="display:none">iPhone 13</button>
                     <!--<button id="toggle-iphone14" class="toggle-button">iPhone 14</button>
                     <button id="toggle-iphone15" class="toggle-button">iPhone 15</button>-->
                 </div>
 
-                <div id="unity-editor-container">
+                <div class="device-containers" id="unity-editor-container">
                     <div class="unity-editor" id="unity-editor"></div>
                 </div>
 
-                <div id="iphone13-container">
+                <div class="device-containers" id="iphone13-container">
                     <div id="iphone13" class="iphone iphone13"></div>
                 </div>
 
-                <div id="iphone14-container">
+                <div class="device-containers" id="iphone14-container">
                     <div id="iphone14" class="iphone iphone14"></div>
                 </div>
 
-                <div id="iphone15-container">
+                <div class="device-containers" id="iphone15-container">
                     <div id="iphone15" class="iphone iphone15"></div>
                 </div>`
 
@@ -1573,9 +1583,9 @@
                 // Show the form
                 detailsForm.show();
 
-                // Trigger click on the first button to show iPhone 13 by default
-                $('#toggle-iphone13').click();
-                
+                $('.iphone-buttons-container').hide();
+                $('.device-containers').hide();
+
                 callback(rowIndex);
             }
 
