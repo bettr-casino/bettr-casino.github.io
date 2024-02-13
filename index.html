@@ -811,6 +811,9 @@
             const wizardShouldShowFunctions = {
                 "RegisterUser": function(stepKey, taskId, rowIndex) {
                     return !isUserLoggedIn();
+                },
+                "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
+                    return !isTaskHashKeyGenerated(taskId);
                 }
             }
 
@@ -819,6 +822,16 @@
                     $('.back-btn').prop('disabled', true);
                     $('.next-btn').prop('disabled', false);
                     $('.finish-btn').prop('disabled', true);
+                },
+                "SetupWizardUnity": function(stepKey, taskId, rowIndex) {
+                    $('.back-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', false);
+                    $('.finish-btn').prop('disabled', true);
+                },
+                "FinishWizard": function(stepKey, taskId, rowIndex) {
+                    $('.back-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', true);
+                    $('.finish-btn').prop('disabled', false);
                 },
                 "SetupIPhone": function(stepKey, taskId, rowIndex) {
                     $('.back-btn').prop('disabled', true);
@@ -1095,7 +1108,7 @@
                     showModalPanel(registerUserA, 'Complete this step to continue.', 'center');
                     return false;
                 },
-                "StartApp": function(stepKey, taskId, rowIndex) {
+                "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
                     if (isTaskHashKeyGenerated(taskId)) {
                         return true;
                     }
@@ -1346,12 +1359,12 @@
 
                     <div class="setup-step" id="SetupWizardIPhone" style="display: none;">
                         <h3>Setup Wizard.</h3>
-                        <p>Sets up the Challenge on an <span class="tag">iPhone 13+</span>.</p>
+                        <p>Sets up the Bettr App on an <span class="tag">iPhone 13+</span>.</p>
                     </div>
 
                     <div class="setup-step" id="SetupWizardUnity" style="display: none;">
                         <h3>Setup Wizard.</h3>
-                        <p>Sets up the Challenge on either <span class="tag">macOS</span> or <span class="tag">Windows</span>.</p>
+                        <p>Sets up the Bettr Unity Project on either <span class="tag">macOS</span> or <span class="tag">Windows</span>.</p>
                     </div>
 
                     <div class="setup-step" id="RegisterUser" style="display: none;">
@@ -1367,14 +1380,14 @@
                     </div>
 
                     <div class="setup-step" id="VerifySetup" style="display: none;">
-                        <h3>Verify the Bettr App.</h3>
+                        <h3>Verify Bettr App.</h3>
                         <p id="VerifyRunningInfo">Running verify. <input type="text" id="setupCountdownTimer" readonly style="width: 30px; text-align: center;" value="60"/><span id="verify-setup-spinner" class="spinner2" style="display: none;"></span></p>
                         <p id="VerifySetupInfo"></p>
                         <p id="VerifySetupChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
                     </div>
 
                     <div class="setup-step" id="SetupIPhone" style="display: none;">
-                        <h3>Install the Bettr App.</h3>
+                        <h3>Install Bettr App.</h3>
                         <p>Type in the address below in a iPhone 13+ browser tab.</p>                        
                         <a href="https://testflight.apple.com/join/6japRuf7" target="_blank"><span class="tag">testflight.apple.com/join/6japRuf7</span></a>                                                
                         <p>Follow the instructions on the web page to install the Bettr App using Testflight.</p>
@@ -1382,7 +1395,7 @@
                     </div>
 
                     <div class="setup-step" id="StartApp" style="display: none;">
-                        <h3>Setup the Bettr App.</h3>
+                        <h3>Setup Bettr App.</h3>
                         <p class="StartAppInfoStep1">Generating Challenge Code <span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
                         <p><span id="StartAppText" class="tag code" style="font-size: 18px;"></span></p>
                         <p class="StartAppInfoStep2" style="display: none;">Launch the Bettr App on the iPhone 13+ device.</p>
@@ -1390,26 +1403,26 @@
                     </div>
 
                     <div class="setup-step" id="VerifyUnitySetup" style="display: none;">
-                        <h3>Verify the Bettr Unity Project.</h3>
+                        <h3>Verify Bettr Unity Project.</h3>
                         <p id="VerifyUnityRunningInfo">Running verify. <input type="text" id="unitySetupCountdownTimer" readonly style="width: 30px; text-align: center;" value="60"/><span id="verify-unity-setup-spinner" class="spinner2" style="display: none;"></span></p>
                         <p id="VerifyUnitySetupInfo"></p>
                     </div>
 
                     <div class="setup-step" id="SetupUnity" style="display: none;">
-                        <h3>Install the Bettr Unity Project.</h3>
+                        <h3>Install Bettr Unity Project.</h3>
                         <p>Install via Unity Hub: <a href="unityhub://2022.3.16f1/d2c21f0ef2f1" target="_blank">unityhub://2022.3.16f1/d2c21f0ef2f1</a></p>
                         <p><span class="tag">macOS</span> <span class="tag">Windows</span></p>
                     </div>
 
                     <div class="setup-step" id="StartUnityApp" style="display: none;">
-                        <h3>Setup the Bettr Unity Project.</h3>
+                        <h3>Setup Bettr Unity Project.</h3>
                         <p id="CreateGitHubBranchZip"></p>
                         <p>Install and open the Project. Set Display to 1280x720 Landscape. Enter Play mode via the Unity Bettr Menu.</p>
                         <p>In the Bettr Challenge Window, type in the code <span id="StartUnityAppChallengeCodeText" class="tag code" style="font-size: 18px;"></span>. Press Continue.</p>
                         <p>Wait for the Main Lobby to load.</p>
                     </div>
 
-                    <div class="setup-step" id="StartChallenge" style="display: none;">
+                    <div class="setup-step" id="FinishWizard" style="display: none;">
                         <h3>Start Challenge.</h3>
                         <p id="StartChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
                     </div>
