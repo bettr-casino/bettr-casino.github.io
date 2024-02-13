@@ -433,6 +433,23 @@
 
         }
 
+        .unity-editor {
+            /* Scaled-down dimensions for display */
+            width: 640px; /* Half of 1280px for scaling down */
+            height: 360px; /* Half of 720px for scaling down */
+            background-color: #000; /* Black background */
+            border: 4px solid #fff; /* White border to represent the editor window */
+            box-shadow: 0 0 20px rgba(0,0,0,0.5); /* Shadow for a 3D effect */
+            margin: 20px auto; /* Centering the element */
+            display: none; /* Initially hidden */
+        }
+
+        .unity-editor img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Or 'cover' if that's the desired effect */
+        }
+
         .scene-hierarchy-container {
             display: none; /* Align items in a row */
             justify-content: center; /* Center items horizontally */
@@ -880,7 +897,7 @@
                             if (hashKey && hashKey.length == 6) {
                                 localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
                                 const objectKey = `developers/${hashKey}/scene_state/image.png`;
-                                verifyAppInstall(objectKey, 0, function(err) {
+                                verifyAppInstall(objectKey, 10, function(response, err) {
                                     clearTimeout(countdownTimer);
                                     $('#verify-setup-spinner').hide();
                                     if (err) {
@@ -894,6 +911,12 @@
                                         // $('#VerifySetupChallengeCode').show();
                                         var nextStepIndex = stepData["map"]["StartApp"];
                                         localStorage.setItem(stepKey, `${nextStepIndex}`);
+                                        if (response.file_data) {
+                                            const imgElement = $('<img>').attr('src', 'data:image/png;base64,' + response.file_data);
+                                            activeIPhoneContainer().empty().append(imgElement);
+                                        } else {
+                                            console.error("Image data not found in response");
+                                        }
                                     }
                                 })                
                             } else {
@@ -940,7 +963,8 @@
                     $('.finish-btn').prop('disabled', true);
                     var taskState = "VERIFY_SETUP"
                     var verifySetupInfo = $('#VerifyUnitySetupInfo');
-                    $('#unitySetupCountdownTimer').show()
+                    $('#unitySetupCountdownTimer').show();
+                    $('#toggle-unity-editor').click();   
                     var countdownTimer = initiateVerifyUnitySetupCountdown(59); 
                     initializeDeveloperAccount(taskId, taskState, rowIndex, function(response, error) {
                         if (error) {
@@ -967,6 +991,12 @@
                                         $('#VerifyUnitySetupInfo').empty().text("Bettr Unity Setup is complete. Click Next.");
                                         var nextStepIndex = stepData["map"]["StartUnityApp"];
                                         localStorage.setItem(stepKey, `${nextStepIndex}`);
+                                        if (response.file_data) {
+                                            const imgElement = $('<img>').attr('src', 'data:image/png;base64,' + response.file_data);
+                                            activeUnityEditorContainer().empty().append(imgElement);
+                                        } else {
+                                            console.error("Image data not found in response");
+                                        }
                                     }
                                 })                
                             } else {
@@ -1076,6 +1106,11 @@
                 if (!$('#toggle-iphone13').prop('disabled')) return $('#iphone13');
                 if (!$('#toggle-iphone14').prop('disabled')) return $('#iphone14');
                 if (!$('#toggle-iphone15').prop('disabled')) return $('#iphone15');
+                return null;
+            }
+
+            function activeUnityEditorContainer() {
+                if (!$('#toggle-unity-editor').prop('disabled')) return $('#unity-editor');
                 return null;
             }
 
@@ -1358,10 +1393,15 @@
                     <div id="scene-hierarchy" class="scene-hierarchy"></div>
                 </div>
 
-                <div class="iphone-buttons-container"> 
+                <div class="iphone-buttons-container">
+                    <button id="toggle-unity-editor" class="toggle-button">Unity Editor</button>
                     <button id="toggle-iphone13" class="toggle-button">iPhone 13</button>
-                    <button id="toggle-iphone14" class="toggle-button">iPhone 14</button>
-                    <button id="toggle-iphone15" class="toggle-button">iPhone 15</button>
+                    <!--<button id="toggle-iphone14" class="toggle-button">iPhone 14</button>
+                    <button id="toggle-iphone15" class="toggle-button">iPhone 15</button>-->
+                </div>
+
+                <div id="unity-editor-container">
+                    <div class="unity-editor" id="unity-editor"></div>
                 </div>
 
                 <div id="iphone13-container">
@@ -1473,11 +1513,16 @@
                     // Remove 'active' class from all buttons and hide all iPhones
                     $('.toggle-button').removeClass('active');
                     $('.iphone').hide();
+                    $('.unity-editor').hide();
 
                     // Add 'active' class to the clicked button and show corresponding iPhone
                     $(this).addClass('active');
                     var containerId = this.id.replace('toggle-', '') + '-container';
-                    $('#' + containerId + ' .iphone').show();
+                    if (containerId === 'unity-editor-container') {
+                        $('#' + containerId + ' .unity-editor').show();
+                    } else {
+                        $('#' + containerId + ' .iphone').show();
+                    }
                 });
 
                 // Show the form
@@ -2148,14 +2193,7 @@
                 function attemptFetch() {
                     getState(objectKey, function(response, status, error) {
                         if (error == null) {
-                            if (response.file_data) {
-                                const imgElement = $('<img>').attr('src', 'data:image/png;base64,' + response.file_data);
-                                activeIPhoneContainer().empty().append(imgElement);
-                                callback(null);
-                            } else {
-                                console.error("Image data not found in response");
-                                callback(new Error('Image data not found'));
-                            }
+                            callback(response, null);
                         } else {
                             if (status === 404) {
                                 retries++;
@@ -2164,7 +2202,7 @@
                                 } else {
                                     console.error(`getState error=${error}`);
                                     const errorMessage = "Verify failed.";
-                                    callback(new Error(errorMessage));
+                                    callback(null, new Error(errorMessage));
                                 }
                             } else {
                                 console.error("Error in invoking Lambda:", error);
