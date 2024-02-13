@@ -815,6 +815,11 @@
             }
 
             const wizardOnShowFunctions = {
+                "SetupWizardIPhone": function(stepKey, taskId, rowIndex) {
+                    $('.back-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', false);
+                    $('.finish-btn').prop('disabled', true);
+                },
                 "SetupIPhone": function(stepKey, taskId, rowIndex) {
                     $('.back-btn').prop('disabled', true);
                     $('.next-btn').prop('disabled', false);
@@ -835,6 +840,10 @@
                         $('#RegisterUserTitle').text('Login.');
                     }
                 },
+                "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
+                    $('.next-btn').prop('disabled', true);
+                    $('.finish-btn').prop('disabled', true);
+                },
                 "VerifySetup": function(stepKey, taskId, rowIndex) {
                     $('.back-btn').prop('disabled', true);
                     $('.next-btn').prop('disabled', true);
@@ -845,9 +854,9 @@
                 "StartApp": function(stepKey, taskId, rowIndex) {
                     $('.next-btn').prop('disabled', true);
                     $('.finish-btn').prop('disabled', true);
-                    $('#GenerateChallengeCodeText').text("______");
-                    $(`.GenerateChallengeCodeInfoStep1`).show();
-                    $(`.GenerateChallengeCodeInfoStep2`).hide();
+                    $('#StartAppText').text("______");
+                    $(`.StartAppInfoStep1`).show();
+                    $(`.StartAppInfoStep2`).hide();
                 },
                 "SetupUnity": function(stepKey, taskId, rowIndex) {
                     $('.back-btn').prop('disabled', true);
@@ -875,6 +884,35 @@
                     if (!isUserLoggedIn()) {
                         $('.next-btn').prop('disabled', true);
                     }
+                },
+                "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
+                    $('.back-btn').prop('disabled', true);
+                    $('.next-btn').prop('disabled', true); 
+                    $('.finish-btn').prop('disabled', true); 
+                    var challengeSpinner = $(`#generate-challenge-code-spinner`);           
+                    challengeSpinner.show();
+                    var challengeCodeText = $('#GenerateChallengeCodeText');
+                    challengeCodeText.hide();
+                    var taskState = "GENERATE_CODE"
+                    initializeDeveloperAccount(taskId, taskState, rowIndex, function(response, error) {
+                        challengeSpinner.hide();
+                        challengeCodeText.show();
+                        if (error) {
+                            console.log(error);
+                            showModalPanel(challengeCodeText, 'Code Generation error. Support email: support@bettr.casino.', 'center');
+                        } else {
+                            // Access the properties from the parsed body
+                            var hashKey = response.task_hash_key;
+                            if (hashKey && hashKey.length == 6) {
+                                challengeCodeText.text(hashKey);
+                                localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
+                                $('.next-btn').prop('disabled', false);
+                            } else {
+                                console.log(`incorrect hash_key (length != 6) in response body=${JSON.stringify(response)}`);
+                                showModalPanel(challengeCodeText, 'Code Generation error. Go Back and retry. Support email: support@bettr.casino.', 'center');
+                            }
+                        }
+                    })
                 },
                 "VerifySetup": function(stepKey, taskId, rowIndex) {
                     $('.back-btn').prop('disabled', true);
@@ -933,29 +971,13 @@
                     $('.next-btn').prop('disabled', true); 
                     $('.finish-btn').prop('disabled', true);              
                     $(`#start-app-spinner`).show();
-                    var generateChallengeCodeText = $('#GenerateChallengeCodeText');
-                    var taskState = "GENERATE_CODE"
-                    initializeDeveloperAccount(taskId, taskState, rowIndex, function(response, error) {
-                        $(`#start-app-spinner`).hide();
-                        if (error) {
-                            console.log(error);
-                            showModalPanel(generateChallengeCodeText, 'Code Generation error. Support email: support@bettr.casino.', 'center');
-                        } else {
-                            // Access the properties from the parsed body
-                            var hashKey = response.task_hash_key;
-                            if (hashKey && hashKey.length == 6) {
-                                $('#GenerateChallengeCodeText').text(hashKey);
-                                localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
-                                $('.next-btn').prop('disabled', false);
-                                $(`.GenerateChallengeCodeInfoStep2`).show();
-                                var nextStepIndex = stepData["map"]["RegisterUser"];
-                                localStorage.setItem(stepKey, `${nextStepIndex}`);
-                            } else {
-                                console.log(`incorrect hash_key (length != 6) in response body=${JSON.stringify(response)}`);
-                                showModalPanel(generateChallengeCodeText, 'Code Generation error. Go Back and retry. Support email: support@bettr.casino.', 'center');
-                            }
-                        }
-                    })
+                    var startAppText = $('#StartAppText');
+                    startAppText.text(hashKey);
+                    localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
+                    $('.next-btn').prop('disabled', false);
+                    $(`.StartAppInfoStep2`).show();
+                    var nextStepIndex = stepData["map"]["RegisterUser"];
+                    localStorage.setItem(stepKey, `${nextStepIndex}`);
                 },
                 "VerifyUnitySetup": function(stepKey, taskId, rowIndex) {
                     $('.back-btn').prop('disabled', true);
@@ -1322,16 +1344,26 @@
                 var setupDiv = `
                 <div id="setup-div" class="setup">
 
-                    <div class="setup-step" id="SetupWizard" style="display: block;">
+                    <div class="setup-step" id="SetupWizardIPhone" style="display: none;">
                         <h3>Setup Wizard.</h3>
-                        <p>Use this wizard to setup the Challenge.</p>
-                        <p>Requires an <span class="tag">iPhone 13+</span> and either <span class="tag">macOS</span> or <span class="tag">Windows</span></p>
+                        <p>Sets up the Challenge on an <span class="tag">iPhone 13+</span>.</p>
+                    </div>
+
+                    <div class="setup-step" id="SetupWizardUnity" style="display: none;">
+                        <h3>Setup Wizard.</h3>
+                        <p>Sets up the Challenge on either <span class="tag">macOS</span> or <span class="tag">Windows</span>.</p>
                     </div>
 
                     <div class="setup-step" id="RegisterUser" style="display: none;">
                         <h3 id="RegisterUserTitle">Register.</h3>
                         <p id="RegisterUserText">We do not store email ids. Read our <a href="https://bettr.casino/privacy.html">Privacy</a> policy.</p>
                         <button id="RegisterUserAction" class="header-btn">Register</button>
+                    </div>
+
+                    <div class="setup-step" id="GenerateChallengeCode" style="display: none;">
+                        <h3>Generate the Challenge Code.</h3>
+                        <p>Generating Challenge Code <span id="generate-challenge-code-spinner" class="spinner2" style="display: none;"></span></p>
+                        <p><span id="GenerateChallengeCodeText" class="tag code" style="font-size: 18px;"></span></p>
                     </div>
 
                     <div class="setup-step" id="VerifySetup" style="display: none;">
@@ -1351,10 +1383,10 @@
 
                     <div class="setup-step" id="StartApp" style="display: none;">
                         <h3>Setup the Bettr App.</h3>
-                        <p class="GenerateChallengeCodeInfoStep1">Generating Challenge Code <span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
-                        <p><span id="GenerateChallengeCodeText" class="tag code" style="font-size: 18px;"></span></p>
-                        <p class="GenerateChallengeCodeInfoStep2" style="display: none;">Launch the Bettr App on the iPhone 13+ device.</p>
-                        <p class="GenerateChallengeCodeInfoStep2" style="display: none;">Type in the Bettr Challenge Code above in the App and press Continue.</p>
+                        <p class="StartAppInfoStep1">Generating Challenge Code <span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
+                        <p><span id="StartAppText" class="tag code" style="font-size: 18px;"></span></p>
+                        <p class="StartAppInfoStep2" style="display: none;">Launch the Bettr App on the iPhone 13+ device.</p>
+                        <p class="StartAppInfoStep2" style="display: none;">Type in the Bettr Challenge Code above in the App and press Continue.</p>
                     </div>
 
                     <div class="setup-step" id="VerifyUnitySetup" style="display: none;">
@@ -1529,7 +1561,9 @@
                 detailsForm.show();
 
                 // Trigger click on the first button to show iPhone 13 by default
-                $('#toggle-iphone13').click();                               
+                $('#toggle-iphone13').click();
+                
+                callback(rowIndex);
             }
 
             function copyToClipboard(text) {
