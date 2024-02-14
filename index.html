@@ -1226,6 +1226,37 @@
             }
         }
 
+        // Function to update the timer display
+        function updateTimerDisplay(taskId, rowIndex, $hoursSpan, $minutesSpan, $secondsSpan) {
+
+            // Get the task from the tasks array
+            var task = getTask(taskId);
+
+            // Get the timerValue from the task
+            var timerValue = task.timerValue || getColumnValue(detailsColumns, detailsRows, rowIndex, 'Timer') || -1;
+
+            if (timerValue < 0) {
+                clearInterval(timerInterval);
+            }
+
+            var [hours, minutes, seconds] = getTimerHHMMSS(timerValue);
+
+            // Update the text of each span with the new time values
+            $hoursSpan.text(hours);
+            $minutesSpan.text(minutes);
+            $secondsSpan.text(seconds);
+
+            // Decrement the timer value by 1 second
+            timerValue = (timerValue * 3600 - 1) / 3600;
+
+            task.timerValue = timerValue;
+
+            // If the timer reaches 0, stop the interval
+            if (timerValue < 0) {
+                clearInterval(timerInterval);
+            }
+        }
+
         function wizardOnFinishFunction(taskId, rowIndex) {
             $('.setup-step-button').hide(); 
             $('.setup-step').hide(); 
@@ -1268,6 +1299,14 @@
                             .append($minutesSpan)
                             .append(document.createTextNode(':'))
                             .append($secondsSpan);
+
+                // Initial update of the timer display
+                updateTimerDisplay(taskId, rowIndex, $hoursSpan, $minutesSpan, $secondsSpan);
+
+                // Set up the interval to update the timer every second
+                var timerInterval = setInterval(function() {
+                    updateTimerDisplay(taskId, rowIndex, $hoursSpan, $minutesSpan, $secondsSpan)
+                }, 1000);
 
                 $timeContainer.show();
             }
