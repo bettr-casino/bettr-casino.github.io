@@ -2423,17 +2423,24 @@
         $(document).ready(function() {
             var userId = localStorage.getItem(prefix_local_store('user_id'));
             var session_token = localStorage.getItem(prefix_local_store('session_token'));
-            getDeveloperAccount(userId, session_token, function(data, error) {
-                if (error) {
-                    console.error('Error in fetching developer account:', error);
-                } else {
-                    data = JSON.parse(data.value);
-                    tasks = data.tasks instanceof Array ? data.tasks : [];
-                    console.log('tasks=', JSON.stringify(tasks, null, 2));
-                }
+            console.log(`userId=${userId} session_token=${session_token}`);
+            if (userId == null || session_token == null) {
                 main();
-            });
-        })
+            } else {
+                getDeveloperAccount(userId, session_token, function(data, error) {
+                    if (error) {
+                        console.error('Error in fetching developer account:', error);
+                    } if (data == null) {
+                        console.error('No data fetching developer account:', error);
+                    } else {
+                        console.log('Developer account:', data);
+                        data = JSON.parse(data.value);
+                        tasks = data.tasks instanceof Array ? data.tasks : [];
+                        console.log('tasks=', JSON.stringify(tasks, null, 2));
+                    }
+                    main();
+                });
+        }});
 
         
     </script>
