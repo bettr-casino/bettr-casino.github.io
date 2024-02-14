@@ -1173,9 +1173,33 @@
                 $('.next-btn').prop('disabled', true);
                 $('.finish-btn').prop('disabled', false);
 
-                const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
-                const $challengeCode = $('#FinishWizardChallengeCodeText');
-                $challengeCode.text(hashKey);
+                // Get the task from the tasks array
+                var task = getTask(taskId);                
+
+                // Get the timerValue from the task
+                var timerValue = task.timerValue || getColumnValue(detailsColumns, detailsRows, rowIndex, 'Timer') || 0;
+            
+                if (timerValue > 0) {
+                    var $timeTextContainer = $('#finishWizardTimerText');
+                    var $timeContainer = $('#finishWizardTimerValue');
+
+                    // Call the getTimerHHMMSS function to get back hours, minutes, seconds
+                    var [hours, minutes, seconds] = getTimerHHMMSS(timerValue);
+
+                    // Constructing timer display with separate tags for hours, minutes, and seconds
+                    const $hoursSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(hours);
+                    const $minutesSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(minutes);
+                    const $secondsSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(seconds);
+
+                    $timeContainer.append($hoursSpan)
+                                .append(document.createTextNode(':'))
+                                .append($minutesSpan)
+                                .append(document.createTextNode(':'))
+                                .append($secondsSpan);
+
+                    $timeContainer.show();
+                }
+                
             }
 
         }
@@ -1245,9 +1269,7 @@
             // Get the timerValue from the task
             var timerValue = task.timerValue || 0;
 
-            var $challengeTimer = $('#ChallengeTimer');
-
-            var $timeContainer = $('#timerValue');
+            var $timeContainer = $('#finishWizardTimerValue');
 
             // Call the getTimerHHMMSS function to get back hours, minutes, seconds
             var [hours, minutes, seconds] = getTimerHHMMSS(timerValue);
@@ -1263,7 +1285,7 @@
                         .append(document.createTextNode(':'))
                         .append($secondsSpan);
 
-            $challengeTimer.show();
+            $timeContainer.show();
 
             return true;
         }                        
@@ -1558,16 +1580,19 @@
                     <p>In the Bettr Challenge Window, type in the code <span id="StartUnityAppChallengeCodeText" class="tag code" style="font-size: 18px;"></span>. Press Continue.</p>
                     <p>Wait for the Main Lobby to load.</p>
                 </div>
-
+                    
                 <div class="setup-step" id="FinishWizard" style="display: none;">
-                    <h3>Start Challenge.</h3>
-                    <p>Your Challenge Code <span id="FinishWizardChallengeCodeText" class="tag code" style="font-size: 18px;"></span>.</p>
-                    <p>.</p>
+                    <h3>Setup Completed.</h3>
+                    <p>Click Finish to close the setup wizard.</p>
+                    <p id="finishWizardTimerText">Time Remaining</p>
+                    <p id="finishWizardTimerValue"></p>
                 </div>
 
                 <div class="setup-step" id="ChallengeTimer" style="display: none;">
                     <h3>Challenge Timer.</h3>
                     <p id="timerValue"></p>
+                    <p>Challenge Code <span id="FinishWizardChallengeCodeText" class="tag" style="font-size: 18px;"></span></p>
+                    <p>Instructions <span id="FinishWizardInstructionsText" class="tag" style="font-size: 18px;">Unity/Assets/Instructions/Task001/README.md</span></p>
                 </div>
 
             </div>
@@ -2413,6 +2438,11 @@
             }
 
             return evaluate(tokens);
+        }
+
+        function getColumnValue(columns, rows, rowIndex, columnName) {
+            const columnIndex = columns.findIndex(column => column.title === columnName);
+            return rows[rowIndex][columnIndex];
         }
 
         function getTask(task_id) {
