@@ -928,7 +928,7 @@
                 $('#toggle-unity-editor').show();
                 $('#toggle-unity-editor').click();
             },
-            "FinishWizard": function(stepKey, taskId, rowIndex) {
+            "FinishUnityWizard": function(stepKey, taskId, rowIndex) {
                 $('.back-btn').prop('disabled', true);
                 $('.next-btn').prop('disabled', true);
                 $('.finish-btn').prop('disabled', false);
@@ -1168,37 +1168,13 @@
                 var nextStepIndex = stepData["map"]["StartApp"];
                 localStorage.setItem(stepKey, `${nextStepIndex}`);
             },
-            "FinishWizard": function(stepKey, taskId, rowIndex) {
+            "FinishUnityWizard": function(stepKey, taskId, rowIndex) {
                 $('.back-btn').prop('disabled', true);
                 $('.next-btn').prop('disabled', true);
-                $('.finish-btn').prop('disabled', false);
-
-                // Get the task from the tasks array
-                var task = getTask(taskId);                
-
-                // Get the timerValue from the task
-                var timerValue = task.timerValue || getColumnValue(detailsColumns, detailsRows, rowIndex, 'Timer') || 0;
-            
-                if (timerValue > 0) {
-                    var $timeTextContainer = $('#finishWizardTimerText');
-                    var $timeContainer = $('#finishWizardTimerValue');
-
-                    // Call the getTimerHHMMSS function to get back hours, minutes, seconds
-                    var [hours, minutes, seconds] = getTimerHHMMSS(timerValue);
-
-                    // Constructing timer display with separate tags for hours, minutes, and seconds
-                    const $hoursSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(hours);
-                    const $minutesSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(minutes);
-                    const $secondsSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(seconds);
-
-                    $timeContainer.append($hoursSpan)
-                                .append(document.createTextNode(':'))
-                                .append($minutesSpan)
-                                .append(document.createTextNode(':'))
-                                .append($secondsSpan);
-
-                    $timeContainer.show();
-                }
+                $('.finish-btn').prop('disabled', false);    
+                
+                var $instructionsText = $('#FinishUnityWizardInstructionsText');
+                $instructionsText.text("Unity/Assets/Instructions/Task001/README.md");
                 
             }
 
@@ -1266,26 +1242,37 @@
             // Get the task from the tasks array
             var task = getTask(taskId);
 
+            const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
+
+            var $challengeCode = $('#TaskProgressChallengeCodeText');
+            $challengeCode.text(hashKey);            
+
+            var $taskProgress = $('#TaskProgress');
+
+            var $timeContainer = $('#timerValue');
+
             // Get the timerValue from the task
-            var timerValue = task.timerValue || 0;
+            var timerValue = task.timerValue || getColumnValue(detailsColumns, detailsRows, rowIndex, 'Timer') || -1;
 
-            var $timeContainer = $('#finishWizardTimerValue');
+            if (timerValue > 0) {
+                // Call the getTimerHHMMSS function to get back hours, minutes, seconds
+                var [hours, minutes, seconds] = getTimerHHMMSS(timerValue);            
 
-            // Call the getTimerHHMMSS function to get back hours, minutes, seconds
-            var [hours, minutes, seconds] = getTimerHHMMSS(timerValue);
+                // Constructing timer display with separate tags for hours, minutes, and seconds
+                const $hoursSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(hours);
+                const $minutesSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(minutes);
+                const $secondsSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(seconds);
 
-            // Constructing timer display with separate tags for hours, minutes, and seconds
-            const $hoursSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(hours);
-            const $minutesSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(minutes);
-            const $secondsSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(seconds);
+                $timeContainer.append($hoursSpan)
+                            .append(document.createTextNode(':'))
+                            .append($minutesSpan)
+                            .append(document.createTextNode(':'))
+                            .append($secondsSpan);
 
-            $timeContainer.append($hoursSpan)
-                        .append(document.createTextNode(':'))
-                        .append($minutesSpan)
-                        .append(document.createTextNode(':'))
-                        .append($secondsSpan);
+                $timeContainer.show();
+            }
 
-            $timeContainer.show();
+            $taskProgress.show();
 
             return true;
         }                        
@@ -1517,7 +1504,7 @@
             <div id="setup-div" class="setup">
 
                 <div class="setup-step" id="SetupWizardIPhone" style="display: none;">
-                    <h3>Setup Wizard.</h3>
+                    <h3>Setup Wizard</h3>
                     <p>Sets up the Bettr App on an <span class="tag">iPhone 13+</span>.</p>
                 </div>
 
@@ -1527,26 +1514,26 @@
                 </div>
 
                 <div class="setup-step" id="RegisterUser" style="display: none;">
-                    <h3 id="RegisterUserTitle">Register.</h3>
+                    <h3 id="RegisterUserTitle">Register</h3>
                     <p id="RegisterUserText">We do not store email ids. Read our <a href="https://bettr.casino/privacy.html">Privacy</a> policy.</p>
                     <button id="RegisterUserAction" class="header-btn">Register</button>
                 </div>
 
                 <div class="setup-step" id="GenerateChallengeCode" style="display: none;">
-                    <h3>Generate the Challenge Code.</h3>
+                    <h3>Generate the Challenge Code</h3>
                     <p>Generating Challenge Code <span id="generate-challenge-code-spinner" class="spinner2" style="display: none;"></span></p>
                     <p><span id="GenerateChallengeCodeText" class="tag code" style="font-size: 18px;"></span></p>
                 </div>
 
                 <div class="setup-step" id="VerifySetup" style="display: none;">
-                    <h3>Verify Bettr App.</h3>
+                    <h3>Verify Bettr App</h3>
                     <p id="VerifyRunningInfo">Running verify. <input type="text" id="setupCountdownTimer" readonly style="width: 30px; text-align: center;" value="60"/><span id="verify-setup-spinner" class="spinner2" style="display: none;"></span></p>
                     <p id="VerifySetupInfo"></p>
                     <p id="VerifySetupChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
                 </div>
 
                 <div class="setup-step" id="SetupIPhone" style="display: none;">
-                    <h3>Install Bettr App.</h3>
+                    <h3>Install Bettr App</h3>
                     <p>Type in the address below in a iPhone 13+ browser tab.</p>                        
                     <a href="https://testflight.apple.com/join/6japRuf7" target="_blank"><span class="tag">testflight.apple.com/join/6japRuf7</span></a>                                                
                     <p>Follow the instructions on the web page to install the Bettr App using Testflight.</p>
@@ -1554,7 +1541,7 @@
                 </div>
 
                 <div class="setup-step" id="StartApp" style="display: none;">
-                    <h3>Setup Bettr App.</h3>
+                    <h3>Setup Bettr App</h3>
                     <p class="StartAppInfoStep1">Generating Challenge Code <span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
                     <p><span id="StartAppText" class="tag code" style="font-size: 18px;"></span></p>
                     <p class="StartAppInfoStep2" style="display: none;">Launch the Bettr App on the iPhone 13+ device.</p>
@@ -1562,37 +1549,35 @@
                 </div>
 
                 <div class="setup-step" id="VerifyUnitySetup" style="display: none;">
-                    <h3>Verify Bettr Unity Project.</h3>
+                    <h3>Verify Bettr Unity Project</h3>
                     <p id="VerifyUnityRunningInfo">Running verify. <input type="text" id="unitySetupCountdownTimer" readonly style="width: 30px; text-align: center;" value="60"/><span id="verify-unity-setup-spinner" class="spinner2" style="display: none;"></span></p>
                     <p id="VerifyUnitySetupInfo"></p>
                 </div>
 
                 <div class="setup-step" id="SetupUnity" style="display: none;">
-                    <h3>Install Bettr Unity Project.</h3>
+                    <h3>Install Bettr Unity Project</h3>
                     <p>Install via Unity Hub: <a href="unityhub://2022.3.16f1/d2c21f0ef2f1" target="_blank">unityhub://2022.3.16f1/d2c21f0ef2f1</a></p>
                     <p><span class="tag">macOS</span> <span class="tag">Windows</span></p>
                 </div>
 
                 <div class="setup-step" id="StartUnityApp" style="display: none;">
-                    <h3>Setup Bettr Unity Project.</h3>
+                    <h3>Setup Bettr Unity Project</h3>
                     <p id="CreateGitHubBranchZip"></p>
                     <p>Install and open the Project. Set Display to 1280x720 Landscape. Enter Play mode via the Unity Bettr Menu.</p>
                     <p>In the Bettr Challenge Window, type in the code <span id="StartUnityAppChallengeCodeText" class="tag code" style="font-size: 18px;"></span>. Press Continue.</p>
                     <p>Wait for the Main Lobby to load.</p>
                 </div>
                     
-                <div class="setup-step" id="FinishWizard" style="display: none;">
-                    <h3>Setup Completed.</h3>
-                    <p>Click Finish to close the setup wizard.</p>
-                    <p id="finishWizardTimerText">Time Remaining</p>
-                    <p id="finishWizardTimerValue"></p>
+                <div class="setup-step" id="FinishUnityWizard" style="display: none;">
+                    <h3>Setup Completed</h3>
+                    <p>Next Steps:</p>
+                    <p><span id="FinishUnityWizardInstructionsText" class="tag" style="font-size: 18px;"></span></p>
                 </div>
 
-                <div class="setup-step" id="ChallengeTimer" style="display: none;">
-                    <h3>Challenge Timer.</h3>
+                <div class="setup-step" id="TaskProgress" style="display: none;">
+                    <h3>Task Progress</h3>
+                    <p>Challenge Code <span id="TaskProgressChallengeCodeText" class="tag" style="font-size: 18px;"></span></p>
                     <p id="timerValue"></p>
-                    <p>Challenge Code <span id="FinishWizardChallengeCodeText" class="tag" style="font-size: 18px;"></span></p>
-                    <p>Instructions <span id="FinishWizardInstructionsText" class="tag" style="font-size: 18px;">Unity/Assets/Instructions/Task001/README.md</span></p>
                 </div>
 
             </div>
