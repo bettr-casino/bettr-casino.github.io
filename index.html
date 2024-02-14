@@ -758,1051 +758,57 @@
         // Create a constant for the prefix
         const prefix = 'BETTR__';
 
+        class ObserverManager {
+            constructor() {
+                this.observers = [];
+            }
+
+            subscribe(observerFunction) {
+                this.observers.push(observerFunction);
+            }
+
+            unsubscribe(observerFunction) {
+                this.observers = this.observers.filter(subscriber => subscriber !== observerFunction);
+            }
+
+            notify(data) {
+                this.observers.forEach(observerFunction => observerFunction(data));
+            }
+        }
+
+        const authObserverManager = new ObserverManager();
+
+        const dataUrl = 'https://bettr-casino-tasks.s3.us-west-2.amazonaws.com/gsheets-task-list/allopentasks.json';
+
+        const stepData = { "map": {}}
+
+        // Initialize all variables to null
+        var summaryColumns = null;
+        var detailsColumns = null;
+        var setupColumns = null;
+        var testColumns = null;
+        var internalColumns = null;
+
+        var summaryRows = null;
+        var detailsRows = null;
+        var setupRows = null;
+        var testRows = null;
+        var internalRows = null;
+
+        var tasks = [];
+
         function prefix_local_store(local_store_value) {
             return `${prefix}${local_store_value}`
         }
 
-        $(document).ready(function() {  
+        const main = function() {  
             
-            class ObserverManager {
-                constructor() {
-                    this.observers = [];
-                }
-
-                subscribe(observerFunction) {
-                    this.observers.push(observerFunction);
-                }
-
-                unsubscribe(observerFunction) {
-                    this.observers = this.observers.filter(subscriber => subscriber !== observerFunction);
-                }
-
-                notify(data) {
-                    this.observers.forEach(observerFunction => observerFunction(data));
-                }
-            }
-
-            const authObserverManager = new ObserverManager();
-
-            const dataUrl = 'https://bettr-casino-tasks.s3.us-west-2.amazonaws.com/gsheets-task-list/allopentasks.json';
-
-            const stepData = { "map": {}}
-
-            // Initialize all variables to null
-            var summaryColumns = null;
-            var detailsColumns = null;
-            var setupColumns = null;
-            var testColumns = null;
-            var internalColumns = null;
-
-            var summaryRows = null;
-            var detailsRows = null;
-            var setupRows = null;
-            var testRows = null;
-            var internalRows = null;
-    
             // Fetch and process data
             fetch(dataUrl)
                 .then(response => response.json())
                 .then(data => {
                     setupTables(data);
                 });
-
-            const wizardShouldShowFunctions = {
-                "RegisterUser": function(stepKey, taskId, rowIndex) {
-                    return !isUserLoggedIn();
-                },
-                "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
-                    return !isTaskHashKeyGenerated(taskId);
-                }
-            }
-
-            const wizardOnShowFunctions = {
-                "SetupWizardIPhone": function(stepKey, taskId, rowIndex) {
-                    $('.back-btn').prop('disabled', true);
-                    $('.next-btn').prop('disabled', false);
-                    $('.finish-btn').prop('disabled', true);
-
-                    $('.iphone-buttons-container').show();
-                    $('.device-containers').show();
-                    $('#toggle-iphone13').show();
-                    $('#toggle-iphone13').click();
-                },
-                "SetupWizardUnity": function(stepKey, taskId, rowIndex) {
-                    $('.back-btn').prop('disabled', true);
-                    $('.next-btn').prop('disabled', false);
-                    $('.finish-btn').prop('disabled', true);
-
-                    $('.iphone-buttons-container').show();
-                    $('.device-containers').show();
-                    $('#toggle-unity-editor').show();
-                    $('#toggle-unity-editor').click();
-                },
-                "FinishWizard": function(stepKey, taskId, rowIndex) {
-                    $('.back-btn').prop('disabled', true);
-                    $('.next-btn').prop('disabled', true);
-                    $('.finish-btn').prop('disabled', false);
-                },
-                "SetupIPhone": function(stepKey, taskId, rowIndex) {
-                    $('.back-btn').prop('disabled', true);
-                    $('.next-btn').prop('disabled', false);
-                    $('.finish-btn').prop('disabled', true);
-                },
-                "RegisterUser": function(stepKey, taskId, rowIndex) {
-                    $('.finish-btn').prop('disabled', true);
-                    if (isUserLoggedIn()) {
-                        $('#RegisterUserText').text('You are logged in. Click Next.');
-                        $('#RegisterUserAction').hide();
-                        $('#RegisterUserAction').text('Login');
-                        $('#RegisterUserTitle').text('Login.');
-                        $('.next-btn').prop('disabled', false);
-                        return;
-                    } 
-                    if (isUserRegistered()) {
-                        $('#RegisterUserAction').text('Login');
-                        $('#RegisterUserTitle').text('Login.');
-                    }
-                },
-                "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
-                    $('.next-btn').prop('disabled', true);
-                    $('.finish-btn').prop('disabled', true);
-                },
-                "VerifySetup": function(stepKey, taskId, rowIndex) {
-                    $('.back-btn').prop('disabled', true);
-                    $('.next-btn').prop('disabled', true);
-                    $('.finish-btn').prop('disabled', true);
-                    $(`#verify-setup-spinner`).show();
-                    $('#setupCountdownTimer').text('60');
-                },
-                "StartApp": function(stepKey, taskId, rowIndex) {
-                    $('.next-btn').prop('disabled', true);
-                    $('.finish-btn').prop('disabled', true);
-                    $('#StartAppText').text("______");
-                    $(`.StartAppInfoStep1`).show();
-                    $(`.StartAppInfoStep2`).hide();
-                },
-                "SetupUnity": function(stepKey, taskId, rowIndex) {
-                    $('.back-btn').prop('disabled', true);
-                    $('.next-btn').prop('disabled', false);
-                    $('.finish-btn').prop('disabled', true);
-                },
-                "VerifyUnitySetup": function(stepKey, taskId, rowIndex) {
-                    $('.back-btn').prop('disabled', true);
-                    $('.next-btn').prop('disabled', true);
-                    $('.finish-btn').prop('disabled', true);
-                    $(`#verify-unity-setup-spinner`).show();
-                    $('#unitySetupCountdownTimer').text('60');
-                },
-                "StartUnityApp": function(stepKey, taskId, rowIndex) {
-                    $('.back-btn').prop('disabled', true);
-                    $('.next-btn').prop('disabled', true);
-                    $('.finish-btn').prop('disabled', true);
-                }
-            }
-
-            const wizardAfterShowFunctions = {
-                "RegisterUser": function(evt, stepKey, taskId, rowIndex) {
-                    $('.finish-btn').prop('disabled', true);
-                    $('.next-btn').prop('disabled', false);
-                    if (!isUserLoggedIn()) {
-                        $('.next-btn').prop('disabled', true);
-                    }
-                },
-                "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
-                    $('.back-btn').prop('disabled', true);
-                    $('.next-btn').prop('disabled', true); 
-                    $('.finish-btn').prop('disabled', true); 
-                    var challengeSpinner = $(`#generate-challenge-code-spinner`);           
-                    challengeSpinner.show();
-                    var challengeCodeText = $('#GenerateChallengeCodeText');
-                    challengeCodeText.hide();
-                    var taskState = "GENERATE_CODE"
-                    initializeDeveloperAccount(taskId, taskState, rowIndex, function(response, error) {
-                        challengeSpinner.hide();
-                        challengeCodeText.show();
-                        if (error) {
-                            console.log(error);
-                            showModalPanel(challengeCodeText, 'Code Generation error. Support email: support@bettr.casino.', 'center');
-                        } else {
-                            // Access the properties from the parsed body
-                            var hashKey = response.task_hash_key;
-                            if (hashKey && hashKey.length == 6) {
-                                challengeCodeText.text(hashKey);
-                                localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
-                                $('.next-btn').prop('disabled', false);
-                            } else {
-                                console.log(`incorrect hash_key (length != 6) in response body=${JSON.stringify(response)}`);
-                                showModalPanel(challengeCodeText, 'Code Generation error. Go Back and retry. Support email: support@bettr.casino.', 'center');
-                            }
-                        }
-                    })
-                },
-                "VerifySetup": function(stepKey, taskId, rowIndex) {
-                    $('.back-btn').prop('disabled', true);
-                    $('.next-btn').prop('disabled', true);
-                    $('.finish-btn').prop('disabled', true);
-                    $('#VerifySetupChallengeCode').hide();
-                    var taskState = "VERIFY_SETUP"
-                    var verifySetupInfo = $('#VerifySetupInfo');
-                    $('#setupCountdownTimer').show();
-                    var countdownTimer = initiateVerifySetupCountdown(59);
-                    initializeDeveloperAccount(taskId, taskState, rowIndex, function(response, error) {
-                        if (error) {
-                            console.log(error);
-                            clearTimeout(countdownTimer);
-                            $('#verify-setup-spinner').hide();
-                            $('.next-btn').prop('disabled', false);
-                            $('#VerifySetupInfo').empty().text("Bettr App Setup incomplete. Click Next.")
-                        } else {
-                            var hashKey = response.task_hash_key;
-                            if (hashKey && hashKey.length == 6) {
-                                localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
-                                const objectKey = `developers/${hashKey}/scene_state/image.png`;
-                                verifyAppInstall(objectKey, 10, function(response, err) {
-                                    clearTimeout(countdownTimer);
-                                    $('#verify-setup-spinner').hide();
-                                    if (err) {
-                                        console.error('VerifySetup verifyAppInstall Error:', err);
-                                        $('.next-btn').prop('disabled', false);
-                                        $('#VerifySetupInfo').empty().text("Click Next.");
-                                    } else {
-                                        $('.next-btn').prop('disabled', false);
-                                        $('#VerifySetupInfo').empty().text("Bettr App Setup is complete. Click Next.");
-                                        $("#VerifySetupChallengeCode .tag.code").text(hashKey);
-                                        // $('#VerifySetupChallengeCode').show();
-                                        var nextStepIndex = stepData["map"]["StartApp"];
-                                        localStorage.setItem(stepKey, `${nextStepIndex}`);
-                                        if (response.file_data) {
-                                            const imgElement = $('<img>').attr('src', 'data:image/png;base64,' + response.file_data);
-                                            activeIPhoneContainer().empty().append(imgElement);
-                                        } else {
-                                            console.error("Image data not found in response");
-                                        }
-                                    }
-                                })                
-                            } else {
-                                clearTimeout(countdownTimer);
-                                $('#verify-setup-spinner').hide();
-                                $('.next-btn').prop('disabled', false);
-                                $('#VerifySetupInfo').empty().text("Bettr App Setup is incomplete. Click Next.");
-                            }
-                        }
-                    })
-                },
-                "StartApp": function(stepKey, taskId, rowIndex) {
-                    $('.back-btn').prop('disabled', true);
-                    $('.next-btn').prop('disabled', true); 
-                    $('.finish-btn').prop('disabled', true);              
-                    $(`#start-app-spinner`).show();
-                    var startAppText = $('#StartAppText');
-                    startAppText.text(hashKey);
-                    localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
-                    $('.next-btn').prop('disabled', false);
-                    $(`.StartAppInfoStep2`).show();
-                    var nextStepIndex = stepData["map"]["RegisterUser"];
-                    localStorage.setItem(stepKey, `${nextStepIndex}`);
-                },
-                "VerifyUnitySetup": function(stepKey, taskId, rowIndex) {
-                    $('.back-btn').prop('disabled', true);
-                    $('.next-btn').prop('disabled', true);
-                    $('.finish-btn').prop('disabled', true);
-                    var taskState = "VERIFY_SETUP"
-                    var verifySetupInfo = $('#VerifyUnitySetupInfo');
-                    $('#unitySetupCountdownTimer').show();
-                    $('#toggle-unity-editor').click();   
-                    var countdownTimer = initiateVerifyUnitySetupCountdown(59); 
-                    initializeDeveloperAccount(taskId, taskState, rowIndex, function(response, error) {
-                        if (error) {
-                            console.log(error);
-                            clearTimeout(countdownTimer);
-                            $('#verify-unity-setup-spinner').hide();
-                            $('.next-btn').prop('disabled', false);
-                            $('#VerifySetupInfo').empty().text("Setup incomplete. Click Next.")
-                        } else {
-                            var hashKey = response.task_hash_key;
-                            if (hashKey && hashKey.length == 6) {
-                                localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
-                                const objectKey = `developers/${hashKey}/scene_state_desktop/image.png`;
-                                verifyAppInstall(objectKey, 0, function(response, err) {
-                                    console.log(`response:${response} err=${err}`);
-                                    clearTimeout(countdownTimer);
-                                    $('#verify-unity-setup-spinner').hide();
-                                    if (err) {
-                                        console.error('VerifyUnitySetup Error:', err);
-                                        $('.next-btn').prop('disabled', false);
-                                        $('#VerifyUnitySetupInfo').empty().text("Bettr Unity Setup is incomplete. Click Next.");
-                                    } else {
-                                        $('.next-btn').prop('disabled', false);
-                                        $('#VerifyUnitySetupInfo').empty().text("Bettr Unity Setup is complete. Click Next.");
-                                        var nextStepIndex = stepData["map"]["StartUnityApp"];
-                                        localStorage.setItem(stepKey, `${nextStepIndex}`);
-                                        if (response.file_data) {
-                                            const imgElement = $('<img>').attr('src', 'data:image/png;base64,' + response.file_data);
-                                            activeUnityEditorContainer().empty().append(imgElement);
-                                        } else {
-                                            console.error("Image data not found in response");
-                                        }
-                                    }
-                                })                
-                            } else {
-                                clearTimeout(countdownTimer);
-                                $('#verify-unity-setup-spinner').hide();
-                                $('.next-btn').prop('disabled', false);
-                                $('#VerifyUnitySetupInfo').empty().text("Bettr Unity Setup is incomplete. Click Next.");
-                            }
-                        }
-                    })
-                },
-                "StartUnityApp": function(stepKey, taskId, rowIndex) {
-                    $('.back-btn').prop('disabled', true);
-                    $('.next-btn').prop('disabled', false);
-                    $('.finish-btn').prop('disabled', true);
-                    const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
-                    const zipUrl = `https://github.com/bettr-casino/slots-game-plugins/archive/refs/heads/${hashKey}.zip`;
-                    $('#CreateGitHubBranchZip').empty().html(`<a href="${zipUrl}" target="_blank">${zipUrl}</a><span id="start-unity-app-spinner" class="spinner2" style="display: none;"></span>`);
-                    $(`#start-unity-app-spinner`).show();
-                    $('#CreateGitHubBranchZip a').addClass('disabled-link');
-                    $('#StartUnityAppChallengeCodeText').text(hashKey);
-                    initializeDeveloperProject(taskId, hashKey, function(response, error) {
-                        $(`#start-unity-app-spinner`).hide();
-                        if (error) {
-                            console.log(error);
-                            showModalPanel($('#CreateGitHubBranchText'), 'Project Generation error. Support email: support@bettr.casino.', 'center');
-                        } else {
-                            // Access the properties from the parsed body
-                            var zipUrl = response.zip_url;
-                            $(`#start-unity-app-spinner`).hide();
-                            $('#CreateGitHubBranchZip a').removeClass('disabled-link');
-                        }
-                    });
-                    var nextStepIndex = stepData["map"]["StartApp"];
-                    localStorage.setItem(stepKey, `${nextStepIndex}`);
-                }
-            }
-
-            const wizardOnClickFunctions = {
-                "RegisterUser": function(evt, stepKey, taskId, rowIndex) {
-                    evt.preventDefault();  // Prevents the default link action
-                    authObserverManager.subscribe(function() {
-                        wizardOnShowFunctions["RegisterUser"]();
-                    });
-                    if (isUserRegistered()) {
-                        showLoginPanel(evt.target, "center");
-                    } else {
-                        showRegisterPanel(evt.target, "center");
-                    }
-                },
-                "StartApp": function(evt, stepKey, taskId, rowIndex) {
-                    evt.preventDefault();  // Prevents the default link action                    
-                }
-            }
-
-            const wizardOnBackFunctions = {
-                "StartApp": function(stepKey, taskId, rowIndex) {
-                    if (isUserLoggedIn()) {
-                        $('.setup-step').hide();
-                        $('#Start').show();
-                        localStorage.removeItem(stepKey);
-                        return false;
-                    }                    
-                    return true;
-                }
-            }
-
-            const wizardOnNextFunctions = {
-                "RegisterUser": function(stepKey, taskId, rowIndex) {
-                    if (isUserLoggedIn()) {
-                        return true;
-                    }
-                    var registerUserA = $('#RegisterUserAction');
-                    showModalPanel(registerUserA, 'Complete this step to continue.', 'center');
-                    return false;
-                },
-                "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
-                    if (isTaskHashKeyGenerated(taskId)) {
-                        return true;
-                    }
-                    return false;
-                }
-            }
-
-            function wizardOnFinishFunction(taskId, rowIndex) {
-                $('.setup-step-button').hide(); 
-                $('.setup-step').hide(); 
-                $('#StartChallenge').show(); 
-                $('.show-challenge-btn').hide();
-                $('.start-challenge-btn').show();
-
-                $('#TestTabButton').show();
-                $('#SubmitTabButton').show();
-
-                $('#TestTabButton').removeAttr("disabled");
-                $('#SubmitTabButton').removeAttr("disabled");
-
-                const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
-
-                $("#StartChallengeCode .tag.code").text(hashKey);
-                $('#StartChallengeCode').show();
-
-                return true;
-            }
-
-            function activeIPhoneContainer() {
-                if (!$('#toggle-iphone13').prop('disabled')) return $('#iphone13');
-                if (!$('#toggle-iphone14').prop('disabled')) return $('#iphone14');
-                if (!$('#toggle-iphone15').prop('disabled')) return $('#iphone15');
-                return null;
-            }
-
-            function activeUnityEditorContainer() {
-                if (!$('#toggle-unity-editor').prop('disabled')) return $('#unity-editor');
-                return null;
-            }
-
-            // Function to validate email using simple regex
-            function isValidEmail(email) {
-                var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                return regex.test(email);
-            }            
-
-            function updateSignInButtons() {
-                validateSessionToken(function(err, response) {
-                    if (err) {
-                        console.error('Error:', err);
-                        $('#register-btn').show();
-                        $('#login-btn').show();
-                        $('#logout-btn').hide();
-                    } else {
-                        $('#register-btn').hide();
-                        $('#login-btn').hide();
-                        $('#logout-btn').show();
-                    }
-                });
-            }
-
-            // Function to enable/disable verification button based on email validity
-            function toggleVerificationButton(inputSelector, buttonSelector) {
-                var email = $(inputSelector).val();
-                if (isValidEmail(email)) {
-                    $(buttonSelector).prop('disabled', false);
-                } else {
-                    $(buttonSelector).prop('disabled', true);
-                }
-            }
-
-            function setupTables(data) {
-
-                // Assuming the first row contains headers
-                var headers = data.headers;
-                var rows = data.rows;
-
-                // Find the index of the "Publish" column
-                const publishIndex = headers.indexOf("Publish");
-
-                // Find indices for the 'Summary', 'Details', and 'Internal' columns
-                const summaryStartIndex = headers.indexOf("Section");
-                const detailsStartIndex = headers.indexOf("Section", summaryStartIndex + 1);
-                const setupStartIndex = headers.indexOf("Section", detailsStartIndex + 1);
-                const testStartIndex = headers.indexOf("Section", setupStartIndex + 1);
-                const internalStartIndex = headers.indexOf("Section", testStartIndex + 1);
-                const endIndex = headers.length;
-    
-                // Create column definitions for Summary and Internal tables
-                summaryColumns = headers.slice(summaryStartIndex + 1, detailsStartIndex)
-                    .map(header => ({ title: header }));
-                detailsColumns = headers.slice(detailsStartIndex + 1, setupStartIndex)
-                    .map(header => ({ title: header }));
-                setupColumns = headers.slice(setupStartIndex + 1, testStartIndex)
-                    .map(header => ({ title: header }));
-                testColumns = headers.slice(testStartIndex + 1, internalStartIndex)
-                .map(header => ({ title: header }));
-                internalColumns = headers.slice(internalStartIndex + 1, endIndex)
-                    .map(header => ({ title: header }));
-
-                summaryRows = rows.map(row => row.slice(summaryStartIndex + 1, detailsStartIndex));
-                detailsRows = rows.map(row => row.slice(detailsStartIndex + 1, setupStartIndex));
-                setupRows = rows.map(row => row.slice(setupStartIndex + 1, testStartIndex));
-                testRows = rows.map(row => row.slice(testStartIndex + 1, internalStartIndex));
-                internalRows = rows.map(row => row.slice(internalStartIndex + 1, endIndex));
-    
-                // // Initialize the Summary DataTable
-                const summaryTable = $('#summary-table').DataTable({
-                    data: summaryRows,
-                    columns: summaryColumns,
-                    pageLength: 5,  // Default number of rows per page
-                    lengthMenu: [5, 10, 20, 50]
-                });
-
-                $(summaryTable.table().container()).addClass('section1');
-
-                // Event listener for row click in Summary table
-                $('#summary-table tbody').on('click', 'tr', function() {
-
-                    // Remove highlighting from all rows
-                    $('#summary-table tbody tr').removeClass('highlighted');
-                
-                    // Highlight the clicked row
-                    $(this).addClass('highlighted');
-
-                    const table = $('#summary-table').DataTable();
-                    const rowIndex = table.row(this).index(); // Gets the index of the clicked row
-                    const detailsRow = detailsRows[rowIndex];
-                    const taskIdIndex = detailsColumns.findIndex(column => column.title === 'ID');
-                    const taskId = detailsRow[taskIdIndex];
-                    const stepKey = `${prefix}TaskID__${taskId}__SetupIndex`;
-
-                    function showNextWizardStep(rowIndex, offset) {
-                        const setupRowData = rows.map(row => row.slice(setupStartIndex + 1, testStartIndex)); // Extract Setup columns
-                        const setupRow = setupRowData[rowIndex];
-                        const totalSteps = setupRow[0];
-                        const completedSetupIndex = parseInt(localStorage.getItem(stepKey), 10) || 0;
-                        const nextStepIndex = completedSetupIndex + offset;
-                        if (nextStepIndex <= totalSteps) {
-                            var stepIndex = setupColumns.findIndex(column => column.title === `Step${nextStepIndex}`);
-                            const stepText = setupRow[stepIndex];
-                            $('.setup-step').hide();
-                            $('.setup-step-button').prop('disabled', true);
-                            localStorage.setItem(stepKey, `${nextStepIndex}`);
-                            const stepShouldShowFn = wizardShouldShowFunctions[stepText];
-                            if (stepShouldShowFn) {
-                                if (!stepShouldShowFn(stepKey, taskId, rowIndex)) {
-                                    // skip further processing for this step
-                                    showNextWizardStep(rowIndex, 1);
-                                    return;
-                                }
-                            }
-                            const stepOnShowFn = wizardOnShowFunctions[stepText];
-                            if (stepOnShowFn) {
-                                stepOnShowFn(stepKey, taskId, rowIndex);
-                            }
-                            const stepOnClickFn = wizardOnClickFunctions[stepText];
-                            if (stepOnClickFn) {
-                                $(`#${stepText}Action`).off('click').on('click', function(evt) { stepOnClickFn(evt, stepKey, taskId, rowIndex); });
-                            }
-                            $(`#${stepText}`).show();
-                            $('.back-btn').off('click').on('click', function() {
-                                const stepOnBackFn = wizardOnBackFunctions[stepText];
-                                if (stepOnBackFn) {
-                                    if (!stepOnBackFn(stepKey, taskId, rowIndex)) {
-                                        return;
-                                    }
-                                }
-                                showNextWizardStep(rowIndex, -1);
-                            });
-                            $('.finish-btn').off('click').on('click', function() {
-                                if (wizardOnFinishFunction(taskId, rowIndex)) {
-                                    return;
-                                }
-                            });
-                            $('.next-btn').off('click').on('click', function() {
-                                const stepOnNextFn = wizardOnNextFunctions[stepText];
-                                if (stepOnNextFn) {
-                                    if (!stepOnNextFn(stepKey, taskId, rowIndex)) {
-                                        return;
-                                    }
-                                }
-                                showNextWizardStep(rowIndex, 1);
-                            });
-                            const stepAfterShowFn = wizardAfterShowFunctions[stepText];
-                            if (stepAfterShowFn) {
-                                stepAfterShowFn(stepKey, taskId, rowIndex);
-                            }
-                        }
-                    }
-
-                    const setupRowData = rows.map(row => row.slice(setupStartIndex + 1, testStartIndex)); // Extract Setup columns
-                    const setupRow = setupRowData[rowIndex];
-                    const totalSteps = setupRow[0];
-
-                    const stepDataMap = stepData["map"];
-
-                    for (let index = 1; index < setupRow.length; index++) {
-                        const stepRow = setupRow[index];
-                        stepDataMap[stepRow] = index;
-                    }
-
-                    populateDetailsForm(detailsColumns, detailsRow, rowIndex, function(rowIndex) {
-                        localStorage.removeItem(stepKey);
-                        showNextWizardStep(rowIndex, 1);
-                    });
-                });
-
-                // Check if there are rows in the table
-                if (summaryTable.data().any()) {
-                    // Trigger click on the first row
-                    $('#summary-table tbody tr:eq(0)').click();
-                }    
-
-            }
-
-
-            function populateDetailsForm(columns, dataRow, rowIndex, callback) {
-                const detailsForm = $('#details-form');
-                // Clear existing content
-                detailsForm.empty();
-
-                var tabsHTML = `
-                    <div id="SetupTab" class="tab-content" style="display:block;">
-                        <!-- Your existing Setup content here -->
-                    </div>
-                    <div id="TestTab" class="tab-content" style="display:none;">
-                        <!-- Content for Test -->
-                    </div>
-                    <div id="SubmitTab" class="tab-content" style="display:none;">
-                        <!-- Content for Submit -->
-                    </div>
-                `;
-
-                // Append the tabs HTML to the detailsForm
-                detailsForm.append(tabsHTML);
-
-                $setupTab = $('#SetupTab')
-
-                // Start the table
-                const detailsTable = $('<table>').addClass('details-table');
-
-                    // Append the table to the form
-                $setupTab.append(detailsTable);
-
-                var setupDiv = `
-                <div id="setup-div" class="setup">
-
-                    <div class="setup-step" id="SetupWizardIPhone" style="display: none;">
-                        <h3>Setup Wizard.</h3>
-                        <p>Sets up the Bettr App on an <span class="tag">iPhone 13+</span>.</p>
-                    </div>
-
-                    <div class="setup-step" id="SetupWizardUnity" style="display: none;">
-                        <h3>Setup Wizard.</h3>
-                        <p>Sets up the Bettr Unity Project on either <span class="tag">macOS</span> or <span class="tag">Windows</span>.</p>
-                    </div>
-
-                    <div class="setup-step" id="RegisterUser" style="display: none;">
-                        <h3 id="RegisterUserTitle">Register.</h3>
-                        <p id="RegisterUserText">We do not store email ids. Read our <a href="https://bettr.casino/privacy.html">Privacy</a> policy.</p>
-                        <button id="RegisterUserAction" class="header-btn">Register</button>
-                    </div>
-
-                    <div class="setup-step" id="GenerateChallengeCode" style="display: none;">
-                        <h3>Generate the Challenge Code.</h3>
-                        <p>Generating Challenge Code <span id="generate-challenge-code-spinner" class="spinner2" style="display: none;"></span></p>
-                        <p><span id="GenerateChallengeCodeText" class="tag code" style="font-size: 18px;"></span></p>
-                    </div>
-
-                    <div class="setup-step" id="VerifySetup" style="display: none;">
-                        <h3>Verify Bettr App.</h3>
-                        <p id="VerifyRunningInfo">Running verify. <input type="text" id="setupCountdownTimer" readonly style="width: 30px; text-align: center;" value="60"/><span id="verify-setup-spinner" class="spinner2" style="display: none;"></span></p>
-                        <p id="VerifySetupInfo"></p>
-                        <p id="VerifySetupChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
-                    </div>
-
-                    <div class="setup-step" id="SetupIPhone" style="display: none;">
-                        <h3>Install Bettr App.</h3>
-                        <p>Type in the address below in a iPhone 13+ browser tab.</p>                        
-                        <a href="https://testflight.apple.com/join/6japRuf7" target="_blank"><span class="tag">testflight.apple.com/join/6japRuf7</span></a>                                                
-                        <p>Follow the instructions on the web page to install the Bettr App using Testflight.</p>
-                        <p>Click Next after installation is complete.</p>
-                    </div>
-
-                    <div class="setup-step" id="StartApp" style="display: none;">
-                        <h3>Setup Bettr App.</h3>
-                        <p class="StartAppInfoStep1">Generating Challenge Code <span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
-                        <p><span id="StartAppText" class="tag code" style="font-size: 18px;"></span></p>
-                        <p class="StartAppInfoStep2" style="display: none;">Launch the Bettr App on the iPhone 13+ device.</p>
-                        <p class="StartAppInfoStep2" style="display: none;">Type in the Bettr Challenge Code above in the App and press Continue.</p>
-                    </div>
-
-                    <div class="setup-step" id="VerifyUnitySetup" style="display: none;">
-                        <h3>Verify Bettr Unity Project.</h3>
-                        <p id="VerifyUnityRunningInfo">Running verify. <input type="text" id="unitySetupCountdownTimer" readonly style="width: 30px; text-align: center;" value="60"/><span id="verify-unity-setup-spinner" class="spinner2" style="display: none;"></span></p>
-                        <p id="VerifyUnitySetupInfo"></p>
-                    </div>
-
-                    <div class="setup-step" id="SetupUnity" style="display: none;">
-                        <h3>Install Bettr Unity Project.</h3>
-                        <p>Install via Unity Hub: <a href="unityhub://2022.3.16f1/d2c21f0ef2f1" target="_blank">unityhub://2022.3.16f1/d2c21f0ef2f1</a></p>
-                        <p><span class="tag">macOS</span> <span class="tag">Windows</span></p>
-                    </div>
-
-                    <div class="setup-step" id="StartUnityApp" style="display: none;">
-                        <h3>Setup Bettr Unity Project.</h3>
-                        <p id="CreateGitHubBranchZip"></p>
-                        <p>Install and open the Project. Set Display to 1280x720 Landscape. Enter Play mode via the Unity Bettr Menu.</p>
-                        <p>In the Bettr Challenge Window, type in the code <span id="StartUnityAppChallengeCodeText" class="tag code" style="font-size: 18px;"></span>. Press Continue.</p>
-                        <p>Wait for the Main Lobby to load.</p>
-                    </div>
-
-                    <div class="setup-step" id="FinishWizard" style="display: none;">
-                        <h3>Start Challenge.</h3>
-                        <p id="StartChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
-                    </div>
-                </div>
-
-                <div id="setup-btn" class="setup">
-                    <button class="setup-step-button back-btn">Back</button>
-                    <button class="setup-step-button next-btn">Next</button>
-                    <button class="setup-step-button finish-btn">Finish</button>
-                </div>
-
-                <div class="scene-hierarchy-container">
-                    <div id="scene-hierarchy" class="scene-hierarchy"></div>
-                </div>
-
-                <div class="iphone-buttons-container">
-                    <button id="toggle-unity-editor" class="toggle-button" style="display:none">Unity Editor</button>
-                    <button id="toggle-iphone13" class="toggle-button" style="display:none">iPhone 13</button>
-                    <!--<button id="toggle-iphone14" class="toggle-button">iPhone 14</button>
-                    <button id="toggle-iphone15" class="toggle-button">iPhone 15</button>-->
-                </div>
-
-                <div class="device-containers" id="unity-editor-container">
-                    <div class="unity-editor" id="unity-editor"></div>
-                </div>
-
-                <div class="device-containers" id="iphone13-container">
-                    <div id="iphone13" class="iphone iphone13"></div>
-                </div>
-
-                <div class="device-containers" id="iphone14-container">
-                    <div id="iphone14" class="iphone iphone14"></div>
-                </div>
-
-                <div class="device-containers" id="iphone15-container">
-                    <div id="iphone15" class="iphone iphone15"></div>
-                </div>`
-
-                $setupTab.append(setupDiv);
-
-                // Iterate over columns and add rows to the table
-                columns.forEach((column, index) => {
-                    const columnName = column.title;  // Assuming column object has a 'title' property
-                    const columnValue = dataRow[index];
-
-                    // Check if the column is 'Tags' and process accordingly
-                    
-                    if (columnName === 'ID' || columnName == 'Timer') {
-                        // hide
-                    } else if (columnName === 'System Requirements') {
-                        // Split the 'System Requirements' value into tags and display as text
-                        const tags = columnValue.split(',').map(tag => tag.trim());
-                        const $requirements = $('#SetupWizardRequirements');
-                        $requirements.empty().text('Setup requires:')
-                        tags.forEach(tag => {
-                            const orTags = tag.split('or').map(t => t.trim());
-                            const $tagContainer = $('<span>').addClass('tag-container');
-                            orTags.forEach((orTag, i) => {
-                                if (i > 0) {
-                                    $tagContainer.append(document.createTextNode(' OR '));
-                                }
-                                $tagContainer.append($('<span>').addClass('tag').text(orTag));
-                            });
-                            $requirements.append($tagContainer);
-                        });
-                    } else if (columnName === 'Tags' || columnName === 'Skill Sets' || columnName == 'Setup Requirements') {
-                        const tags = columnValue.split(',').map(tag => tag.trim());
-                        const tagsContainer = $('<td>');
-                        tags.forEach(tag => {
-                            $('<span>').addClass('tag').text(tag).appendTo(tagsContainer);
-                        });
-                        const row = $('<tr>').append($('<td>').text(columnName)).append(tagsContainer);
-                        detailsTable.append(row);
-                    } else if (columnName === 'Difficulty') {
-                        // Color-coded tags for Difficulty
-                        const difficultySpan = $('<span>').addClass('tag').text(columnValue);
-                        switch (columnValue.toUpperCase()) {
-                            case 'EASY':
-                                difficultySpan.css('background-color', 'green');
-                                break;
-                            case 'MEDIUM':
-                                difficultySpan.css('background-color', 'yellow');
-                                break;
-                            case 'HARD':
-                                difficultySpan.css('background-color', 'red');
-                                break;
-                        }
-                        const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').append(difficultySpan));
-                        detailsTable.append(row);
-                    } else if (columnName === 'Timer') {
-                        // Assuming columnValue is in fractional hours, convert to HH:MM:SS
-                        let totalHours = parseFloat(columnValue);
-                        let totalSeconds = Math.round(totalHours * 3600); // Convert hours to seconds
-
-                        let hours = Math.floor(totalSeconds / 3600);
-                        totalSeconds %= 3600;
-                        let minutes = Math.floor(totalSeconds / 60);
-                        let seconds = totalSeconds % 60;
-
-                        // Padding with '0' if necessary
-                        hours = String(hours).padStart(2, '0');
-                        minutes = String(minutes).padStart(2, '0');
-                        seconds = String(seconds).padStart(2, '0');
-
-                        // Constructing timer display with separate tags for hours, minutes, and seconds
-                        const $hoursSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(hours);
-                        const $minutesSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(minutes);
-                        const $secondsSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(seconds);
-
-                        const $timeContainer = $('<td>');
-                        $timeContainer.append($hoursSpan)
-                                    .append(document.createTextNode(':'))
-                                    .append($minutesSpan)
-                                    .append(document.createTextNode(':'))
-                                    .append($secondsSpan);
-
-                        const row = $('<tr>').append($('<td>').text(columnName)).append($timeContainer);
-                        detailsTable.append(row);
-                    } else {
-                        const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').text(columnValue));
-                        detailsTable.append(row);
-                    }
-
-                });
-
-                $('.setup-step-button').prop('disabled', true);
-                
-                $('.next-btn').prop('disabled', false).off('click').on('click', function() {
-                    callback(rowIndex);
-                });
-
-                $('.toggle-button').click(function() {
-                    // Remove 'active' class from all buttons and hide all iPhones
-                    $('.toggle-button').removeClass('active');
-                    $('.iphone').hide();
-                    $('.unity-editor').hide();
-
-                    // Add 'active' class to the clicked button and show corresponding iPhone
-                    $(this).addClass('active');
-                    var containerId = this.id.replace('toggle-', '') + '-container';
-                    if (containerId === 'unity-editor-container') {
-                        $('#' + containerId + ' .unity-editor').show();
-                    } else {
-                        $('#' + containerId + ' .iphone').show();
-                    }
-                });
-
-                // Show the form
-                detailsForm.show();
-
-                $('.iphone-buttons-container').hide();
-                $('.device-containers').hide();
-
-                callback(rowIndex);
-            }
-
-            function copyToClipboard(text) {
-                navigator.clipboard.writeText(text).then(() => {
-                    console.log('Text copied to clipboard');
-                }).catch(err => {
-                    console.error('Failed to copy text to clipboard', err);
-                });
-            }
-
-            function fillHashKey(hash_key) {
-                if(hash_key.length !== 6) {
-                    console.error("hash_key must be exactly 6 characters long.");
-                    return;
-                }
-
-                var inputs = $('.code-container input');
-                for(var i = 0; i < hash_key.length; i++) {
-                    inputs.eq(i).val(hash_key[i]);
-                }
-            }
-
-            function updatePageHash(hashStr) {
-                window.location.hash = hashStr;
-            }
-
-            function isUserRegistered() {
-                var userId = localStorage.getItem(prefix_local_store('user_id'));
-                return userId ? true : false;
-            }
-
-            function isUserLoggedIn() {
-                var userId = localStorage.getItem(prefix_local_store('user_id'));
-                var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
-                return userId && sessionToken ? true : false;
-            }
-
-            function isTaskHashKeyGenerated(taskId) {
-                var hash_key = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
-                return hash_key ? true : false;
-            }
-
-            function checkUserSession() {
-                var userId = localStorage.getItem(prefix_local_store('user_id'));
-                var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
-
-                if (!userId) {
-                    showModal('Please register to start on this challenge.');
-                    return false;
-                } else if (!sessionToken) {
-                    showModal('Please login to continue.');
-                    return false;
-                }
-
-                return true;
-            }
-
-            function showModal(message) {
-                $('#modal-message').text(message);
-    
-                var modal = $('#user-modal');
-                var windowWidth = $(window).width();
-                var windowHeight = $(window).height();
-                var modalWidth = modal.outerWidth();
-                var modalHeight = modal.outerHeight();
-
-                // Calculating the top and left offset to center the modal
-                var top = Math.max(windowHeight / 2 - modalHeight / 2, 0);
-                var left = Math.max(windowWidth / 2 - modalWidth / 2, 0);
-
-                modal.css({
-                    top: top + $(window).scrollTop(),
-                    left: left + $(window).scrollLeft(),
-                    position: 'absolute'
-                });
-
-                modal.show();
-            }            
-
-            function showModalPanel(evtTgt, message, panelPosition = "left") {
-                var $modalText = $('#modal-message');
-                $modalText.text(message);
-
-                var $modal = $('#user-modal');
-                $modal.show();
-
-                var targetPosition = $(evtTgt).offset(); // Using offset() to consider the document's top and left
-                var targetHeight = $(evtTgt).outerHeight(); // Height of the clicked element
-                var targetWidth = $(evtTgt).outerWidth(); // Width of the clicked element
-
-                var top = targetPosition.top + targetHeight;
-                var left = 0;
-
-                switch (panelPosition) {
-                    case "center":
-                        left = targetPosition.left + targetWidth / 2 - ($modal.innerWidth() / 2);
-                        break;
-                    case "left":
-                        left = targetPosition.left - $modal.innerWidth();
-                        break;
-                    case "right":
-                        left = targetPosition.left + $modal.innerWidth();
-                        break;
-                }
-                
-                $modal.css({
-                    "top": top, // Position above evtTgt
-                    "left": left, // Adjust for horizontal scroll
-                    "position": "absolute", // Ensure the modal is positioned absolutely
-                    "display": "block"
-                });
-            }
-
-            function showRegisterPanel(evtTgt, panelPosition = "left") {
-                var $registerModal = $('#register-modal');
-                $registerModal.show();
-
-                var targetPosition = $(evtTgt).offset(); // Using offset() to consider the document's top and left
-                var targetHeight = $(evtTgt).outerHeight(); // Height of the clicked element
-                var targetWidth = $(evtTgt).outerWidth(); // Width of the clicked element
-
-                var top = targetPosition.top + targetHeight;
-                var left = 0;
-
-                switch (panelPosition) {
-                    case "center":
-                        left = targetPosition.left + targetWidth / 2 - ($registerModal.innerWidth() / 2);
-                        break;
-                    case "left":
-                        left = targetPosition.left - $registerModal.innerWidth();
-                        break;
-                    case "right":
-                        left = targetPosition.left + $registerModal.innerWidth();
-                        break;
-                }
-                
-                $registerModal.css({
-                    "top": top, // Position above evtTgt
-                    "left": left, // Adjust for horizontal scroll
-                    "position": "absolute", // Ensure the modal is positioned absolutely
-                    "display": "block"
-                });
-
-                // Event listener for email input on register modal
-                $("#register-modal input[name='email']").on('input', function() {
-                    toggleVerificationButton("#register-modal input[name='email']", "#register_button");
-                });
-
-                // Initialize verification buttons as disabled
-                $('#register_button').prop('disabled', true);
-
-                $('#register-modal-input').off('keydown').on('keydown', function(event) {
-                    if (event.keyCode === 13) { // 13 is the key code for Enter
-                        event.preventDefault();
-                        generateVerificationCode(evtTgt, "register");
-                    }
-                });
-
-                // Bind the showVerificationModal to the click event of the button
-                $('#register_button').click(function() {
-                    generateVerificationCode(evtTgt, "register");
-                });                
-
-                toggleVerificationButton("#register-modal input[name='email']", "#register_button");
-            }
-
-            function showLoginPanel(evtTgt, panelPosition = "left") {
-                var $loginModal = $('#login-modal');
-                $loginModal.show();
-
-                var targetPosition = $(evtTgt).offset(); // Using offset() to consider the document's top and left
-                var targetHeight = $(evtTgt).outerHeight(); // Height of the clicked element
-                var targetWidth = $(evtTgt).outerWidth(); // Width of the clicked element
-
-                var top = targetPosition.top + targetHeight;
-                var left = 0;
-
-                switch (panelPosition) {
-                    case "center":
-                        left = targetPosition.left + targetWidth / 2 - ($loginModal.innerWidth() / 2);
-                        break;
-                    case "left":
-                        left = targetPosition.left - $loginModal.innerWidth();
-                        break;
-                    case "right":
-                        left = targetPosition.left + $loginModal.innerWidth();
-                        break;
-                }
-                
-                $loginModal.css({
-                    "top": top, // Position above evtTgt
-                    "left": left, // Adjust for horizontal scroll
-                    "position": "absolute", // Ensure the modal is positioned absolutely
-                    "display": "block"
-                });
-
-                // Event listener for email input on login modal
-                $("#login-modal input[name='email']").on('input', function() {
-                    toggleVerificationButton("#login-modal input[name='email']", "#login_button");
-                });
-
-                $('#login_button').prop('disabled', true);                 
-
-                $('#login-modal-input').off('keydown').on('keydown', function(event) {
-                    if (event.keyCode === 13) { // 13 is the key code for Enter
-                        event.preventDefault();
-                        generateVerificationCode(evtTgt, "login");
-                    }
-                });
-
-                $('#login_button').click(function() {
-                    generateVerificationCode(evtTgt, "login");
-                });
-
-                toggleVerificationButton("#login-modal input[name='email']", "#login_button");
-            }
 
             // Close modal when the close button is clicked
             $('.close-btn').on('click', function() {
@@ -1871,471 +877,6 @@
                 verificationModal.style.display = 'none';
             }
 
-            function authUser(email, otp, modalType) {
-                // Show spinner
-                $(`#${modalType}-spinner`).show();
-
-                // Define a timeout duration
-                var timeoutDuration = 10000;
-
-                // Set up a timer for the timeout
-                var timeout = setTimeout(function() {
-                    // Hide spinner
-                    $(`#${modalType}-spinner`).hide();
-                    // Show timeout error message
-                    $(`#${modalType}-error`).text('Verify timed out. Support email: support@bettr.casino.').show();
-                }, timeoutDuration);
-
-                var createUser = modalType === "register" ? true : false;
-
-                // Make the HTTP POST request
-                $.ajax({
-                    url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/login/email',
-                    type: 'PUT',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ "email": email, 'otp': otp, 'create_user': createUser }),
-                    success: function(response) {
-                        // Clear the timeout
-                        clearTimeout(timeout);
-                        // Hide spinner and error message
-                        $(`#verification-spinner`).hide();
-                        $(`#verification-error`).hide();
-                        // Store the user id and session token in local storage
-                        var user = response.user;
-                        var userId = user.id;
-                        var sessionToken = user.session_token;
-                        var isBanned = user.is_banned;
-                        var isVerified = user.is_verified;
-                        if (isBanned) {
-                            $(`#verification-error`).text('Your account is currently banned. If this persists, email support@bettr.casino.');
-                        } else if (!isVerified) {
-                            $(`#verification-error`).text('Your account is currently not verified using the email verification code. Support email: support@bettr.casino.');
-                        } else {
-                            $(`#verification-error`).hide();
-                            $(`#verification-modal`).hide();
-                            localStorage.setItem(prefix_local_store('user_id'), userId);
-                            localStorage.setItem(prefix_local_store('session_token'), sessionToken);
-                            $('#register-btn').hide();
-                            $('#login-btn').hide();
-                            $('#logout-btn').show();
-                            authObserverManager.notify({});
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        // Clear the timeout
-                        clearTimeout(timeout);
-                        // Hide spinner and show error message
-                        $(`#verification-spinner`).hide();
-                        $(`#verification-error`).text(`Verify error. If this persists, email support@bettr.casino.`).show();
-                    }
-                });
-            }
-
-            // Function to show the verification modal
-            function showVerificationPanel(evtTgt, email, modalType, panelPosition = "center") {
-                // Get the register modal
-                var parentModal = $(`#${modalType}-modal`);
-                parentModal.hide();
-
-                var $verificationModal = $('#verification-modal');
-                $verificationModal.show();
-
-                var targetPosition = $(evtTgt).offset(); // Using offset() to consider the document's top and left
-                var targetHeight = $(evtTgt).outerHeight(); // Height of the clicked element
-                var targetWidth = $(evtTgt).outerWidth(); // Width of the clicked element
-
-                var top = targetPosition.top + targetHeight;
-                var left = 0;
-
-                switch (panelPosition) {
-                    case "center":
-                        left = targetPosition.left + targetWidth / 2 - ($verificationModal.innerWidth() / 2);
-                        break;
-                    case "left":
-                        left = targetPosition.left - $verificationModal.innerWidth();
-                        break;
-                    case "right":
-                        left = targetPosition.left + $verificationModal.innerWidth();
-                        break;
-                }
-                
-                $verificationModal.css({
-                    "top": top, // Position above evtTgt
-                    "left": left, // Adjust for horizontal scroll
-                    "position": "absolute", // Ensure the modal is positioned absolutely
-                    "display": "block"
-                });
-
-                var modalHeader = $("#verification-modal .verification-modal-content h2");
-                var modalBackButton = $("#verification_back");
-                modalHeader.text(modalType === "register" ? "Register" : "Login");
-
-                // Set the event handler for the back button
-                modalBackButton.on("click", function() {
-                    $('#verification-modal').hide();
-                    $("#" + modalType + "-modal").show();
-                });
-
-                // Get the button that opens the login or register modal
-                var btn = document.getElementById(`${modalType}-btn`);
-                var rect = btn.getBoundingClientRect();
-
-                $('#verification_button').click(function() {
-                    var otp = $("#verification-form input[name='verification_code']").val();
-                    authUser(email, otp, modalType);
-                });
-
-                $('#verification-modal-input').off('keydown').on('keydown', function(event) {
-                    if (event.keyCode === 13) {
-                        event.preventDefault();
-                        var otp = $("#verification-form input[name='verification_code']").val();
-                        authUser(email, otp, modalType);
-                    }
-                });
-
-            }
-
-            function generateVerificationCode(evtTgt, modalType) {
-                var email = $(`#${modalType}-modal input[name='email']`).val();
-                // Show spinner
-                $(`#${modalType}-spinner`).show();
-
-                // Define a timeout duration
-                var timeoutDuration = 10000;
-
-                // Set up a timer for the timeout
-                var timeout = setTimeout(function() {
-                    // Hide spinner
-                    $(`#${modalType}-spinner`).hide();
-                    // Show timeout error message
-                    $(`#${modalType}-error`).text('Verification code request timed out. If this persists, email support@bettr.casino.').show();
-                }, timeoutDuration);
-
-                // Make the HTTP POST request
-                $.ajax({
-                    url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/otp',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ "email": email }),
-                    success: function(response) {
-                        // Clear the timeout
-                        clearTimeout(timeout);
-                        // Hide spinner and error message
-                        $(`#${modalType}-spinner`).hide();
-                        $(`#${modalType}-error`).hide();
-                        // Call showVerificationModal on success
-                        showVerificationPanel(evtTgt, email, modalType);
-                    },
-                    error: function(xhr, status, error) {
-                        // Clear the timeout
-                        clearTimeout(timeout);
-                        // Hide spinner and show error message
-                        $(`#${modalType}-spinner`).hide();
-                        $(`#${modalType}-error').text('Verification code request error. If this persists, email support@bettr.casino.`).show();
-                    }
-                });
-            }
-
-            // Function to refresh the session token
-            function validateSessionToken(callback) {
-                var userId = localStorage.getItem(prefix_local_store('user_id'));
-                var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
-
-                if (!sessionToken)
-                {
-                    $('#login-btn').show();
-                    $('#logout-btn').hide();
-                    return;
-                }
-
-                if (userId && sessionToken) {
-                    $.ajax({
-                        url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/validate',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        headers: { 'Token': sessionToken },
-                        data: JSON.stringify({ "session_token": sessionToken }),
-                        success: function(response) {
-                            console.log(response);
-                            var user = response.user;
-                            $('#login-btn').hide();
-                            $('#logout-btn').show();
-                            callback(null, response);
-                        },
-                        error: function(xhr, status, error) {
-                            // Handle error (optional)
-                            console.error(error);
-                            localStorage.removeItem(prefix_local_store('session_token'));
-                            $('#login-btn').show();
-                            $('#logout-btn').hide();
-                            callback(error, null);
-                        }
-                    });
-                }
-            }
-
-            function initializeDeveloperAccount(taskId, taskState, rowIndex, callback) {
-                var userId = localStorage.getItem(prefix_local_store('user_id'));
-                var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
-                const unityPathIndex = internalColumns.findIndex(column => column.title === 'UnityPath');
-                var unityPath = internalRows[rowIndex][unityPathIndex];
-                const moduleIndex = internalColumns.findIndex(column => column.title === 'Module');
-                var module = internalRows[rowIndex][moduleIndex];
-                const variantIndex = internalColumns.findIndex(column => column.title === 'Variant');
-                var variant = internalRows[rowIndex][variantIndex];
-                console.log('userId=', userId, 'sessionToken=', sessionToken);
-                $.ajax({
-                    url: 'https://zgtla52nt3w5vyh6jhh6e4js6y0qbgji.lambda-url.us-west-2.on.aws/',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        "user_id": userId,
-                        "session_token": sessionToken,
-                        "task_id": taskId,
-                        "task_state": taskState,
-                        "unity_path": unityPath,
-                        "module_name": module,
-                        "variant_name": variant
-                    }),
-                    success: function(response) {
-                        console.log("Response received: ", JSON.stringify(response));
-                        callback(response, null);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Error in invoking Lambda:", error);
-                        callback(null, error);
-                    }
-                });
-            }
-
-            function initializeDeveloperProject(taskId, taskHashKey, callback) {
-                var userId = localStorage.getItem(prefix_local_store('user_id'));
-                var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
-                console.log('userId=', userId, 'sessionToken=', sessionToken);
-                $.ajax({
-                    url: 'https://czdog5nmjoycpd66iijtznxyse0sqhfd.lambda-url.us-west-2.on.aws/',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        "user_id": userId,
-                        "session_token": sessionToken,
-                        "task_id": taskId,
-                        "task_hash_key": taskHashKey
-                    }),
-                    success: function(response) {
-                        console.log("Response received: ", JSON.stringify(response));
-                        callback(response, null);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Error in invoking Lambda:", error);
-                        callback(null, error);
-                    }
-                });
-            }
-
-            function wrapSuccessMessage(message) {
-                return '<span style="color: #9a9af7;">' + message + '</span>';
-            }
-
-            function updateTaskState(blob, task_id, task_state, callback) {
-                if (!blob) {
-                    console.error('No blob found');
-                    callback(null, new Error('No blob found'));
-                    return;
-                }
-                let tasks = blob.tasks;
-                if (!tasks) {
-                    console.error('No tasks found in blob');
-                    callback(null, new Error('No tasks found in blob'));
-                    return;
-                }
-                // Search for the task and change its state to 'started'
-                let task = tasks.find(t => t.task_id === task_id);
-                if (!task) {
-                    console.error(`No task found with task_id=${task_id}`);
-                    callback(null, new Error(`No task found with task_id=${task_id}`));
-                    return
-                }
-                task.state = task_state;
-                console.log('local updated developer blob=', blob);
-                callback(blob, null);
-            }
-
-            function updateDeveloperAccount(user_id, session_token, blob, cas, callback) {
-                const url = `https://gateway.snapser.com/xbeovm9i/v1/storage/owner/${user_id}/protected/blobs/developer`;
-                $.ajax({
-                    url: url,
-                    type: 'PUT',
-                    contentType: 'application/json',
-                    headers: { 'Token': session_token },
-                    data: JSON.stringify({
-                        value: JSON.stringify(blob),
-                        create: false,
-                        cas: cas
-                    }),
-                    success: function(putResponse) {
-                        console.log('PUT success: putResponse=', putResponse);
-                        callback(putResponse, null);
-                    },
-                    error: function(xhr, status, putError) {
-                        console.error('PUT error:', putError);
-                        callback(null, putError);
-                    }
-                });
-            }
-
-            function getDeveloperAccount(user_id, session_token, callback) {                
-                const url = `https://gateway.snapser.com/xbeovm9i/v1/storage/owner/${user_id}/protected/blobs/developer`;
-
-                $.ajax({
-                    url: url,
-                    type: 'GET',
-                    headers: { 'Token': session_token },
-                    success: function(data) {
-                        console.log('Fetch success:', data);
-                        callback(data, null);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Fetch error:', error);
-                        callback(null, error);
-                    }
-                });
-            }
-            
-            function wrapErrorMessage(message) {
-                return '<span style="color: #f79a9a;">' + message + '</span>';
-            }
-
-            function findKeysWithPrefix(prefix) {
-                const keysWithPrefix = [];
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key.startsWith(prefix)) {
-                        keysWithPrefix.push(key);
-                    }
-                }
-                return keysWithPrefix;
-            }
-
-            function startCountdown(duration, display) {
-                var timer = duration, seconds;
-                var countdownInterval = setInterval(function () {
-                    seconds = parseInt(timer % 60, 10);
-
-                    seconds = seconds < 10 ? "0" + seconds : seconds;
-
-                    display.val(seconds);
-
-                    if (--timer < 0) {
-                        clearInterval(countdownInterval);
-                    }
-                }, 1000);
-                return countdownInterval;
-            }
-
-            function initiateVerifySetupCountdown(duration) {
-                display = $('#setupCountdownTimer');
-                return startCountdown(duration, display);
-            }
-
-            function initiateVerifyUnitySetupCountdown(duration) {
-                display = $('#unitySetupCountdownTimer');
-                return startCountdown(duration, display);
-            }
-
-            function verifyAppInstall(objectKey, maxRetries, callback) {
-                let retries = 0;
-                const retryInterval = 3000; // Retry every 3 seconds
-
-                function attemptFetch() {
-                    getState(objectKey, function(response, status, error) {
-                        if (error == null) {
-                            callback(response, null);
-                        } else {
-                            if (status === 404) {
-                                retries++;
-                                if (retries < maxRetries) {
-                                    setTimeout(attemptFetch, retryInterval);
-                                } else {
-                                    console.error(`getState error=${error}`);
-                                    const errorMessage = "Verify failed.";
-                                    callback(null, new Error(errorMessage));
-                                }
-                            } else {
-                                console.error("Error in invoking Lambda:", error);
-                                callback(null, error);
-                            }
-                        }
-                    });                
-                }
-
-                attemptFetch();
-            }
-
-            function getState(objectKey, callback) {
-                console.debug(`getState: objectKey=${objectKey}`);
-                $.ajax({
-                    url: 'https://acqgvpocrqiy6t6v7wfdhku2ae0bmfka.lambda-url.us-west-2.on.aws/',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        "object_key": objectKey
-                    }),
-                    success: function(response) {
-                        console.log(`Response received: objectKey=${objectKey} response=${JSON.stringify(response)}`);
-                        callback(response, 200, null);
-                    },
-                    error: function(xhr, status, error) {
-                        console.log(`Response received: xhr.status=${xhr.status} objectKey=${objectKey} response=${JSON.stringify(error)}`);
-                        callback(null, status, error);
-                    }
-                });
-            }
-
-            function parseExpression(expr, context) {
-                // Tokenize the expression, including curly braces
-                const tokens = expr.match(/\w+|AND|OR|\{|\}/g);
-
-                // Recursive function to evaluate the expression
-                function evaluate(tokens) {
-                    let stack = [];
-
-                    while (tokens.length > 0) {
-                        const token = tokens.shift();
-
-                        if (token === 'AND' || token === 'OR') {
-                            const right = stack.pop();
-                            const left = stack.pop();
-                            const result = (token === 'AND') ? (left && right) : (left || right);
-                            stack.push(result);
-                        } else if (token === '{') {
-                            // Handle curly brace as grouping
-                            let subExpr = [];
-                            let openBraces = 1;
-                            while (openBraces > 0) {
-                                const nextToken = tokens.shift();
-                                if (nextToken === '{') {
-                                    openBraces++;
-                                } else if (nextToken === '}') {
-                                    openBraces--;
-                                }
-                                if (openBraces > 0) {
-                                    subExpr.push(nextToken);
-                                }
-                            }
-                            stack.push(evaluate(subExpr));
-                        } else {
-                            // Assume token is a variable and evaluate its value
-                            stack.push(context[token]);
-                        }
-                    }
-
-                    return stack.pop();
-                }
-
-                return evaluate(tokens);
-            }
-
             // Event handlers for closing the modals
             $(".close-btn").click(function() {
                 $(this).closest(".modal").hide();
@@ -2355,7 +896,1492 @@
 
             updateSignInButtons();
 
-        });
+        };
+
+        const wizardShouldShowFunctions = {
+            "RegisterUser": function(stepKey, taskId, rowIndex) {
+                return !isUserLoggedIn();
+            },
+            "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
+                return !isTaskHashKeyGenerated(taskId);
+            }
+        }
+
+        const wizardOnShowFunctions = {
+            "SetupWizardIPhone": function(stepKey, taskId, rowIndex) {
+                $('.back-btn').prop('disabled', true);
+                $('.next-btn').prop('disabled', false);
+                $('.finish-btn').prop('disabled', true);
+
+                $('.iphone-buttons-container').show();
+                $('.device-containers').show();
+                $('#toggle-iphone13').show();
+                $('#toggle-iphone13').click();
+            },
+            "SetupWizardUnity": function(stepKey, taskId, rowIndex) {
+                $('.back-btn').prop('disabled', true);
+                $('.next-btn').prop('disabled', false);
+                $('.finish-btn').prop('disabled', true);
+
+                $('.iphone-buttons-container').show();
+                $('.device-containers').show();
+                $('#toggle-unity-editor').show();
+                $('#toggle-unity-editor').click();
+            },
+            "FinishWizard": function(stepKey, taskId, rowIndex) {
+                $('.back-btn').prop('disabled', true);
+                $('.next-btn').prop('disabled', true);
+                $('.finish-btn').prop('disabled', false);
+            },
+            "SetupIPhone": function(stepKey, taskId, rowIndex) {
+                $('.back-btn').prop('disabled', true);
+                $('.next-btn').prop('disabled', false);
+                $('.finish-btn').prop('disabled', true);
+            },
+            "RegisterUser": function(stepKey, taskId, rowIndex) {
+                $('.finish-btn').prop('disabled', true);
+                if (isUserLoggedIn()) {
+                    $('#RegisterUserText').text('You are logged in. Click Next.');
+                    $('#RegisterUserAction').hide();
+                    $('#RegisterUserAction').text('Login');
+                    $('#RegisterUserTitle').text('Login.');
+                    $('.next-btn').prop('disabled', false);
+                    return;
+                } 
+                if (isUserRegistered()) {
+                    $('#RegisterUserAction').text('Login');
+                    $('#RegisterUserTitle').text('Login.');
+                }
+            },
+            "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
+                $('.next-btn').prop('disabled', true);
+                $('.finish-btn').prop('disabled', true);
+            },
+            "VerifySetup": function(stepKey, taskId, rowIndex) {
+                $('.back-btn').prop('disabled', true);
+                $('.next-btn').prop('disabled', true);
+                $('.finish-btn').prop('disabled', true);
+                $(`#verify-setup-spinner`).show();
+                $('#setupCountdownTimer').text('60');
+            },
+            "StartApp": function(stepKey, taskId, rowIndex) {
+                $('.next-btn').prop('disabled', true);
+                $('.finish-btn').prop('disabled', true);
+                $('#StartAppText').text("______");
+                $(`.StartAppInfoStep1`).show();
+                $(`.StartAppInfoStep2`).hide();
+            },
+            "SetupUnity": function(stepKey, taskId, rowIndex) {
+                $('.back-btn').prop('disabled', true);
+                $('.next-btn').prop('disabled', false);
+                $('.finish-btn').prop('disabled', true);
+            },
+            "VerifyUnitySetup": function(stepKey, taskId, rowIndex) {
+                $('.back-btn').prop('disabled', true);
+                $('.next-btn').prop('disabled', true);
+                $('.finish-btn').prop('disabled', true);
+                $(`#verify-unity-setup-spinner`).show();
+                $('#unitySetupCountdownTimer').text('60');
+            },
+            "StartUnityApp": function(stepKey, taskId, rowIndex) {
+                $('.back-btn').prop('disabled', true);
+                $('.next-btn').prop('disabled', true);
+                $('.finish-btn').prop('disabled', true);
+            }
+        }
+
+        const wizardAfterShowFunctions = {
+            "RegisterUser": function(evt, stepKey, taskId, rowIndex) {
+                $('.finish-btn').prop('disabled', true);
+                $('.next-btn').prop('disabled', false);
+                if (!isUserLoggedIn()) {
+                    $('.next-btn').prop('disabled', true);
+                }
+            },
+            "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
+                $('.back-btn').prop('disabled', true);
+                $('.next-btn').prop('disabled', true); 
+                $('.finish-btn').prop('disabled', true); 
+                var challengeSpinner = $(`#generate-challenge-code-spinner`);           
+                challengeSpinner.show();
+                var challengeCodeText = $('#GenerateChallengeCodeText');
+                challengeCodeText.hide();
+                var taskState = "GENERATE_CODE"
+                initializeDeveloperAccount(taskId, taskState, rowIndex, function(response, error) {
+                    challengeSpinner.hide();
+                    challengeCodeText.show();
+                    if (error) {
+                        console.log(error);
+                        showModalPanel(challengeCodeText, 'Code Generation error. Support email: support@bettr.casino.', 'center');
+                    } else {
+                        // Access the properties from the parsed body
+                        var hashKey = response.task_hash_key;
+                        if (hashKey && hashKey.length == 6) {
+                            challengeCodeText.text(hashKey);
+                            localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
+                            $('.next-btn').prop('disabled', false);
+                        } else {
+                            console.log(`incorrect hash_key (length != 6) in response body=${JSON.stringify(response)}`);
+                            showModalPanel(challengeCodeText, 'Code Generation error. Go Back and retry. Support email: support@bettr.casino.', 'center');
+                        }
+                    }
+                })
+            },
+            "VerifySetup": function(stepKey, taskId, rowIndex) {
+                $('.back-btn').prop('disabled', true);
+                $('.next-btn').prop('disabled', true);
+                $('.finish-btn').prop('disabled', true);
+                $('#VerifySetupChallengeCode').hide();
+                var taskState = "VERIFY_SETUP"
+                var verifySetupInfo = $('#VerifySetupInfo');
+                $('#setupCountdownTimer').show();
+                var countdownTimer = initiateVerifySetupCountdown(59);
+                initializeDeveloperAccount(taskId, taskState, rowIndex, function(response, error) {
+                    if (error) {
+                        console.log(error);
+                        clearTimeout(countdownTimer);
+                        $('#verify-setup-spinner').hide();
+                        $('.next-btn').prop('disabled', false);
+                        $('#VerifySetupInfo').empty().text("Bettr App Setup incomplete. Click Next.")
+                    } else {
+                        var hashKey = response.task_hash_key;
+                        if (hashKey && hashKey.length == 6) {
+                            localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
+                            const objectKey = `developers/${hashKey}/scene_state/image.png`;
+                            verifyAppInstall(objectKey, 10, function(response, err) {
+                                clearTimeout(countdownTimer);
+                                $('#verify-setup-spinner').hide();
+                                if (err) {
+                                    console.error('VerifySetup verifyAppInstall Error:', err);
+                                    $('.next-btn').prop('disabled', false);
+                                    $('#VerifySetupInfo').empty().text("Click Next.");
+                                } else {
+                                    $('.next-btn').prop('disabled', false);
+                                    $('#VerifySetupInfo').empty().text("Bettr App Setup is complete. Click Next.");
+                                    $("#VerifySetupChallengeCode .tag.code").text(hashKey);
+                                    // $('#VerifySetupChallengeCode').show();
+                                    var nextStepIndex = stepData["map"]["StartApp"];
+                                    localStorage.setItem(stepKey, `${nextStepIndex}`);
+                                    if (response.file_data) {
+                                        const imgElement = $('<img>').attr('src', 'data:image/png;base64,' + response.file_data);
+                                        activeIPhoneContainer().empty().append(imgElement);
+                                    } else {
+                                        console.error("Image data not found in response");
+                                    }
+                                }
+                            })                
+                        } else {
+                            clearTimeout(countdownTimer);
+                            $('#verify-setup-spinner').hide();
+                            $('.next-btn').prop('disabled', false);
+                            $('#VerifySetupInfo').empty().text("Bettr App Setup is incomplete. Click Next.");
+                        }
+                    }
+                })
+            },
+            "StartApp": function(stepKey, taskId, rowIndex) {
+                $('.back-btn').prop('disabled', true);
+                $('.next-btn').prop('disabled', true); 
+                $('.finish-btn').prop('disabled', true);              
+                $(`#start-app-spinner`).show();
+                var startAppText = $('#StartAppText');
+                startAppText.text(hashKey);
+                localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
+                $('.next-btn').prop('disabled', false);
+                $(`.StartAppInfoStep2`).show();
+                var nextStepIndex = stepData["map"]["RegisterUser"];
+                localStorage.setItem(stepKey, `${nextStepIndex}`);
+            },
+            "VerifyUnitySetup": function(stepKey, taskId, rowIndex) {
+                $('.back-btn').prop('disabled', true);
+                $('.next-btn').prop('disabled', true);
+                $('.finish-btn').prop('disabled', true);
+                var taskState = "VERIFY_SETUP"
+                var verifySetupInfo = $('#VerifyUnitySetupInfo');
+                $('#unitySetupCountdownTimer').show();
+                $('#toggle-unity-editor').click();   
+                var countdownTimer = initiateVerifyUnitySetupCountdown(59); 
+                initializeDeveloperAccount(taskId, taskState, rowIndex, function(response, error) {
+                    if (error) {
+                        console.log(error);
+                        clearTimeout(countdownTimer);
+                        $('#verify-unity-setup-spinner').hide();
+                        $('.next-btn').prop('disabled', false);
+                        $('#VerifySetupInfo').empty().text("Setup incomplete. Click Next.")
+                    } else {
+                        var hashKey = response.task_hash_key;
+                        if (hashKey && hashKey.length == 6) {
+                            localStorage.setItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`), hashKey);
+                            const objectKey = `developers/${hashKey}/scene_state_desktop/image.png`;
+                            verifyAppInstall(objectKey, 0, function(response, err) {
+                                console.log(`response:${response} err=${err}`);
+                                clearTimeout(countdownTimer);
+                                $('#verify-unity-setup-spinner').hide();
+                                if (err) {
+                                    console.error('VerifyUnitySetup Error:', err);
+                                    $('.next-btn').prop('disabled', false);
+                                    $('#VerifyUnitySetupInfo').empty().text("Bettr Unity Setup is incomplete. Click Next.");
+                                } else {
+                                    $('.next-btn').prop('disabled', false);
+                                    $('#VerifyUnitySetupInfo').empty().text("Bettr Unity Setup is complete. Click Next.");
+                                    var nextStepIndex = stepData["map"]["StartUnityApp"];
+                                    localStorage.setItem(stepKey, `${nextStepIndex}`);
+                                    if (response.file_data) {
+                                        const imgElement = $('<img>').attr('src', 'data:image/png;base64,' + response.file_data);
+                                        activeUnityEditorContainer().empty().append(imgElement);
+                                    } else {
+                                        console.error("Image data not found in response");
+                                    }
+                                }
+                            })                
+                        } else {
+                            clearTimeout(countdownTimer);
+                            $('#verify-unity-setup-spinner').hide();
+                            $('.next-btn').prop('disabled', false);
+                            $('#VerifyUnitySetupInfo').empty().text("Bettr Unity Setup is incomplete. Click Next.");
+                        }
+                    }
+                })
+            },
+            "StartUnityApp": function(stepKey, taskId, rowIndex) {
+                $('.back-btn').prop('disabled', true);
+                $('.next-btn').prop('disabled', false);
+                $('.finish-btn').prop('disabled', true);
+                const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
+                const zipUrl = `https://github.com/bettr-casino/slots-game-plugins/archive/refs/heads/${hashKey}.zip`;
+                $('#CreateGitHubBranchZip').empty().html(`<a href="${zipUrl}" target="_blank">${zipUrl}</a><span id="start-unity-app-spinner" class="spinner2" style="display: none;"></span>`);
+                $(`#start-unity-app-spinner`).show();
+                $('#CreateGitHubBranchZip a').addClass('disabled-link');
+                $('#StartUnityAppChallengeCodeText').text(hashKey);
+                initializeDeveloperProject(taskId, hashKey, function(response, error) {
+                    $(`#start-unity-app-spinner`).hide();
+                    if (error) {
+                        console.log(error);
+                        showModalPanel($('#CreateGitHubBranchText'), 'Project Generation error. Support email: support@bettr.casino.', 'center');
+                    } else {
+                        // Access the properties from the parsed body
+                        var zipUrl = response.zip_url;
+                        $(`#start-unity-app-spinner`).hide();
+                        $('#CreateGitHubBranchZip a').removeClass('disabled-link');
+                    }
+                });
+                var nextStepIndex = stepData["map"]["StartApp"];
+                localStorage.setItem(stepKey, `${nextStepIndex}`);
+            }
+        }
+
+        const wizardOnClickFunctions = {
+            "RegisterUser": function(evt, stepKey, taskId, rowIndex) {
+                evt.preventDefault();  // Prevents the default link action
+                authObserverManager.subscribe(function() {
+                    wizardOnShowFunctions["RegisterUser"]();
+                });
+                if (isUserRegistered()) {
+                    showLoginPanel(evt.target, "center");
+                } else {
+                    showRegisterPanel(evt.target, "center");
+                }
+            },
+            "StartApp": function(evt, stepKey, taskId, rowIndex) {
+                evt.preventDefault();  // Prevents the default link action                    
+            }
+        }
+
+        const wizardOnBackFunctions = {
+            "StartApp": function(stepKey, taskId, rowIndex) {
+                if (isUserLoggedIn()) {
+                    $('.setup-step').hide();
+                    $('#Start').show();
+                    localStorage.removeItem(stepKey);
+                    return false;
+                }                    
+                return true;
+            }
+        }
+
+        const wizardOnNextFunctions = {
+            "RegisterUser": function(stepKey, taskId, rowIndex) {
+                if (isUserLoggedIn()) {
+                    return true;
+                }
+                var registerUserA = $('#RegisterUserAction');
+                showModalPanel(registerUserA, 'Complete this step to continue.', 'center');
+                return false;
+            },
+            "GenerateChallengeCode": function(stepKey, taskId, rowIndex) {
+                if (isTaskHashKeyGenerated(taskId)) {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        function wizardOnFinishFunction(taskId, rowIndex) {
+            $('.setup-step-button').hide(); 
+            $('.setup-step').hide(); 
+            $('#StartChallenge').show(); 
+            $('.show-challenge-btn').hide();
+            $('.start-challenge-btn').show();
+
+            $('#TestTabButton').show();
+            $('#SubmitTabButton').show();
+
+            $('#TestTabButton').removeAttr("disabled");
+            $('#SubmitTabButton').removeAttr("disabled");
+
+            const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
+
+            $("#StartChallengeCode .tag.code").text(hashKey);
+            $('#StartChallengeCode').show();
+
+            return true;
+        }                        
+
+        
+
+        // Function to validate email using simple regex
+        function isValidEmail(email) {
+            var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(email);
+        }            
+
+        function updateSignInButtons() {
+            validateSessionToken(function(err, response) {
+                if (err) {
+                    console.error('Error:', err);
+                    $('#register-btn').show();
+                    $('#login-btn').show();
+                    $('#logout-btn').hide();
+                } else {
+                    $('#register-btn').hide();
+                    $('#login-btn').hide();
+                    $('#logout-btn').show();
+                }
+            });
+        }
+
+        // Function to enable/disable verification button based on email validity
+        function toggleVerificationButton(inputSelector, buttonSelector) {
+            var email = $(inputSelector).val();
+            if (isValidEmail(email)) {
+                $(buttonSelector).prop('disabled', false);
+            } else {
+                $(buttonSelector).prop('disabled', true);
+            }
+        }
+
+        function setupTables(data) {
+
+            // Assuming the first row contains headers
+            var headers = data.headers;
+            var rows = data.rows;
+
+            // Find the index of the "Publish" column
+            const publishIndex = headers.indexOf("Publish");
+
+            // Find indices for the 'Summary', 'Details', and 'Internal' columns
+            const summaryStartIndex = headers.indexOf("Section");
+            const detailsStartIndex = headers.indexOf("Section", summaryStartIndex + 1);
+            const setupStartIndex = headers.indexOf("Section", detailsStartIndex + 1);
+            const testStartIndex = headers.indexOf("Section", setupStartIndex + 1);
+            const internalStartIndex = headers.indexOf("Section", testStartIndex + 1);
+            const endIndex = headers.length;
+
+            // Create column definitions for Summary and Internal tables
+            summaryColumns = headers.slice(summaryStartIndex + 1, detailsStartIndex)
+                .map(header => ({ title: header }));
+            detailsColumns = headers.slice(detailsStartIndex + 1, setupStartIndex)
+                .map(header => ({ title: header }));
+            setupColumns = headers.slice(setupStartIndex + 1, testStartIndex)
+                .map(header => ({ title: header }));
+            testColumns = headers.slice(testStartIndex + 1, internalStartIndex)
+            .map(header => ({ title: header }));
+            internalColumns = headers.slice(internalStartIndex + 1, endIndex)
+                .map(header => ({ title: header }));
+
+            summaryRows = rows.map(row => row.slice(summaryStartIndex + 1, detailsStartIndex));
+            detailsRows = rows.map(row => row.slice(detailsStartIndex + 1, setupStartIndex));
+            setupRows = rows.map(row => row.slice(setupStartIndex + 1, testStartIndex));
+            testRows = rows.map(row => row.slice(testStartIndex + 1, internalStartIndex));
+            internalRows = rows.map(row => row.slice(internalStartIndex + 1, endIndex));
+
+            // // Initialize the Summary DataTable
+            const summaryTable = $('#summary-table').DataTable({
+                data: summaryRows,
+                columns: summaryColumns,
+                pageLength: 5,  // Default number of rows per page
+                lengthMenu: [5, 10, 20, 50]
+            });
+
+            $(summaryTable.table().container()).addClass('section1');
+
+            // Event listener for row click in Summary table
+            $('#summary-table tbody').on('click', 'tr', function() {
+
+                // Remove highlighting from all rows
+                $('#summary-table tbody tr').removeClass('highlighted');
+            
+                // Highlight the clicked row
+                $(this).addClass('highlighted');
+
+                const table = $('#summary-table').DataTable();
+                const rowIndex = table.row(this).index(); // Gets the index of the clicked row
+                const detailsRow = detailsRows[rowIndex];
+                const taskIdIndex = detailsColumns.findIndex(column => column.title === 'ID');
+                const taskId = detailsRow[taskIdIndex];
+                const stepKey = `${prefix}TaskID__${taskId}__SetupIndex`;
+
+                function showNextWizardStep(rowIndex, offset) {
+                    const setupRowData = rows.map(row => row.slice(setupStartIndex + 1, testStartIndex)); // Extract Setup columns
+                    const setupRow = setupRowData[rowIndex];
+                    const totalSteps = setupRow[0];
+                    const completedSetupIndex = parseInt(localStorage.getItem(stepKey), 10) || 0;
+                    const nextStepIndex = completedSetupIndex + offset;
+                    if (nextStepIndex <= totalSteps) {
+                        var stepIndex = setupColumns.findIndex(column => column.title === `Step${nextStepIndex}`);
+                        const stepText = setupRow[stepIndex];
+                        $('.setup-step').hide();
+                        $('.setup-step-button').prop('disabled', true);
+                        localStorage.setItem(stepKey, `${nextStepIndex}`);
+                        const stepShouldShowFn = wizardShouldShowFunctions[stepText];
+                        if (stepShouldShowFn) {
+                            if (!stepShouldShowFn(stepKey, taskId, rowIndex)) {
+                                // skip further processing for this step
+                                showNextWizardStep(rowIndex, 1);
+                                return;
+                            }
+                        }
+                        const stepOnShowFn = wizardOnShowFunctions[stepText];
+                        if (stepOnShowFn) {
+                            stepOnShowFn(stepKey, taskId, rowIndex);
+                        }
+                        const stepOnClickFn = wizardOnClickFunctions[stepText];
+                        if (stepOnClickFn) {
+                            $(`#${stepText}Action`).off('click').on('click', function(evt) { stepOnClickFn(evt, stepKey, taskId, rowIndex); });
+                        }
+                        $(`#${stepText}`).show();
+                        $('.back-btn').off('click').on('click', function() {
+                            const stepOnBackFn = wizardOnBackFunctions[stepText];
+                            if (stepOnBackFn) {
+                                if (!stepOnBackFn(stepKey, taskId, rowIndex)) {
+                                    return;
+                                }
+                            }
+                            showNextWizardStep(rowIndex, -1);
+                        });
+                        $('.finish-btn').off('click').on('click', function() {
+                            if (wizardOnFinishFunction(taskId, rowIndex)) {
+                                return;
+                            }
+                        });
+                        $('.next-btn').off('click').on('click', function() {
+                            const stepOnNextFn = wizardOnNextFunctions[stepText];
+                            if (stepOnNextFn) {
+                                if (!stepOnNextFn(stepKey, taskId, rowIndex)) {
+                                    return;
+                                }
+                            }
+                            showNextWizardStep(rowIndex, 1);
+                        });
+                        const stepAfterShowFn = wizardAfterShowFunctions[stepText];
+                        if (stepAfterShowFn) {
+                            stepAfterShowFn(stepKey, taskId, rowIndex);
+                        }
+                    }
+                }
+
+                const setupRowData = rows.map(row => row.slice(setupStartIndex + 1, testStartIndex)); // Extract Setup columns
+                const setupRow = setupRowData[rowIndex];
+                const totalSteps = setupRow[0];
+
+                const stepDataMap = stepData["map"];
+
+                for (let index = 1; index < setupRow.length; index++) {
+                    const stepRow = setupRow[index];
+                    stepDataMap[stepRow] = index;
+                }
+
+                populateDetailsForm(detailsColumns, detailsRow, rowIndex, function(rowIndex) {
+                    localStorage.removeItem(stepKey);
+                    showNextWizardStep(rowIndex, 1);
+                });
+            });
+
+            // Check if there are rows in the table
+            if (summaryTable.data().any()) {
+                // Trigger click on the first row
+                $('#summary-table tbody tr:eq(0)').click();
+            }    
+
+        }
+
+
+        function populateDetailsForm(columns, dataRow, rowIndex, callback) {
+            const detailsForm = $('#details-form');
+            // Clear existing content
+            detailsForm.empty();
+
+            var tabsHTML = `
+                <div id="SetupTab" class="tab-content" style="display:block;">
+                    <!-- Your existing Setup content here -->
+                </div>
+                <div id="TestTab" class="tab-content" style="display:none;">
+                    <!-- Content for Test -->
+                </div>
+                <div id="SubmitTab" class="tab-content" style="display:none;">
+                    <!-- Content for Submit -->
+                </div>
+            `;
+
+            // Append the tabs HTML to the detailsForm
+            detailsForm.append(tabsHTML);
+
+            $setupTab = $('#SetupTab')
+
+            // Start the table
+            const detailsTable = $('<table>').addClass('details-table');
+
+                // Append the table to the form
+            $setupTab.append(detailsTable);
+
+            var setupDiv = `
+            <div id="setup-div" class="setup">
+
+                <div class="setup-step" id="SetupWizardIPhone" style="display: none;">
+                    <h3>Setup Wizard.</h3>
+                    <p>Sets up the Bettr App on an <span class="tag">iPhone 13+</span>.</p>
+                </div>
+
+                <div class="setup-step" id="SetupWizardUnity" style="display: none;">
+                    <h3>Setup Wizard.</h3>
+                    <p>Sets up the Bettr Unity Project on either <span class="tag">macOS</span> or <span class="tag">Windows</span>.</p>
+                </div>
+
+                <div class="setup-step" id="RegisterUser" style="display: none;">
+                    <h3 id="RegisterUserTitle">Register.</h3>
+                    <p id="RegisterUserText">We do not store email ids. Read our <a href="https://bettr.casino/privacy.html">Privacy</a> policy.</p>
+                    <button id="RegisterUserAction" class="header-btn">Register</button>
+                </div>
+
+                <div class="setup-step" id="GenerateChallengeCode" style="display: none;">
+                    <h3>Generate the Challenge Code.</h3>
+                    <p>Generating Challenge Code <span id="generate-challenge-code-spinner" class="spinner2" style="display: none;"></span></p>
+                    <p><span id="GenerateChallengeCodeText" class="tag code" style="font-size: 18px;"></span></p>
+                </div>
+
+                <div class="setup-step" id="VerifySetup" style="display: none;">
+                    <h3>Verify Bettr App.</h3>
+                    <p id="VerifyRunningInfo">Running verify. <input type="text" id="setupCountdownTimer" readonly style="width: 30px; text-align: center;" value="60"/><span id="verify-setup-spinner" class="spinner2" style="display: none;"></span></p>
+                    <p id="VerifySetupInfo"></p>
+                    <p id="VerifySetupChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
+                </div>
+
+                <div class="setup-step" id="SetupIPhone" style="display: none;">
+                    <h3>Install Bettr App.</h3>
+                    <p>Type in the address below in a iPhone 13+ browser tab.</p>                        
+                    <a href="https://testflight.apple.com/join/6japRuf7" target="_blank"><span class="tag">testflight.apple.com/join/6japRuf7</span></a>                                                
+                    <p>Follow the instructions on the web page to install the Bettr App using Testflight.</p>
+                    <p>Click Next after installation is complete.</p>
+                </div>
+
+                <div class="setup-step" id="StartApp" style="display: none;">
+                    <h3>Setup Bettr App.</h3>
+                    <p class="StartAppInfoStep1">Generating Challenge Code <span id="start-app-spinner" class="spinner2" style="display: none;"></span></p>
+                    <p><span id="StartAppText" class="tag code" style="font-size: 18px;"></span></p>
+                    <p class="StartAppInfoStep2" style="display: none;">Launch the Bettr App on the iPhone 13+ device.</p>
+                    <p class="StartAppInfoStep2" style="display: none;">Type in the Bettr Challenge Code above in the App and press Continue.</p>
+                </div>
+
+                <div class="setup-step" id="VerifyUnitySetup" style="display: none;">
+                    <h3>Verify Bettr Unity Project.</h3>
+                    <p id="VerifyUnityRunningInfo">Running verify. <input type="text" id="unitySetupCountdownTimer" readonly style="width: 30px; text-align: center;" value="60"/><span id="verify-unity-setup-spinner" class="spinner2" style="display: none;"></span></p>
+                    <p id="VerifyUnitySetupInfo"></p>
+                </div>
+
+                <div class="setup-step" id="SetupUnity" style="display: none;">
+                    <h3>Install Bettr Unity Project.</h3>
+                    <p>Install via Unity Hub: <a href="unityhub://2022.3.16f1/d2c21f0ef2f1" target="_blank">unityhub://2022.3.16f1/d2c21f0ef2f1</a></p>
+                    <p><span class="tag">macOS</span> <span class="tag">Windows</span></p>
+                </div>
+
+                <div class="setup-step" id="StartUnityApp" style="display: none;">
+                    <h3>Setup Bettr Unity Project.</h3>
+                    <p id="CreateGitHubBranchZip"></p>
+                    <p>Install and open the Project. Set Display to 1280x720 Landscape. Enter Play mode via the Unity Bettr Menu.</p>
+                    <p>In the Bettr Challenge Window, type in the code <span id="StartUnityAppChallengeCodeText" class="tag code" style="font-size: 18px;"></span>. Press Continue.</p>
+                    <p>Wait for the Main Lobby to load.</p>
+                </div>
+
+                <div class="setup-step" id="FinishWizard" style="display: none;">
+                    <h3>Start Challenge.</h3>
+                    <p id="StartChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
+                </div>
+            </div>
+
+            <div id="setup-btn" class="setup">
+                <button class="setup-step-button back-btn">Back</button>
+                <button class="setup-step-button next-btn">Next</button>
+                <button class="setup-step-button finish-btn">Finish</button>
+            </div>
+
+            <div class="scene-hierarchy-container">
+                <div id="scene-hierarchy" class="scene-hierarchy"></div>
+            </div>
+
+            <div class="iphone-buttons-container">
+                <button id="toggle-unity-editor" class="toggle-button" style="display:none">Unity Editor</button>
+                <button id="toggle-iphone13" class="toggle-button" style="display:none">iPhone 13</button>
+                <!--<button id="toggle-iphone14" class="toggle-button">iPhone 14</button>
+                <button id="toggle-iphone15" class="toggle-button">iPhone 15</button>-->
+            </div>
+
+            <div class="device-containers" id="unity-editor-container">
+                <div class="unity-editor" id="unity-editor"></div>
+            </div>
+
+            <div class="device-containers" id="iphone13-container">
+                <div id="iphone13" class="iphone iphone13"></div>
+            </div>
+
+            <div class="device-containers" id="iphone14-container">
+                <div id="iphone14" class="iphone iphone14"></div>
+            </div>
+
+            <div class="device-containers" id="iphone15-container">
+                <div id="iphone15" class="iphone iphone15"></div>
+            </div>`
+
+            $setupTab.append(setupDiv);
+
+            // Iterate over columns and add rows to the table
+            columns.forEach((column, index) => {
+                const columnName = column.title;  // Assuming column object has a 'title' property
+                const columnValue = dataRow[index];
+
+                // Check if the column is 'Tags' and process accordingly
+                
+                if (columnName === 'ID' || columnName == 'Timer') {
+                    // hide
+                } else if (columnName === 'System Requirements') {
+                    // Split the 'System Requirements' value into tags and display as text
+                    const tags = columnValue.split(',').map(tag => tag.trim());
+                    const $requirements = $('#SetupWizardRequirements');
+                    $requirements.empty().text('Setup requires:')
+                    tags.forEach(tag => {
+                        const orTags = tag.split('or').map(t => t.trim());
+                        const $tagContainer = $('<span>').addClass('tag-container');
+                        orTags.forEach((orTag, i) => {
+                            if (i > 0) {
+                                $tagContainer.append(document.createTextNode(' OR '));
+                            }
+                            $tagContainer.append($('<span>').addClass('tag').text(orTag));
+                        });
+                        $requirements.append($tagContainer);
+                    });
+                } else if (columnName === 'Tags' || columnName === 'Skill Sets' || columnName == 'Setup Requirements') {
+                    const tags = columnValue.split(',').map(tag => tag.trim());
+                    const tagsContainer = $('<td>');
+                    tags.forEach(tag => {
+                        $('<span>').addClass('tag').text(tag).appendTo(tagsContainer);
+                    });
+                    const row = $('<tr>').append($('<td>').text(columnName)).append(tagsContainer);
+                    detailsTable.append(row);
+                } else if (columnName === 'Difficulty') {
+                    // Color-coded tags for Difficulty
+                    const difficultySpan = $('<span>').addClass('tag').text(columnValue);
+                    switch (columnValue.toUpperCase()) {
+                        case 'EASY':
+                            difficultySpan.css('background-color', 'green');
+                            break;
+                        case 'MEDIUM':
+                            difficultySpan.css('background-color', 'yellow');
+                            break;
+                        case 'HARD':
+                            difficultySpan.css('background-color', 'red');
+                            break;
+                    }
+                    const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').append(difficultySpan));
+                    detailsTable.append(row);
+                } else if (columnName === 'Timer') {
+                    // Assuming columnValue is in fractional hours, convert to HH:MM:SS
+                    let totalHours = parseFloat(columnValue);
+                    let totalSeconds = Math.round(totalHours * 3600); // Convert hours to seconds
+
+                    let hours = Math.floor(totalSeconds / 3600);
+                    totalSeconds %= 3600;
+                    let minutes = Math.floor(totalSeconds / 60);
+                    let seconds = totalSeconds % 60;
+
+                    // Padding with '0' if necessary
+                    hours = String(hours).padStart(2, '0');
+                    minutes = String(minutes).padStart(2, '0');
+                    seconds = String(seconds).padStart(2, '0');
+
+                    // Constructing timer display with separate tags for hours, minutes, and seconds
+                    const $hoursSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(hours);
+                    const $minutesSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(minutes);
+                    const $secondsSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(seconds);
+
+                    const $timeContainer = $('<td>');
+                    $timeContainer.append($hoursSpan)
+                                .append(document.createTextNode(':'))
+                                .append($minutesSpan)
+                                .append(document.createTextNode(':'))
+                                .append($secondsSpan);
+
+                    const row = $('<tr>').append($('<td>').text(columnName)).append($timeContainer);
+                    detailsTable.append(row);
+                } else {
+                    const row = $('<tr>').append($('<td>').text(columnName)).append($('<td>').text(columnValue));
+                    detailsTable.append(row);
+                }
+
+            });
+
+            $('.setup-step-button').prop('disabled', true);
+            
+            $('.next-btn').prop('disabled', false).off('click').on('click', function() {
+                callback(rowIndex);
+            });
+
+            $('.toggle-button').click(function() {
+                // Remove 'active' class from all buttons and hide all iPhones
+                $('.toggle-button').removeClass('active');
+                $('.iphone').hide();
+                $('.unity-editor').hide();
+
+                // Add 'active' class to the clicked button and show corresponding iPhone
+                $(this).addClass('active');
+                var containerId = this.id.replace('toggle-', '') + '-container';
+                if (containerId === 'unity-editor-container') {
+                    $('#' + containerId + ' .unity-editor').show();
+                } else {
+                    $('#' + containerId + ' .iphone').show();
+                }
+            });
+
+            // Show the form
+            detailsForm.show();
+
+            $('.iphone-buttons-container').hide();
+            $('.device-containers').hide();
+
+            callback(rowIndex);
+        }
+
+        function activeIPhoneContainer() {
+            if (!$('#toggle-iphone13').prop('disabled')) return $('#iphone13');
+            if (!$('#toggle-iphone14').prop('disabled')) return $('#iphone14');
+            if (!$('#toggle-iphone15').prop('disabled')) return $('#iphone15');
+            return null;
+        }
+
+        function activeUnityEditorContainer() {
+            if (!$('#toggle-unity-editor').prop('disabled')) return $('#unity-editor');
+            return null;
+        }
+            
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                console.log('Text copied to clipboard');
+            }).catch(err => {
+                console.error('Failed to copy text to clipboard', err);
+            });
+        }
+
+        function fillHashKey(hash_key) {
+            if(hash_key.length !== 6) {
+                console.error("hash_key must be exactly 6 characters long.");
+                return;
+            }
+
+            var inputs = $('.code-container input');
+            for(var i = 0; i < hash_key.length; i++) {
+                inputs.eq(i).val(hash_key[i]);
+            }
+        }
+
+        function updatePageHash(hashStr) {
+            window.location.hash = hashStr;
+        }
+
+        function isUserRegistered() {
+            var userId = localStorage.getItem(prefix_local_store('user_id'));
+            return userId ? true : false;
+        }
+
+        function isUserLoggedIn() {
+            var userId = localStorage.getItem(prefix_local_store('user_id'));
+            var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
+            return userId && sessionToken ? true : false;
+        }
+
+        function isTaskHashKeyGenerated(taskId) {
+            var hash_key = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
+            return hash_key ? true : false;
+        }
+
+        function checkUserSession() {
+            var userId = localStorage.getItem(prefix_local_store('user_id'));
+            var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
+
+            if (!userId) {
+                showModal('Please register to start on this challenge.');
+                return false;
+            } else if (!sessionToken) {
+                showModal('Please login to continue.');
+                return false;
+            }
+
+            return true;
+        }
+
+        function showModal(message) {
+            $('#modal-message').text(message);
+
+            var modal = $('#user-modal');
+            var windowWidth = $(window).width();
+            var windowHeight = $(window).height();
+            var modalWidth = modal.outerWidth();
+            var modalHeight = modal.outerHeight();
+
+            // Calculating the top and left offset to center the modal
+            var top = Math.max(windowHeight / 2 - modalHeight / 2, 0);
+            var left = Math.max(windowWidth / 2 - modalWidth / 2, 0);
+
+            modal.css({
+                top: top + $(window).scrollTop(),
+                left: left + $(window).scrollLeft(),
+                position: 'absolute'
+            });
+
+            modal.show();
+        }            
+
+        function showModalPanel(evtTgt, message, panelPosition = "left") {
+            var $modalText = $('#modal-message');
+            $modalText.text(message);
+
+            var $modal = $('#user-modal');
+            $modal.show();
+
+            var targetPosition = $(evtTgt).offset(); // Using offset() to consider the document's top and left
+            var targetHeight = $(evtTgt).outerHeight(); // Height of the clicked element
+            var targetWidth = $(evtTgt).outerWidth(); // Width of the clicked element
+
+            var top = targetPosition.top + targetHeight;
+            var left = 0;
+
+            switch (panelPosition) {
+                case "center":
+                    left = targetPosition.left + targetWidth / 2 - ($modal.innerWidth() / 2);
+                    break;
+                case "left":
+                    left = targetPosition.left - $modal.innerWidth();
+                    break;
+                case "right":
+                    left = targetPosition.left + $modal.innerWidth();
+                    break;
+            }
+            
+            $modal.css({
+                "top": top, // Position above evtTgt
+                "left": left, // Adjust for horizontal scroll
+                "position": "absolute", // Ensure the modal is positioned absolutely
+                "display": "block"
+            });
+        }
+
+        function showRegisterPanel(evtTgt, panelPosition = "left") {
+            var $registerModal = $('#register-modal');
+            $registerModal.show();
+
+            var targetPosition = $(evtTgt).offset(); // Using offset() to consider the document's top and left
+            var targetHeight = $(evtTgt).outerHeight(); // Height of the clicked element
+            var targetWidth = $(evtTgt).outerWidth(); // Width of the clicked element
+
+            var top = targetPosition.top + targetHeight;
+            var left = 0;
+
+            switch (panelPosition) {
+                case "center":
+                    left = targetPosition.left + targetWidth / 2 - ($registerModal.innerWidth() / 2);
+                    break;
+                case "left":
+                    left = targetPosition.left - $registerModal.innerWidth();
+                    break;
+                case "right":
+                    left = targetPosition.left + $registerModal.innerWidth();
+                    break;
+            }
+            
+            $registerModal.css({
+                "top": top, // Position above evtTgt
+                "left": left, // Adjust for horizontal scroll
+                "position": "absolute", // Ensure the modal is positioned absolutely
+                "display": "block"
+            });
+
+            // Event listener for email input on register modal
+            $("#register-modal input[name='email']").on('input', function() {
+                toggleVerificationButton("#register-modal input[name='email']", "#register_button");
+            });
+
+            // Initialize verification buttons as disabled
+            $('#register_button').prop('disabled', true);
+
+            $('#register-modal-input').off('keydown').on('keydown', function(event) {
+                if (event.keyCode === 13) { // 13 is the key code for Enter
+                    event.preventDefault();
+                    generateVerificationCode(evtTgt, "register");
+                }
+            });
+
+            // Bind the showVerificationModal to the click event of the button
+            $('#register_button').click(function() {
+                generateVerificationCode(evtTgt, "register");
+            });                
+
+            toggleVerificationButton("#register-modal input[name='email']", "#register_button");
+        }
+
+        function showLoginPanel(evtTgt, panelPosition = "left") {
+            var $loginModal = $('#login-modal');
+            $loginModal.show();
+
+            var targetPosition = $(evtTgt).offset(); // Using offset() to consider the document's top and left
+            var targetHeight = $(evtTgt).outerHeight(); // Height of the clicked element
+            var targetWidth = $(evtTgt).outerWidth(); // Width of the clicked element
+
+            var top = targetPosition.top + targetHeight;
+            var left = 0;
+
+            switch (panelPosition) {
+                case "center":
+                    left = targetPosition.left + targetWidth / 2 - ($loginModal.innerWidth() / 2);
+                    break;
+                case "left":
+                    left = targetPosition.left - $loginModal.innerWidth();
+                    break;
+                case "right":
+                    left = targetPosition.left + $loginModal.innerWidth();
+                    break;
+            }
+            
+            $loginModal.css({
+                "top": top, // Position above evtTgt
+                "left": left, // Adjust for horizontal scroll
+                "position": "absolute", // Ensure the modal is positioned absolutely
+                "display": "block"
+            });
+
+            // Event listener for email input on login modal
+            $("#login-modal input[name='email']").on('input', function() {
+                toggleVerificationButton("#login-modal input[name='email']", "#login_button");
+            });
+
+            $('#login_button').prop('disabled', true);                 
+
+            $('#login-modal-input').off('keydown').on('keydown', function(event) {
+                if (event.keyCode === 13) { // 13 is the key code for Enter
+                    event.preventDefault();
+                    generateVerificationCode(evtTgt, "login");
+                }
+            });
+
+            $('#login_button').click(function() {
+                generateVerificationCode(evtTgt, "login");
+            });
+
+            toggleVerificationButton("#login-modal input[name='email']", "#login_button");
+        }
+
+        function authUser(email, otp, modalType) {
+            // Show spinner
+            $(`#${modalType}-spinner`).show();
+
+            // Define a timeout duration
+            var timeoutDuration = 10000;
+
+            // Set up a timer for the timeout
+            var timeout = setTimeout(function() {
+                // Hide spinner
+                $(`#${modalType}-spinner`).hide();
+                // Show timeout error message
+                $(`#${modalType}-error`).text('Verify timed out. Support email: support@bettr.casino.').show();
+            }, timeoutDuration);
+
+            var createUser = modalType === "register" ? true : false;
+
+            // Make the HTTP POST request
+            $.ajax({
+                url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/login/email',
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({ "email": email, 'otp': otp, 'create_user': createUser }),
+                success: function(response) {
+                    // Clear the timeout
+                    clearTimeout(timeout);
+                    // Hide spinner and error message
+                    $(`#verification-spinner`).hide();
+                    $(`#verification-error`).hide();
+                    // Store the user id and session token in local storage
+                    var user = response.user;
+                    var userId = user.id;
+                    var sessionToken = user.session_token;
+                    var isBanned = user.is_banned;
+                    var isVerified = user.is_verified;
+                    if (isBanned) {
+                        $(`#verification-error`).text('Your account is currently banned. If this persists, email support@bettr.casino.');
+                    } else if (!isVerified) {
+                        $(`#verification-error`).text('Your account is currently not verified using the email verification code. Support email: support@bettr.casino.');
+                    } else {
+                        $(`#verification-error`).hide();
+                        $(`#verification-modal`).hide();
+                        localStorage.setItem(prefix_local_store('user_id'), userId);
+                        localStorage.setItem(prefix_local_store('session_token'), sessionToken);
+                        $('#register-btn').hide();
+                        $('#login-btn').hide();
+                        $('#logout-btn').show();
+                        authObserverManager.notify({});
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Clear the timeout
+                    clearTimeout(timeout);
+                    // Hide spinner and show error message
+                    $(`#verification-spinner`).hide();
+                    $(`#verification-error`).text(`Verify error. If this persists, email support@bettr.casino.`).show();
+                }
+            });
+        }
+
+        // Function to show the verification modal
+        function showVerificationPanel(evtTgt, email, modalType, panelPosition = "center") {
+            // Get the register modal
+            var parentModal = $(`#${modalType}-modal`);
+            parentModal.hide();
+
+            var $verificationModal = $('#verification-modal');
+            $verificationModal.show();
+
+            var targetPosition = $(evtTgt).offset(); // Using offset() to consider the document's top and left
+            var targetHeight = $(evtTgt).outerHeight(); // Height of the clicked element
+            var targetWidth = $(evtTgt).outerWidth(); // Width of the clicked element
+
+            var top = targetPosition.top + targetHeight;
+            var left = 0;
+
+            switch (panelPosition) {
+                case "center":
+                    left = targetPosition.left + targetWidth / 2 - ($verificationModal.innerWidth() / 2);
+                    break;
+                case "left":
+                    left = targetPosition.left - $verificationModal.innerWidth();
+                    break;
+                case "right":
+                    left = targetPosition.left + $verificationModal.innerWidth();
+                    break;
+            }
+            
+            $verificationModal.css({
+                "top": top, // Position above evtTgt
+                "left": left, // Adjust for horizontal scroll
+                "position": "absolute", // Ensure the modal is positioned absolutely
+                "display": "block"
+            });
+
+            var modalHeader = $("#verification-modal .verification-modal-content h2");
+            var modalBackButton = $("#verification_back");
+            modalHeader.text(modalType === "register" ? "Register" : "Login");
+
+            // Set the event handler for the back button
+            modalBackButton.on("click", function() {
+                $('#verification-modal').hide();
+                $("#" + modalType + "-modal").show();
+            });
+
+            // Get the button that opens the login or register modal
+            var btn = document.getElementById(`${modalType}-btn`);
+            var rect = btn.getBoundingClientRect();
+
+            $('#verification_button').click(function() {
+                var otp = $("#verification-form input[name='verification_code']").val();
+                authUser(email, otp, modalType);
+            });
+
+            $('#verification-modal-input').off('keydown').on('keydown', function(event) {
+                if (event.keyCode === 13) {
+                    event.preventDefault();
+                    var otp = $("#verification-form input[name='verification_code']").val();
+                    authUser(email, otp, modalType);
+                }
+            });
+
+        }
+
+        function generateVerificationCode(evtTgt, modalType) {
+            var email = $(`#${modalType}-modal input[name='email']`).val();
+            // Show spinner
+            $(`#${modalType}-spinner`).show();
+
+            // Define a timeout duration
+            var timeoutDuration = 10000;
+
+            // Set up a timer for the timeout
+            var timeout = setTimeout(function() {
+                // Hide spinner
+                $(`#${modalType}-spinner`).hide();
+                // Show timeout error message
+                $(`#${modalType}-error`).text('Verification code request timed out. If this persists, email support@bettr.casino.').show();
+            }, timeoutDuration);
+
+            // Make the HTTP POST request
+            $.ajax({
+                url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/otp',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ "email": email }),
+                success: function(response) {
+                    // Clear the timeout
+                    clearTimeout(timeout);
+                    // Hide spinner and error message
+                    $(`#${modalType}-spinner`).hide();
+                    $(`#${modalType}-error`).hide();
+                    // Call showVerificationModal on success
+                    showVerificationPanel(evtTgt, email, modalType);
+                },
+                error: function(xhr, status, error) {
+                    // Clear the timeout
+                    clearTimeout(timeout);
+                    // Hide spinner and show error message
+                    $(`#${modalType}-spinner`).hide();
+                    $(`#${modalType}-error').text('Verification code request error. If this persists, email support@bettr.casino.`).show();
+                }
+            });
+        }
+
+        // Function to refresh the session token
+        function validateSessionToken(callback) {
+            var userId = localStorage.getItem(prefix_local_store('user_id'));
+            var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
+
+            if (!sessionToken)
+            {
+                $('#login-btn').show();
+                $('#logout-btn').hide();
+                return;
+            }
+
+            if (userId && sessionToken) {
+                $.ajax({
+                    url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/validate',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    headers: { 'Token': sessionToken },
+                    data: JSON.stringify({ "session_token": sessionToken }),
+                    success: function(response) {
+                        console.log(response);
+                        var user = response.user;
+                        $('#login-btn').hide();
+                        $('#logout-btn').show();
+                        callback(null, response);
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle error (optional)
+                        console.error(error);
+                        localStorage.removeItem(prefix_local_store('session_token'));
+                        $('#login-btn').show();
+                        $('#logout-btn').hide();
+                        callback(error, null);
+                    }
+                });
+            }
+        }
+
+        function initializeDeveloperAccount(taskId, taskState, rowIndex, callback) {
+            var userId = localStorage.getItem(prefix_local_store('user_id'));
+            var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
+            const unityPathIndex = internalColumns.findIndex(column => column.title === 'UnityPath');
+            var unityPath = internalRows[rowIndex][unityPathIndex];
+            const moduleIndex = internalColumns.findIndex(column => column.title === 'Module');
+            var module = internalRows[rowIndex][moduleIndex];
+            const variantIndex = internalColumns.findIndex(column => column.title === 'Variant');
+            var variant = internalRows[rowIndex][variantIndex];
+            console.log('userId=', userId, 'sessionToken=', sessionToken);
+            $.ajax({
+                url: 'https://zgtla52nt3w5vyh6jhh6e4js6y0qbgji.lambda-url.us-west-2.on.aws/',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    "user_id": userId,
+                    "session_token": sessionToken,
+                    "task_id": taskId,
+                    "task_state": taskState,
+                    "unity_path": unityPath,
+                    "module_name": module,
+                    "variant_name": variant
+                }),
+                success: function(response) {
+                    console.log("Response received: ", JSON.stringify(response));
+                    callback(response, null);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error in invoking Lambda:", error);
+                    callback(null, error);
+                }
+            });
+        }
+
+        function initializeDeveloperProject(taskId, taskHashKey, callback) {
+            var userId = localStorage.getItem(prefix_local_store('user_id'));
+            var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
+            console.log('userId=', userId, 'sessionToken=', sessionToken);
+            $.ajax({
+                url: 'https://czdog5nmjoycpd66iijtznxyse0sqhfd.lambda-url.us-west-2.on.aws/',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    "user_id": userId,
+                    "session_token": sessionToken,
+                    "task_id": taskId,
+                    "task_hash_key": taskHashKey
+                }),
+                success: function(response) {
+                    console.log("Response received: ", JSON.stringify(response));
+                    callback(response, null);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error in invoking Lambda:", error);
+                    callback(null, error);
+                }
+            });
+        }
+
+        function wrapSuccessMessage(message) {
+            return '<span style="color: #9a9af7;">' + message + '</span>';
+        }
+
+        function updateTaskState(blob, task_id, task_state, callback) {
+            if (!blob) {
+                console.error('No blob found');
+                callback(null, new Error('No blob found'));
+                return;
+            }
+            let tasks = blob.tasks;
+            if (!tasks) {
+                console.error('No tasks found in blob');
+                callback(null, new Error('No tasks found in blob'));
+                return;
+            }
+            // Search for the task and change its state to 'started'
+            let task = tasks.find(t => t.task_id === task_id);
+            if (!task) {
+                console.error(`No task found with task_id=${task_id}`);
+                callback(null, new Error(`No task found with task_id=${task_id}`));
+                return
+            }
+            task.state = task_state;
+            console.log('local updated developer blob=', blob);
+            callback(blob, null);
+        }
+
+        function updateDeveloperAccount(user_id, session_token, blob, cas, callback) {
+            const url = `https://gateway.snapser.com/xbeovm9i/v1/storage/owner/${user_id}/protected/blobs/developer`;
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                contentType: 'application/json',
+                headers: { 'Token': session_token },
+                data: JSON.stringify({
+                    value: JSON.stringify(blob),
+                    create: false,
+                    cas: cas
+                }),
+                success: function(putResponse) {
+                    console.log('PUT success: putResponse=', putResponse);
+                    callback(putResponse, null);
+                },
+                error: function(xhr, status, putError) {
+                    console.error('PUT error:', putError);
+                    callback(null, putError);
+                }
+            });
+        }
+
+        function getDeveloperAccount(user_id, session_token, callback) {                
+            const url = `https://gateway.snapser.com/xbeovm9i/v1/storage/owner/${user_id}/protected/blobs/developer`;
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                headers: { 'Token': session_token },
+                success: function(data) {
+                    console.log('Fetch success:', data);
+                    callback(data, null);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Fetch error:', error);
+                    callback(null, error);
+                }
+            });
+        }
+        
+        function wrapErrorMessage(message) {
+            return '<span style="color: #f79a9a;">' + message + '</span>';
+        }
+
+        function findKeysWithPrefix(prefix) {
+            const keysWithPrefix = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith(prefix)) {
+                    keysWithPrefix.push(key);
+                }
+            }
+            return keysWithPrefix;
+        }
+
+        function startCountdown(duration, display) {
+            var timer = duration, seconds;
+            var countdownInterval = setInterval(function () {
+                seconds = parseInt(timer % 60, 10);
+
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.val(seconds);
+
+                if (--timer < 0) {
+                    clearInterval(countdownInterval);
+                }
+            }, 1000);
+            return countdownInterval;
+        }
+
+        function initiateVerifySetupCountdown(duration) {
+            display = $('#setupCountdownTimer');
+            return startCountdown(duration, display);
+        }
+
+        function initiateVerifyUnitySetupCountdown(duration) {
+            display = $('#unitySetupCountdownTimer');
+            return startCountdown(duration, display);
+        }
+
+        function verifyAppInstall(objectKey, maxRetries, callback) {
+            let retries = 0;
+            const retryInterval = 3000; // Retry every 3 seconds
+
+            function attemptFetch() {
+                getState(objectKey, function(response, status, error) {
+                    if (error == null) {
+                        callback(response, null);
+                    } else {
+                        if (status === 404) {
+                            retries++;
+                            if (retries < maxRetries) {
+                                setTimeout(attemptFetch, retryInterval);
+                            } else {
+                                console.error(`getState error=${error}`);
+                                const errorMessage = "Verify failed.";
+                                callback(null, new Error(errorMessage));
+                            }
+                        } else {
+                            console.error("Error in invoking Lambda:", error);
+                            callback(null, error);
+                        }
+                    }
+                });                
+            }
+
+            attemptFetch();
+        }
+
+        function getState(objectKey, callback) {
+            console.debug(`getState: objectKey=${objectKey}`);
+            $.ajax({
+                url: 'https://acqgvpocrqiy6t6v7wfdhku2ae0bmfka.lambda-url.us-west-2.on.aws/',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    "object_key": objectKey
+                }),
+                success: function(response) {
+                    console.log(`Response received: objectKey=${objectKey} response=${JSON.stringify(response)}`);
+                    callback(response, 200, null);
+                },
+                error: function(xhr, status, error) {
+                    console.log(`Response received: xhr.status=${xhr.status} objectKey=${objectKey} response=${JSON.stringify(error)}`);
+                    callback(null, status, error);
+                }
+            });
+        }
+
+        function parseExpression(expr, context) {
+            // Tokenize the expression, including curly braces
+            const tokens = expr.match(/\w+|AND|OR|\{|\}/g);
+
+            // Recursive function to evaluate the expression
+            function evaluate(tokens) {
+                let stack = [];
+
+                while (tokens.length > 0) {
+                    const token = tokens.shift();
+
+                    if (token === 'AND' || token === 'OR') {
+                        const right = stack.pop();
+                        const left = stack.pop();
+                        const result = (token === 'AND') ? (left && right) : (left || right);
+                        stack.push(result);
+                    } else if (token === '{') {
+                        // Handle curly brace as grouping
+                        let subExpr = [];
+                        let openBraces = 1;
+                        while (openBraces > 0) {
+                            const nextToken = tokens.shift();
+                            if (nextToken === '{') {
+                                openBraces++;
+                            } else if (nextToken === '}') {
+                                openBraces--;
+                            }
+                            if (openBraces > 0) {
+                                subExpr.push(nextToken);
+                            }
+                        }
+                        stack.push(evaluate(subExpr));
+                    } else {
+                        // Assume token is a variable and evaluate its value
+                        stack.push(context[token]);
+                    }
+                }
+
+                return stack.pop();
+            }
+
+            return evaluate(tokens);
+        }
+
+        function getTask(task_id) {
+            task = tasks.filter(task => task.task_id === task_id);
+            return task.length > 0 ? task[0] : null;
+        }
+
+        $(document).ready(function() {
+            var userId = localStorage.getItem(prefix_local_store('user_id'));
+            var session_token = localStorage.getItem(prefix_local_store('session_token'));
+            getDeveloperAccount(userId, session_token, function(data, error) {
+                if (error) {
+                    console.error('Error in fetching developer account:', error);
+                } else {
+                    data = JSON.parse(data.value);
+                    tasks = data.tasks instanceof Array ? data.tasks : [];
+                    console.log('tasks=', JSON.stringify(tasks, null, 2));
+                }
+                main();
+            });
+        })
+
+        
     </script>
 
     <footer>
