@@ -1167,7 +1167,43 @@
                 });
                 var nextStepIndex = stepData["map"]["StartApp"];
                 localStorage.setItem(stepKey, `${nextStepIndex}`);
+            },
+            "FinishWizard": function(stepKey, taskId, rowIndex) {
+                $('.back-btn').prop('disabled', true);
+                $('.next-btn').prop('disabled', true);
+                $('.finish-btn').prop('disabled', false);
+
+                const $timeContainer = $('#timerValue');
+
+                var timerIndex = detailsColumns.findIndex(column => column.title === "Timer");
+                var timerValue = detailsRows[rowIndex][timerIndex];
+
+                // Assuming columnValue is in fractional hours, convert to HH:MM:SS
+                let totalHours = parseFloat(timerValue);
+                let totalSeconds = Math.round(totalHours * 3600); // Convert hours to seconds
+
+                let hours = Math.floor(totalSeconds / 3600);
+                totalSeconds %= 3600;
+                let minutes = Math.floor(totalSeconds / 60);
+                let seconds = totalSeconds % 60;
+
+                // Padding with '0' if necessary
+                hours = String(hours).padStart(2, '0');
+                minutes = String(minutes).padStart(2, '0');
+                seconds = String(seconds).padStart(2, '0');
+
+                // Constructing timer display with separate tags for hours, minutes, and seconds
+                const $hoursSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(hours);
+                const $minutesSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(minutes);
+                const $secondsSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(seconds);
+
+                $timeContainer.append($hoursSpan)
+                            .append(document.createTextNode(':'))
+                            .append($minutesSpan)
+                            .append(document.createTextNode(':'))
+                            .append($secondsSpan);
             }
+
         }
 
         const wizardOnClickFunctions = {
@@ -1515,7 +1551,9 @@
                 <div class="setup-step" id="FinishWizard" style="display: none;">
                     <h3>Start Challenge.</h3>
                     <p id="StartChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
+                    <p id="timerValue"></p>
                 </div>
+
             </div>
 
             <div id="setup-btn" class="setup">
