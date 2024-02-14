@@ -1173,35 +1173,9 @@
                 $('.next-btn').prop('disabled', true);
                 $('.finish-btn').prop('disabled', false);
 
-                const $timeContainer = $('#timerValue');
-
-                var timerIndex = detailsColumns.findIndex(column => column.title === "Timer");
-                var timerValue = detailsRows[rowIndex][timerIndex];
-
-                // Assuming columnValue is in fractional hours, convert to HH:MM:SS
-                let totalHours = parseFloat(timerValue);
-                let totalSeconds = Math.round(totalHours * 3600); // Convert hours to seconds
-
-                let hours = Math.floor(totalSeconds / 3600);
-                totalSeconds %= 3600;
-                let minutes = Math.floor(totalSeconds / 60);
-                let seconds = totalSeconds % 60;
-
-                // Padding with '0' if necessary
-                hours = String(hours).padStart(2, '0');
-                minutes = String(minutes).padStart(2, '0');
-                seconds = String(seconds).padStart(2, '0');
-
-                // Constructing timer display with separate tags for hours, minutes, and seconds
-                const $hoursSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(hours);
-                const $minutesSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(minutes);
-                const $secondsSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(seconds);
-
-                $timeContainer.append($hoursSpan)
-                            .append(document.createTextNode(':'))
-                            .append($minutesSpan)
-                            .append(document.createTextNode(':'))
-                            .append($secondsSpan);
+                const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
+                const $challengeCode = $('#FinishWizardChallengeCodeText');
+                $challengeCode.text(hashKey);
             }
 
         }
@@ -1265,15 +1239,52 @@
             $('#TestTabButton').removeAttr("disabled");
             $('#SubmitTabButton').removeAttr("disabled");
 
-            const hashKey = localStorage.getItem(prefix_local_store(`TASK_ID__${taskId}__hash_key`));
+            // Get the task from the tasks array
+            var task = getTask(taskId);
 
-            $("#StartChallengeCode .tag.code").text(hashKey);
-            $('#StartChallengeCode').show();
+            // Get the timerValue from the task
+            var timerValue = task.timerValue || 0;
+
+            var $challengeTimer = $('#ChallengeTimer');
+
+            var $timeContainer = $('#timerValue');
+
+            // Call the getTimerHHMMSS function to get back hours, minutes, seconds
+            var [hours, minutes, seconds] = getTimerHHMMSS(timerValue);
+
+            // Constructing timer display with separate tags for hours, minutes, and seconds
+            const $hoursSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(hours);
+            const $minutesSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(minutes);
+            const $secondsSpan = $('<span>').addClass('tag timer').css({'background-color': 'green'}).text(seconds);
+
+            $timeContainer.append($hoursSpan)
+                        .append(document.createTextNode(':'))
+                        .append($minutesSpan)
+                        .append(document.createTextNode(':'))
+                        .append($secondsSpan);
+
+            $challengeTimer.show();
 
             return true;
         }                        
 
-        
+        function getTimerHHMMSS(timerValue) {
+            // Assuming columnValue is in fractional hours, convert to HH:MM:SS
+            let totalHours = parseFloat(timerValue);
+            let totalSeconds = Math.round(totalHours * 3600); // Convert hours to seconds
+
+            let hours = Math.floor(totalSeconds / 3600);
+            totalSeconds %= 3600;
+            let minutes = Math.floor(totalSeconds / 60);
+            let seconds = totalSeconds % 60;
+
+            // Padding with '0' if necessary
+            hours = String(hours).padStart(2, '0');
+            minutes = String(minutes).padStart(2, '0');
+            seconds = String(seconds).padStart(2, '0');
+
+            return [hours, minutes, seconds];
+        }
 
         // Function to validate email using simple regex
         function isValidEmail(email) {
@@ -1550,7 +1561,12 @@
 
                 <div class="setup-step" id="FinishWizard" style="display: none;">
                     <h3>Start Challenge.</h3>
-                    <p id="StartChallengeCode" style="display: none">Challenge Code: <span class="tag code" style="font-size: 18px;"></span></p>
+                    <p>Your Challenge Code <span id="FinishWizardChallengeCodeText" class="tag code" style="font-size: 18px;"></span>.</p>
+                    <p>.</p>
+                </div>
+
+                <div class="setup-step" id="ChallengeTimer" style="display: none;">
+                    <h3>Challenge Timer.</h3>
                     <p id="timerValue"></p>
                 </div>
 
