@@ -845,7 +845,9 @@
 
             // When the user clicks the button, open the modal 
             loginButton.onclick = function() {
-                showLoginPanel(loginButton);                
+                var source = getOAuthSource();
+                var authUrl = `https://ss8psyuikh.execute-api.us-west-2.amazonaws.com/prod/github-oauth?source=${source}`;
+                window.location.href = authUrl;
             }
 
             // When the user clicks on <span> (x), close the modal
@@ -2474,27 +2476,38 @@
             return task.length > 0 ? task[0] : null;
         }
 
+        function getOAuthSource() {
+            var currentDomain = window.location.hostname;
+            var source = currentDomain.includes('localhost') ? 'local' : 'prod';
+            return source;
+        }
+
         $(document).ready(function() {
-            var userId = localStorage.getItem(prefix_local_store('user_id'));
-            var session_token = localStorage.getItem(prefix_local_store('session_token'));
-            console.log(`userId=${userId} session_token=${session_token}`);
-            if (userId == null || session_token == null) {
-                main();
-            } else {
-                getDeveloperAccount(userId, session_token, function(data, error) {
-                    if (error) {
-                        console.error('Error in fetching developer account:', error);
-                    } if (data == null) {
-                        console.error('No data fetching developer account:', error);
-                    } else {
-                        console.log('Developer account:', data);
-                        data = JSON.parse(data.value);
-                        tasks = data.tasks instanceof Array ? data.tasks : [];
-                        console.log('tasks=', JSON.stringify(tasks, null, 2));
+            // Check if the URL contains the 'code' parameter returned by GitHub
+            var urlParams = new URLSearchParams(window.location.search);
+            var code = urlParams.get('code');
+            var source = getOAuthSource();
+
+            if (code) {
+                // If the code parameter is present, make an AJAX call to your API Gateway endpoint
+                $.ajax({
+                    url: 'https://ss8psyuikh.execute-api.us-west-2.amazonaws.com/prod/github-oauth',
+                    type: 'GET',
+                    data: { code: code, source: source},
+                    success: function(response) {
+                        // Handle the response from your Lambda function
+                        console.log('GitHub user info:', response);
+                        // You can now use the GitHub user information in your application
+                        main();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
                     }
-                    main();
                 });
-        }});
+            } else {
+                main();
+            }
+        });
 
         
     </script>
