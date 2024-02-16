@@ -895,9 +895,6 @@
                 $('#register-btn').show();
                 $('#logout-btn').hide();
             });
-
-            updateSignInButtons();
-
         };
 
         const wizardShouldShowFunctions = {
@@ -1342,19 +1339,18 @@
             return regex.test(email);
         }            
 
-        function updateSignInButtons() {
-            validateSessionToken(function(err, response) {
-                if (err) {
-                    console.error('Error:', err);
-                    $('#register-btn').show();
-                    $('#login-btn').show();
-                    $('#logout-btn').hide();
-                } else {
-                    $('#register-btn').hide();
-                    $('#login-btn').hide();
-                    $('#logout-btn').show();
-                }
-            });
+        function updateSignIn(response, err) {
+            if (err || !response) {
+                localStorage.removeItem(prefix_local_store('github_user_response'));
+                $('#register-btn').show();
+                $('#login-btn').show();
+                $('#logout-btn').hide();
+            } else {
+                localStorage.setItem(prefix_local_store('github_user_response'), JSON.stringify(response));
+                $('#register-btn').hide();
+                $('#login-btn').hide();
+                $('#logout-btn').show();
+            }
         }
 
         // Function to enable/disable verification button based on email validity
@@ -2167,40 +2163,32 @@
         }
 
         // Function to refresh the session token
-        function validateSessionToken(callback) {
-            var userId = localStorage.getItem(prefix_local_store('user_id'));
-            var sessionToken = localStorage.getItem(prefix_local_store('session_token'));
-
-            if (!sessionToken)
-            {
-                $('#login-btn').show();
-                $('#logout-btn').hide();
-                return;
-            }
-
-            if (userId && sessionToken) {
-                $.ajax({
-                    url: 'https://gateway.snapser.com/xbeovm9i/v1/auth/validate',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    headers: { 'Token': sessionToken },
-                    data: JSON.stringify({ "session_token": sessionToken }),
-                    success: function(response) {
-                        console.log(response);
-                        var user = response.user;
-                        $('#login-btn').hide();
-                        $('#logout-btn').show();
-                        callback(null, response);
-                    },
-                    error: function(xhr, status, error) {
-                        // Handle error (optional)
-                        console.error(error);
-                        localStorage.removeItem(prefix_local_store('session_token'));
-                        $('#login-btn').show();
-                        $('#logout-btn').hide();
-                        callback(error, null);
-                    }
-                });
+        function validateSessionToken(code, callback) {
+            var githubUserResponse = localStorage.getItem(prefix_local_store('github_user_response'));            
+            if (githubUserResponse) {
+                callback(JSON.parse(githubUserResponse), null);
+            } else {
+                var source = getOAuthSource();
+                if (code) {
+                    // If the code parameter is present, make an AJAX call to your API Gateway endpoint
+                    $.ajax({
+                        url: 'https://ss8psyuikh.execute-api.us-west-2.amazonaws.com/prod/github-oauth',
+                        type: 'GET',
+                        data: { code: code, source: source},
+                        success: function(response) {
+                            // Handle the response from your Lambda function
+                            console.log('GitHub user info:', response);
+                            // You can now use the GitHub user information in your application
+                            callback(response, null);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error:', error);
+                            callback(null, error);
+                        }
+                    });
+                } else {
+                    callback(null, null);
+                }
             }
         }
 
@@ -2486,27 +2474,12 @@
             // Check if the URL contains the 'code' parameter returned by GitHub
             var urlParams = new URLSearchParams(window.location.search);
             var code = urlParams.get('code');
-            var source = getOAuthSource();
-
-            if (code) {
-                // If the code parameter is present, make an AJAX call to your API Gateway endpoint
-                $.ajax({
-                    url: 'https://ss8psyuikh.execute-api.us-west-2.amazonaws.com/prod/github-oauth',
-                    type: 'GET',
-                    data: { code: code, source: source},
-                    success: function(response) {
-                        // Handle the response from your Lambda function
-                        console.log('GitHub user info:', response);
-                        // You can now use the GitHub user information in your application
-                        main();
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error:', error);
-                    }
-                });
-            } else {
+            validateSessionToken(code, function(response, error) {
+                console.error('Error:', error);
+                console.log('Response:', response);
+                updateSignIn(response, error);
                 main();
-            }
+            });
         });
 
         
