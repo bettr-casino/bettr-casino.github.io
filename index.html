@@ -723,9 +723,11 @@
 
     <div class="header-buttons section1">
         <h1>Bettr Casino: Open Source Game Development Platform</h1>
-        <button id="register-btn" class="header-btn" style="display: none;">Register</button>
-        <button id="login-btn" class="header-btn" style="display: none;">Login</button>
-        <button id="logout-btn" class="header-btn" style="display: none;">Logout</button>
+        <div style="display: none;">
+            <button id="register-btn" class="header-btn" style="display: none;">Register</button>
+            <button id="login-btn" class="header-btn" style="display: none;">Login</button>
+            <button id="logout-btn" class="header-btn" style="display: none;">Logout</button>    
+        </div>
     </div>
 
     <div class="content section1">
@@ -2475,10 +2477,21 @@
             var urlParams = new URLSearchParams(window.location.search);
             var code = urlParams.get('code');
             validateSessionToken(code, function(response, error) {
-                console.error('Error:', error);
-                console.log('Response:', response);
+                // Clear the code from the query params
+                if (error) {
+                    console.error('Error:', error);
+                }
+                if (response) {
+                    console.log('Response:', response);
+                }
                 updateSignIn(response, error);
                 main();
+                urlParams.delete('code');
+                if (urlParams.size > 0) {
+                    window.history.pushState({}, '', `${window.location.pathname}?${urlParams}`);
+                } else {
+                    window.history.pushState({}, '', `${window.location.pathname}`);
+                }
             });
         });
 
